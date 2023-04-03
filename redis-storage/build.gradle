@@ -20,7 +20,30 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    implementation {
+        attributes {
+            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements, 'instrumented-core-jar'))
+        }
+    }
+}
+
+abstract class InstrumentedJarsRule implements AttributeCompatibilityRule<LibraryElements> {
+
+    @Override
+    void execute(CompatibilityCheckDetails<LibraryElements> details) {
+        if (details.consumerValue.name == 'instrumented-core-jar' && details.producerValue.name == 'jar') {
+            details.compatible()
+        }
+    }
+}
+
 dependencies {
+    attributesSchema {
+        attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE) {
+            compatibilityRules.add(InstrumentedJarsRule)
+        }
+    }
     implementation project(path: ':core')
     // Use JUnit Jupiter for testing.
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
