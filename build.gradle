@@ -12,9 +12,22 @@ allprojects {
     group = 'it.pagopa'
 }
 
+// Settings for allowing reproducible build
 tasks.withType(AbstractArchiveTask).configureEach {
     preserveFileTimestamps = false
     reproducibleFileOrder = true
+}
+
+// Generate MD5 checksum on eng-lollipop-consumer-java-sdk jar file
+jar.doLast { task ->
+    ant.checksum file: task.archivePath
+}
+
+// Print all available plugins
+task showPlugins {
+    project.plugins.each {
+        println it.getClass().name
+    }
 }
 
 subprojects {
@@ -25,6 +38,12 @@ subprojects {
     java {
         withSourcesJar()
         withJavadocJar()
+    }
+
+    // Settings for allowing reproducible build
+    tasks.withType(AbstractArchiveTask).configureEach {
+        preserveFileTimestamps = false
+        reproducibleFileOrder = true
     }
 
     publishing {
