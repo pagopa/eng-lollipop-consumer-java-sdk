@@ -1,7 +1,8 @@
 plugins {
-    id 'java'
-    id 'org.graalvm.buildtools.native' version '0.9.20'
+	id 'java'
+	id 'org.graalvm.buildtools.native' version '0.9.20'
 	id("com.diffplug.spotless") version "6.17.0"
+	id("nebula.lint") version "18.0.3"
 }
 
 repositories {
@@ -12,6 +13,9 @@ repositories {
 allprojects {
 	version = "1.0.0-SNAPSHOT"
 	group = 'it.pagopa'
+	apply plugin: 'com.diffplug.spotless'
+	apply plugin: 'nebula.lint'
+	gradleLint.rules = ['all-dependency']
 }
 
 tasks.withType(AbstractArchiveTask).configureEach {
@@ -54,7 +58,8 @@ subprojects {
 
 	apply plugin: 'java'
 	apply plugin: 'maven-publish'
-    apply plugin: 'org.graalvm.buildtools.native'
+	apply plugin: 'org.graalvm.buildtools.native'
+
 
 	java {
 		withSourcesJar()
@@ -75,12 +80,9 @@ subprojects {
 }
 
 graalvmNative {
-    binaries {
-        main {
-            sharedLibrary=true
-        }
-    }
+	binaries {
+		main {
+			sharedLibrary=true
+		}
+	}
 }
-
-
-
