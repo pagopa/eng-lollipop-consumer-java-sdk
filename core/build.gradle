@@ -21,6 +21,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'javax.inject:javax.inject:1'
     implementation 'com.typesafe:config:1.4.2'
     // Use JUnit Jupiter for testing.
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'

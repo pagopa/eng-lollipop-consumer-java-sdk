@@ -7,10 +7,19 @@ import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
 import it.pagopa.tech.lollipop.consumer.service.AssertionVerifierService;
 
-public class AssertionVerifierServiceImplStub implements AssertionVerifierService {
+import javax.inject.Inject;
+
+public class AssertionVerifierServiceImpl implements AssertionVerifierService {
 
     private IdpCertProvider idpCertProvider;
-    private AssertionService assertion;
+    private AssertionService assertionService;
+
+    @Inject
+    public AssertionVerifierServiceImpl(IdpCertProvider idpCertProvider, AssertionService assertionService) {
+        this.idpCertProvider = idpCertProvider;
+        this.assertionService = assertionService;
+    }
+
     @Override
     public boolean validateLollipop(LollipopConsumerRequest request) {
         return false;
