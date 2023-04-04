@@ -5,7 +5,7 @@ import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import java.io.UnsupportedEncodingException;
 
 public interface HttpMessageVerifierService {
-    boolean verifyHttpMessage(LollipopConsumerRequest request) throws LollipopDigestException;
+    boolean verifyHttpMessage(LollipopConsumerRequest request) throws LollipopDigestException, UnsupportedEncodingException;
 
     boolean verifyHttpMessage(LollipopConsumerRequest request) throws LollipopDigestException, UnsupportedEncodingException;
 }
