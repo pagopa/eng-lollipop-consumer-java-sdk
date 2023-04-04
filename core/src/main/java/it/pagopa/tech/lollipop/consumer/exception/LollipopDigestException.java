@@ -48,6 +48,8 @@ public class LollipopDigestException extends Exception {
      * Error codes to classify Digest Exceptions
      */
     public enum ErrorCode {
+
+        MISSING_DIGEST,
         /**
          * No supported hash algorithms detected when verifying or processing <em>Want-...-Digest</em> headers.
          */
