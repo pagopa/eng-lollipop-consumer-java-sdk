@@ -13,7 +13,7 @@ plugins {
     id("io.freefair.lombok") version "8.0.0-rc4"
 }
 
-group 'it.pagopa.commons'
+group 'it.pagopa.tech'
 
 repositories {
     mavenLocal()
