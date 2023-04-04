@@ -1,6 +1,5 @@
-package it.pagopa.tech.lollipop.consumer.http.verifier.visma;
+package it.pagopa.tech.lollipop.consumer.http_verifier.visma;
 
-import it.pagopa.tech.lollipop.consumer.http_verifier.HttpMessageVerifierFactory;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
