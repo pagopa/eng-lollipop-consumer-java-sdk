@@ -1,14 +1,15 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.service.impl;
 
 import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopDigestException;
+import it.pagopa.tech.lollipop.consumer.exception.LollipopVerifierException;
 import it.pagopa.tech.lollipop.consumer.http_verifier.HttpMessageVerifier;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.service.HttpMessageVerifierService;
-
-import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
+import javax.inject.Inject;
 
 public class HttpMessageVerifierServiceImpl implements HttpMessageVerifierService {
 
@@ -16,62 +17,78 @@ public class HttpMessageVerifierServiceImpl implements HttpMessageVerifierServic
     private LollipopConsumerRequestConfig lollipopConsumerRequestConfig;
 
     @Inject
-    public HttpMessageVerifierServiceImpl(HttpMessageVerifier httpMessageVerifier,
-                                          LollipopConsumerRequestConfig lollipopConsumerRequestConfig) {
+    public HttpMessageVerifierServiceImpl(
+            HttpMessageVerifier httpMessageVerifier,
+            LollipopConsumerRequestConfig lollipopConsumerRequestConfig) {
         this.httpMessageVerifier = httpMessageVerifier;
         this.lollipopConsumerRequestConfig = lollipopConsumerRequestConfig;
     }
 
     @Override
     public boolean verifyHttpMessage(LollipopConsumerRequest lollipopConsumerRequest)
-            throws LollipopDigestException, UnsupportedEncodingException {
+            throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException {
 
-        Map<String,String> headerParams = lollipopConsumerRequest.getHeaderParams();
+        Map<String, String> headerParams = lollipopConsumerRequest.getHeaderParams();
 
-        String signatureInput = headerParams.get(lollipopConsumerRequestConfig.getSignatureInputHeader());
+        String signature =
+                headerParams.get(lollipopConsumerRequestConfig.getSignatureHeader());
+
+        if (signature == null) {
+            throw new LollipopVerifierException(LollipopVerifierException.ErrorCode.MISSING_SIGNATURE,
+                    "Missing Signature Header");
+        }
+
+        String signatureInput =
+                headerParams.get(lollipopConsumerRequestConfig.getSignatureInputHeader());
 
         if (signatureInput == null) {
-
+            throw new LollipopVerifierException(LollipopVerifierException.ErrorCode.MISSING_SIGNATURE_INPUT,
+                    "Missing Signature Input Header");
         }
 
-        String contentDigest = null;
+        if (signatureInput.contains(lollipopConsumerRequestConfig.getContentDigestHeader())) {
 
-        String requestBody = null;
+            String contentDigest =
+                    headerParams.get(lollipopConsumerRequestConfig.getContentDigestHeader());
 
-        String contentEncoding = null;
+            String requestBody = lollipopConsumerRequest.getRequestBody();
 
-        return verifyContentDigest(contentDigest, requestBody, contentEncoding) && verifyHttpSignature(lollipopConsumerRequest);
+            String contentEncoding =
+                    headerParams.get(lollipopConsumerRequestConfig.getContentEncodingHeader());
+
+            verifyContentDigest(contentDigest, requestBody, contentEncoding);
+        }
+
+        return verifyHttpSignature(lollipopConsumerRequest);
+
     }
 
-    protected boolean verifyContentDigest(String contentDigest, String requestBody, String contentEncoding)
+    protected boolean verifyContentDigest(
+            String contentDigest, String requestBody, String contentEncoding)
             throws LollipopDigestException, UnsupportedEncodingException {
 
-
-
         if (contentDigest == null) {
-            throw new LollipopDigestException
-                    (LollipopDigestException.ErrorCode.MISSING_DIGEST,
-                            "Missing required Content-Digest for validation");
+            throw new LollipopDigestException(
+                    LollipopDigestException.ErrorCode.MISSING_DIGEST,
+                    "Missing required Content-Digest for validation");
         }
 
+        if (requestBody == null) {
+            throw new LollipopDigestException(LollipopDigestException.ErrorCode.MISSING_PAYLOAD,
+                    "Missing required payload for digest validation");
+        }
 
-        //Attempt to execute digest validation
-        if (!httpMessageVerifier.verifyDigest(
-                contentDigest,
-                requestBody,
-                contentEncoding)) {
+        // Attempt to execute digest validation
+        if (!httpMessageVerifier.verifyDigest(contentDigest, requestBody, contentEncoding)) {
             throw new LollipopDigestException(
-                    LollipopDigestException.ErrorCode.INCORRECT_DIGEST,"Invalid Digest");
+                    LollipopDigestException.ErrorCode.INCORRECT_DIGEST, "Invalid Digest");
         }
 
         return true;
     }
 
-    /**
-    * TODO: stub
-     */
+    /** TODO: stub */
     private boolean verifyHttpSignature(LollipopConsumerRequest lollipopConsumerRequest) {
         return true;
     }
-
 }

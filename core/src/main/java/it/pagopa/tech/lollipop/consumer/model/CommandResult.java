@@ -1,3 +1,4 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.model;
 
 import lombok.AllArgsConstructor;

@@ -1,13 +1,11 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.http_verifier.visma;
 
 import it.pagopa.tech.lollipop.consumer.http_verifier.HttpMessageVerifier;
 import it.pagopa.tech.lollipop.consumer.http_verifier.HttpMessageVerifierFactory;
-
 import java.nio.charset.Charset;
 
-/**
- * Implements {@link HttpMessageVerifierFactory} with Visma-AutoPay http-signature library
- */
+/** Implements {@link HttpMessageVerifierFactory} with Visma-AutoPay http-signature library */
 public class VismaHttpMessageVerifierFactory implements HttpMessageVerifierFactory {
 
     private final String defaultEncoding;
@@ -21,11 +19,12 @@ public class VismaHttpMessageVerifierFactory implements HttpMessageVerifierFacto
 
     /**
      * {@inheritDoc}
-     * @return instance of {@link VismaHttpMessageVerifierFactory}, passing the configured default encoding
-     **/
+     *
+     * @return instance of {@link VismaHttpMessageVerifierFactory}, passing the configured default
+     *     encoding
+     */
     @Override
     public HttpMessageVerifier create() {
         return new VismaHttpMessageVerifier(defaultEncoding);
     }
-
 }

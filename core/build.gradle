@@ -8,29 +8,29 @@
 
 
 plugins {
-    // Apply the java-library plugin for API and implementation separation.
-    id 'java-library'
-    id("io.freefair.lombok") version "8.0.0-rc4"
+	// Apply the java-library plugin for API and implementation separation.
+	id 'java-library'
+	id("io.freefair.lombok") version "8.0.0-rc4"
 }
 
 group 'it.pagopa.tech'
 
 repositories {
-    mavenLocal()
-    mavenCentral()
+	mavenLocal()
+	mavenCentral()
 }
 
 dependencies {
-    implementation 'javax.inject:javax.inject:1'
-    implementation 'com.typesafe:config:1.4.2'
-    implementation 'javax.inject:javax.inject:1'
-    // Use JUnit Jupiter for testing.
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
-    testImplementation 'org.mockito:mockito-core:5.2.0'
-    testImplementation 'org.mockito:mockito-junit-jupiter:5.2.0'
+	implementation 'javax.inject:javax.inject:1'
+	implementation 'com.typesafe:config:1.4.2'
+	implementation 'javax.inject:javax.inject:1'
+	// Use JUnit Jupiter for testing.
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+	testImplementation 'org.mockito:mockito-core:5.2.0'
+	testImplementation 'org.mockito:mockito-junit-jupiter:5.2.0'
 }
 
 tasks.named('test') {
-    // Use JUnit Platform for unit tests.
-    useJUnitPlatform()
+	// Use JUnit Platform for unit tests.
+	useJUnitPlatform()
 }

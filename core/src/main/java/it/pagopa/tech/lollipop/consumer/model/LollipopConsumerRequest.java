@@ -1,11 +1,9 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.model;
 
+import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.Map;
 
 @Data
 @Builder

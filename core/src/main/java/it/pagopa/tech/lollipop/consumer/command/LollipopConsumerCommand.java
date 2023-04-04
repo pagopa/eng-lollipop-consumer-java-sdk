@@ -1,3 +1,4 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.command;
 
 import it.pagopa.tech.lollipop.consumer.model.CommandResult;
