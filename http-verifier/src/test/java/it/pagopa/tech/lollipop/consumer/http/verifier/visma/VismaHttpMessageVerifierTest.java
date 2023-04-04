@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package it.pagopa.lollipop.consumer.http.verifier.visma;
+package it.pagopa.tech.lollipop.consumer.http.verifier.visma;
 
 import it.pagopa.tech.lollipop.consumer.exception.LollipopDigestException;
 import net.visma.autopay.http.digest.DigestException;
@@ -30,12 +30,12 @@ import java.io.UnsupportedEncodingException;
 
 import static org.assertj.core.api.Assertions.*;
 
-class VismaHttpMessageVerifierTest {
+public class VismaHttpMessageVerifierTest {
 
-    public VismaHttpMessageVerifier vismaDigestVerifier = new VismaHttpMessageVerifier();
+    public VismaHttpMessageVerifier vismaDigestVerifier = new VismaHttpMessageVerifier("UTF-8");
 
     @Test
-    void correctDigestIsVerified() {
+    public void correctDigestIsVerified() {
         // setup
         var content = new String(new byte[]{1, 2, 4});
         var header = "md5=:V9tg6T+1JldSH4+Zy8c5jw==:,sha-256=:1LKaloxAFzY43tjRdMhpV6+iEb5HnO4CDbpd/hJ9kco=:";
@@ -46,7 +46,7 @@ class VismaHttpMessageVerifierTest {
     }
 
     @Test
-    void invalidDigestIsDetected() {
+    public void invalidDigestIsDetected() {
         // setup
         var content = new String(new byte[]{1, 2, 4});
         var header = "sha-256=:A5BYxvLAy0ksUzsKTRTvd8wPeKvMztUofYShogEc+4E=:";
@@ -61,7 +61,7 @@ class VismaHttpMessageVerifierTest {
     }
 
     @Test
-    void malformedDigestIsDetected() {
+    public void malformedDigestIsDetected() {
         // setup
         var content = new String(new byte[]{1, 2, 4});
         var header = "sha-256=1LKaloxAFzY43tjRdMhpV6+iEb5HnO4CDbpd/hJ9kco=";
@@ -76,7 +76,7 @@ class VismaHttpMessageVerifierTest {
     }
 
     @Test
-    void unsupportedAlgorithmsAreDetected() {
+    public void unsupportedAlgorithmsAreDetected() {
         // setup
         var content = new String(new byte[]{1, 2, 4});
         var header = "md5=:V9tg6T+1JldSH4+Zy8c5jw==: ,sha=:q3kRUT3rxwFa1QQpqBWXcUWLJM4=:";
@@ -91,7 +91,7 @@ class VismaHttpMessageVerifierTest {
     }
 
     @Test
-    void emptyHeaderIsDetected() {
+    public void emptyHeaderIsDetected() {
         // setup
         var content = new String(new byte[]{1, 2, 4});
         var header = "";
@@ -106,7 +106,7 @@ class VismaHttpMessageVerifierTest {
     }
 
     @Test
-    void invalidDictionaryValuesAreDetected() {
+    public void invalidDictionaryValuesAreDetected() {
         // setup
         var content = new String(new byte[]{1, 2, 4});
         var header = "sha-256=ok";
@@ -121,7 +121,7 @@ class VismaHttpMessageVerifierTest {
     }
 
     @Test
-    void invalidContentEncoding() {
+    public void invalidContentEncoding() {
         // setup
         var content = new String(new byte[]{1, 2, 4});
         var header = "sha-256=ok";
