@@ -22,7 +22,7 @@
 
 package it.pagopa.lollipop.consumer.http.verifier.visma;
 
-import it.pagopa.common.lollipop.consumer.exception.LollipopDigestException;
+import it.pagopa.tech.lollipop.consumer.exception.LollipopDigestException;
 import net.visma.autopay.http.digest.DigestException;
 import org.junit.jupiter.api.Test;
 

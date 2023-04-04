@@ -1,11 +1,10 @@
 package it.pagopa.lollipop.consumer.http.verifier.visma;
 
-import it.pagopa.common.lollipop.consumer.exception.LollipopDigestException;
-import it.pagopa.common.lollipop.consumer.http_verifier.HttpMessageVerifier;
+import it.pagopa.tech.lollipop.consumer.exception.LollipopDigestException;
+import it.pagopa.tech.lollipop.consumer.http_verifier.HttpMessageVerifier;
 import net.visma.autopay.http.digest.DigestException;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
