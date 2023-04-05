@@ -39,15 +39,16 @@ abstract class InstrumentedJarsRule implements AttributeCompatibilityRule<Librar
 }
 
 dependencies {
-attributesSchema {
-	attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE) {
-		compatibilityRules.add(InstrumentedJarsRule)
+	attributesSchema {
+		attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE) {
+			compatibilityRules.add(InstrumentedJarsRule)
+		}
 	}
-}
 	implementation 'net.visma.autopay:http-signatures:1.1.0'
 	// Use JUnit Jupiter for testing.
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
 	testImplementation 'org.assertj:assertj-core:3.24.2'
+	implementation project(':core')
 }
 
 tasks.named('test') {
