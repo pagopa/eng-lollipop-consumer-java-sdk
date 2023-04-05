@@ -30,10 +30,14 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2'
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
-    implementation 'javax.inject:javax.inject:1' //TODO
+    implementation 'org.mock-server:mockserver-client-java:5.15.0'
+    implementation 'javax.inject:javax.inject:1'
+    implementation 'junit:junit:4.13.1'
     // Use JUnit Jupiter for testing.
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
     testImplementation 'org.assertj:assertj-core:3.24.2'
+    //Mockserver for testing api
+    testImplementation 'org.mock-server:mockserver-netty:5.15.0'
 }
 
 tasks.named('test') {

@@ -64,8 +64,6 @@ public class AssertionSimpleClient implements AssertionClient {
                 return response;
         }
 
-        //TODO handle oidc assertion
-
         return null;
     }
 }
