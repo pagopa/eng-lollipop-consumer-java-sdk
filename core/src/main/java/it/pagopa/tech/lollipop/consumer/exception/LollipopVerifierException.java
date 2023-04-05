@@ -4,10 +4,9 @@ package it.pagopa.tech.lollipop.consumer.exception;
 import java.util.Objects;
 
 /**
- * Thrown in case of problems when computing or verifying digest, or when verified digest is
- * incorrect
+ * Thrown in case of problems when computing or verifying lollipop request through the http-signature flow
  */
-public class LollipopDigestException extends Exception {
+public class LollipopVerifierException extends Exception {
 
     /** Error code of this exception */
     private final ErrorCode errorCode;
@@ -18,7 +17,7 @@ public class LollipopDigestException extends Exception {
      * @param errorCode Error code
      * @param message Detail message
      */
-    public LollipopDigestException(ErrorCode errorCode, String message) {
+    public LollipopVerifierException(ErrorCode errorCode, String message) {
         super(message);
         this.errorCode = Objects.requireNonNull(errorCode);
     }
@@ -30,7 +29,7 @@ public class LollipopDigestException extends Exception {
      * @param message Detail message
      * @param cause Exception causing the constructed one
      */
-    public LollipopDigestException(ErrorCode errorCode, String message, Throwable cause) {
+    public LollipopVerifierException(ErrorCode errorCode, String message, Throwable cause) {
         super(message, cause);
         this.errorCode = Objects.requireNonNull(errorCode);
     }
@@ -44,23 +43,11 @@ public class LollipopDigestException extends Exception {
         return errorCode;
     }
 
-    /** Error codes to classify Digest Exceptions */
+    /** Error codes to classify Lollipop Request Exceptions */
     public enum ErrorCode {
-        MISSING_DIGEST,
-        MISSING_PAYLOAD,
-        /**
-         * No supported hash algorithms detected when verifying or processing
-         * <em>Want-...-Digest</em> headers.
-         */
-        UNSUPPORTED_ALGORITHM,
 
-        /** When verifying, provided digest is different from the computed one */
-        INCORRECT_DIGEST,
+        MISSING_SIGNATURE,
 
-        /**
-         * Parsed <em>...-Digest</em> or <em>Want-...-Digest</em> header is not syntactically
-         * correct
-         */
-        INVALID_HEADER,
+        MISSING_SIGNATURE_INPUT
     }
 }

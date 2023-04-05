@@ -1,3 +1,4 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.model;
 
 import lombok.Getter;
@@ -10,5 +11,4 @@ public class IdpCertData {
     private String entityId;
     private String tag;
     private String certData;
-
 }

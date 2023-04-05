@@ -1,12 +1,12 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.model;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.Map;
+import lombok.Builder;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
+@Builder
 public class LollipopConsumerRequest {
     private String requestBody;
     private Map<String, String> requestParams;
