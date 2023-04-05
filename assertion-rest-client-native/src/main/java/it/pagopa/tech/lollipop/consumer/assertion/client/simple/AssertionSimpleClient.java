@@ -1,3 +1,4 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.assertion.client.simple;
 
 import it.pagopa.tech.lollipop.consumer.assertion.client.AssertionClient;
@@ -9,12 +10,9 @@ import it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal.model.L
 import it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal.model.SamlUserInfo;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopAssertionNotFoundException;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
-
 import javax.inject.Inject;
 
-/**
- Implementation of the @AssertionClient using generated openAPI REST Client
- */
+/** Implementation of the @AssertionClient using generated openAPI REST Client */
 public class AssertionSimpleClient implements AssertionClient {
 
     ApiClient apiClient;
@@ -26,12 +24,9 @@ public class AssertionSimpleClient implements AssertionClient {
         this.defaultApi = new DefaultApi(client);
     }
 
-
     /**
-     * Retrieve assertion from IdentityProvider using REST Client
-     * The retrieved assertion can be of two types:
-     * SAML or OIDC
-     * Only SAML assertions are supported at this moment
+     * Retrieve assertion from IdentityProvider using REST Client The retrieved assertion can be of
+     * two types: SAML or OIDC Only SAML assertions are supported at this moment
      *
      * @param jwt Auth token for header param x-pagopa-lollipop-auth
      * @param assertionRef Assertion unique identification
@@ -39,29 +34,30 @@ public class AssertionSimpleClient implements AssertionClient {
      * @throws LollipopAssertionNotFoundException if some error occurred in the request
      */
     @Override
-    public SamlAssertion getAssertion(String jwt, String assertionRef) throws LollipopAssertionNotFoundException {
+    public SamlAssertion getAssertion(String jwt, String assertionRef)
+            throws LollipopAssertionNotFoundException {
         AssertionRef ref = new AssertionRef(assertionRef);
 
-        if(jwt.isEmpty() || assertionRef.isEmpty()){
+        if (jwt.isEmpty() || assertionRef.isEmpty()) {
             throw new IllegalArgumentException("Jwt or Assertion Ref missing");
         }
 
         LCUserInfo responseAssertion;
 
-        try{
+        try {
             responseAssertion = this.defaultApi.getAssertion(ref, jwt);
-        }
-        catch(ApiException e){
-            throw new LollipopAssertionNotFoundException("Error retrieving assertion: "+e.getMessage(), e);
+        } catch (ApiException e) {
+            throw new LollipopAssertionNotFoundException(
+                    "Error retrieving assertion: " + e.getMessage(), e);
         }
 
-        if(responseAssertion.getActualInstance().getClass().equals(SamlUserInfo.class)){
-                SamlAssertion response = new SamlAssertion();
-                SamlUserInfo data = (SamlUserInfo)responseAssertion.getActualInstance();
-                String assertionData = data.getResponseXml();
-                response.setAssertionRef(assertionRef);
-               response.setAssertionData(assertionData);
-                return response;
+        if (responseAssertion.getActualInstance().getClass().equals(SamlUserInfo.class)) {
+            SamlAssertion response = new SamlAssertion();
+            SamlUserInfo data = (SamlUserInfo) responseAssertion.getActualInstance();
+            String assertionData = data.getResponseXml();
+            response.setAssertionRef(assertionRef);
+            response.setAssertionData(assertionData);
+            return response;
         }
 
         return null;

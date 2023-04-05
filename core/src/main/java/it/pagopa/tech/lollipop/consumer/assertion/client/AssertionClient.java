@@ -6,5 +6,6 @@ import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
 
 public interface AssertionClient {
 
-    SamlAssertion getAssertion(String jwt, String assertionRef) throws LollipopAssertionNotFoundException;
+    SamlAssertion getAssertion(String jwt, String assertionRef)
+            throws LollipopAssertionNotFoundException;
 }
