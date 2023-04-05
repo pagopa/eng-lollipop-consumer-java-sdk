@@ -27,7 +27,9 @@ public class HttpMessageVerifierServiceImpl implements HttpMessageVerifierServic
         this.lollipopConsumerRequestConfig = lollipopConsumerRequestConfig;
     }
 
-    /** @see HttpMessageVerifierService#verifyHttpMessage(LollipopConsumerRequest) */
+    /**
+     * @see HttpMessageVerifierService#verifyHttpMessage(LollipopConsumerRequest)
+     */
     @Override
     public boolean verifyHttpMessage(LollipopConsumerRequest lollipopConsumerRequest)
             throws LollipopDigestException, UnsupportedEncodingException,
