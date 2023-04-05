@@ -9,6 +9,5 @@ import lombok.Setter;
 public class SamlAssertion {
 
     private String assertionRef;
-    private String inResponseTo;
-    private Long notBefore;
+    private String assertionData;
 }
