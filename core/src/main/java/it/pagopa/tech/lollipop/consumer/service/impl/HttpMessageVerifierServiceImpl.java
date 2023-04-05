@@ -8,9 +8,15 @@ import it.pagopa.tech.lollipop.consumer.http_verifier.HttpMessageVerifier;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.service.HttpMessageVerifierService;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+import java.util.Locale;
 import java.util.Map;
 import javax.inject.Inject;
 
+
+/**
+ * Standard implementation of {@link HttpMessageVerifierService}
+ */
 public class HttpMessageVerifierServiceImpl implements HttpMessageVerifierService {
 
     private HttpMessageVerifier httpMessageVerifier;
@@ -24,6 +30,14 @@ public class HttpMessageVerifierServiceImpl implements HttpMessageVerifierServic
         this.lollipopConsumerRequestConfig = lollipopConsumerRequestConfig;
     }
 
+    /**
+     * {@see HttpMessageVerifierService.verifyHttpMessage()}
+     * @param lollipopConsumerRequest
+     * @return
+     * @throws LollipopDigestException
+     * @throws UnsupportedEncodingException
+     * @throws LollipopVerifierException
+     */
     @Override
     public boolean verifyHttpMessage(LollipopConsumerRequest lollipopConsumerRequest)
             throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException {
@@ -43,10 +57,11 @@ public class HttpMessageVerifierServiceImpl implements HttpMessageVerifierServic
 
         if (signatureInput == null) {
             throw new LollipopVerifierException(LollipopVerifierException.ErrorCode.MISSING_SIGNATURE_INPUT,
-                    "Missing Signature Input Header");
+                    "Missing Signature-Input Header");
         }
 
-        if (signatureInput.contains(lollipopConsumerRequestConfig.getContentDigestHeader())) {
+
+        if (lollipopConsumerRequestConfig.isStrictDigestVerify() || hasDigestInSignatureInput(signatureInput)) {
 
             String contentDigest =
                     headerParams.get(lollipopConsumerRequestConfig.getContentDigestHeader());
@@ -56,14 +71,39 @@ public class HttpMessageVerifierServiceImpl implements HttpMessageVerifierServic
             String contentEncoding =
                     headerParams.get(lollipopConsumerRequestConfig.getContentEncodingHeader());
 
-            verifyContentDigest(contentDigest, requestBody, contentEncoding);
+            if (!verifyContentDigest(contentDigest, requestBody, contentEncoding)) {
+                throw new LollipopDigestException(LollipopDigestException.ErrorCode.INCORRECT_DIGEST,
+                        "Content-Digest does not match the request payload");
+            }
         }
 
         return verifyHttpSignature(lollipopConsumerRequest);
 
     }
 
-    protected boolean verifyContentDigest(
+    /**
+     * Checks if any of the signatures have the content-digest param within the signature input, to determine
+     * if in non-strict mode the digest should be validated
+     * @param signatureInput
+     * @return flag to determine if the content-digest is present
+     */
+    private boolean hasDigestInSignatureInput(String signatureInput) {
+        return Arrays.stream(signatureInput.split(";")).anyMatch(
+                signaturePart -> signaturePart.contains("=") && signaturePart.toLowerCase(Locale.ROOT).contains(
+                lollipopConsumerRequestConfig.getContentDigestHeader().toLowerCase(Locale.ROOT)));
+    }
+
+    /**
+     * Checks for required params to be used within the digest validation process, and executes the validation
+     * through the usage of the provided implementation of the {@link HttpMessageVerifier}
+     * @param contentDigest
+     * @param requestBody
+     * @param contentEncoding
+     * @return
+     * @throws LollipopDigestException
+     * @throws UnsupportedEncodingException
+     */
+    private boolean verifyContentDigest(
             String contentDigest, String requestBody, String contentEncoding)
             throws LollipopDigestException, UnsupportedEncodingException {
 
@@ -79,12 +119,7 @@ public class HttpMessageVerifierServiceImpl implements HttpMessageVerifierServic
         }
 
         // Attempt to execute digest validation
-        if (!httpMessageVerifier.verifyDigest(contentDigest, requestBody, contentEncoding)) {
-            throw new LollipopDigestException(
-                    LollipopDigestException.ErrorCode.INCORRECT_DIGEST, "Invalid Digest");
-        }
-
-        return true;
+        return httpMessageVerifier.verifyDigest(contentDigest, requestBody, contentEncoding);
     }
 
     /** TODO: stub */

@@ -10,12 +10,24 @@ import it.pagopa.tech.lollipop.consumer.service.HttpMessageVerifierService;
 import it.pagopa.tech.lollipop.consumer.service.impl.AssertionVerifierServiceImpl;
 import it.pagopa.tech.lollipop.consumer.service.impl.HttpMessageVerifierServiceImpl;
 
+import javax.inject.Inject;
+
 /** Helper class for retrieving instances */
 public class LollipopConsumerFactoryHelper {
 
     private HttpMessageVerifierFactory httpMessageVerifierFactory;
     private IdpCertProviderFactory idpCertProviderFactory;
     private AssertionServiceFactory assertionServiceFactory;
+
+    @Inject
+    public LollipopConsumerFactoryHelper(
+            HttpMessageVerifierFactory httpMessageVerifierFactory,
+            IdpCertProviderFactory idpCertProviderFactory,
+            AssertionServiceFactory assertionServiceFactory) {
+        this.httpMessageVerifierFactory = httpMessageVerifierFactory;
+        this.idpCertProviderFactory = idpCertProviderFactory;
+        this.assertionServiceFactory = assertionServiceFactory;
+    }
 
     /**
      * Utility method for retrieving an instance of {@link HttpMessageVerifierService}

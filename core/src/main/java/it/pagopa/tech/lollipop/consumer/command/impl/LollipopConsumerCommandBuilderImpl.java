@@ -6,7 +6,7 @@ import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommandBuilder;
 import it.pagopa.tech.lollipop.consumer.helper.LollipopConsumerFactoryHelper;
 import javax.inject.Inject;
 
-/** Builder class for creating command instance */
+/** Implementation of {@link LollipopConsumerCommandBuilder}, used to create istances of {@link LollipopConsumerCommandImpl} */
 public class LollipopConsumerCommandBuilderImpl implements LollipopConsumerCommandBuilder {
 
     private final LollipopConsumerFactoryHelper factoryHelper;

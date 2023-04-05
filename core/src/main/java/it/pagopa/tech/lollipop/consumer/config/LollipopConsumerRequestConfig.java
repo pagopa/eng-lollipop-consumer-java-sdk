@@ -12,4 +12,5 @@ public class LollipopConsumerRequestConfig {
     private String signatureInputHeader = "signature-input";
     private String contentEncodingHeader = "content-encoding";
     private String contentDigestHeader = "content-digest";
+    private boolean strictDigestVerify = false;
 }
