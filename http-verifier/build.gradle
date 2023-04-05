@@ -13,11 +13,11 @@ plugins {
     id("io.freefair.lombok") version "8.0.0"
 }
 
-group 'it.pagopa.commons'
+group 'it.pagopa.tech'
 
 repositories {
-    mavenLocal()
-    mavenCentral()
+	mavenLocal()
+	mavenCentral()
 }
 
 configurations {
@@ -39,17 +39,18 @@ abstract class InstrumentedJarsRule implements AttributeCompatibilityRule<Librar
 }
 
 dependencies {
-    attributesSchema {
-        attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE) {
-            compatibilityRules.add(InstrumentedJarsRule)
-        }
-    }
-    implementation project(path: ':core')
-    // Use JUnit Jupiter for testing.
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+  attributesSchema {
+      attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE) {
+          compatibilityRules.add(InstrumentedJarsRule)
+      }
+  }
+	implementation 'net.visma.autopay:http-signatures:1.1.0'
+	// Use JUnit Jupiter for testing.
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+	testImplementation 'org.assertj:assertj-core:3.24.2'
 }
 
 tasks.named('test') {
-    // Use JUnit Platform for unit tests.
-    useJUnitPlatform()
+	// Use JUnit Platform for unit tests.
+	useJUnitPlatform()
 }

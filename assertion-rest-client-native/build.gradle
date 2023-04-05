@@ -16,8 +16,8 @@ plugins {
 group 'it.pagopa.commons'
 
 repositories {
-    mavenLocal()
-    mavenCentral()
+	mavenLocal()
+	mavenCentral()
 }
 
 configurations {
@@ -50,6 +50,6 @@ dependencies {
 }
 
 tasks.named('test') {
-    // Use JUnit Platform for unit tests.
-    useJUnitPlatform()
+	// Use JUnit Platform for unit tests.
+	useJUnitPlatform()
 }
