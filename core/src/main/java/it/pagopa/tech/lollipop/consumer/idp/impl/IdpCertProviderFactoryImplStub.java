@@ -1,3 +1,4 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.idp.impl;
 
 import it.pagopa.tech.lollipop.consumer.idp.IdpCertProvider;
@@ -9,6 +10,7 @@ public class IdpCertProviderFactoryImplStub implements IdpCertProviderFactory {
 
     private IdpCertClientProvider idpCertClientProvider;
     private IdpCertStorageProvider idpCertStorageProvider;
+
     @Override
     public IdpCertProvider create() {
         return null;

@@ -1,3 +1,4 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.assertion;
 
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
