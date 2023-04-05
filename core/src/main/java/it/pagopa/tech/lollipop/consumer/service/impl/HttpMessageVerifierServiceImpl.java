@@ -27,15 +27,7 @@ public class HttpMessageVerifierServiceImpl implements HttpMessageVerifierServic
         this.lollipopConsumerRequestConfig = lollipopConsumerRequestConfig;
     }
 
-    /**
-     * {@see HttpMessageVerifierService.verifyHttpMessage()}
-     *
-     * @param lollipopConsumerRequest
-     * @return
-     * @throws LollipopDigestException
-     * @throws UnsupportedEncodingException
-     * @throws LollipopVerifierException
-     */
+    /** @see HttpMessageVerifierService#verifyHttpMessage(LollipopConsumerRequest) */
     @Override
     public boolean verifyHttpMessage(LollipopConsumerRequest lollipopConsumerRequest)
             throws LollipopDigestException, UnsupportedEncodingException,
@@ -85,7 +77,7 @@ public class HttpMessageVerifierServiceImpl implements HttpMessageVerifierServic
      * Checks if any of the signatures have the content-digest param within the signature input, to
      * determine if in non-strict mode the digest should be validated
      *
-     * @param signatureInput
+     * @param signatureInput request Signature-Input content
      * @return flag to determine if the content-digest is present
      */
     private boolean hasDigestInSignatureInput(String signatureInput) {
@@ -106,12 +98,13 @@ public class HttpMessageVerifierServiceImpl implements HttpMessageVerifierServic
      * validation through the usage of the provided implementation of the {@link
      * HttpMessageVerifier}
      *
-     * @param contentDigest
-     * @param requestBody
-     * @param contentEncoding
-     * @return
-     * @throws LollipopDigestException
-     * @throws UnsupportedEncodingException
+     * @param contentDigest content digest provided by the request to check
+     * @param requestBody payload to be used for digest verification
+     * @param contentEncoding encoding for the related payload, if necessary
+     * @return flag to determine if the content digest matches the calculated one with the provided
+     *     request Body
+     * @throws LollipopDigestException exceptions related to the digest validation process
+     * @throws UnsupportedEncodingException exceptions related to encoding errors
      */
     private boolean verifyContentDigest(
             String contentDigest, String requestBody, String contentEncoding)

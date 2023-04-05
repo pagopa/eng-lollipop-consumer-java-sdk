@@ -15,11 +15,11 @@ public interface HttpMessageVerifierService {
     /**
      * Validates the http request
      *
-     * @param request
+     * @param request instance of lollipop request to validate
      * @return flag to true if the request is validated
-     * @throws UnsupportedEncodingException
-     * @throws LollipopDigestException
-     * @throws LollipopVerifierException
+     * @throws UnsupportedEncodingException thrown if the provided encoding is invalid
+     * @throws LollipopDigestException thrown for digest validation exceptions
+     * @throws LollipopVerifierException thrown for general errors in the verification process
      */
     boolean verifyHttpMessage(LollipopConsumerRequest request)
             throws UnsupportedEncodingException, LollipopDigestException, LollipopVerifierException;
