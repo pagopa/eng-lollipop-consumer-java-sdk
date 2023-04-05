@@ -4,9 +4,7 @@ package it.pagopa.tech.lollipop.consumer.command;
 import it.pagopa.tech.lollipop.consumer.model.CommandResult;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 
-/**
- *  Interface for the command executing the lollipop request consumption
- * */
+/** Interface for the command executing the lollipop request consumption */
 public interface LollipopConsumerCommand {
 
     /**

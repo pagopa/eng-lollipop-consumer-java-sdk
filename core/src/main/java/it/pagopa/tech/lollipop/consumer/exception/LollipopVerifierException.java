@@ -4,7 +4,8 @@ package it.pagopa.tech.lollipop.consumer.exception;
 import java.util.Objects;
 
 /**
- * Thrown in case of problems when computing or verifying lollipop request through the http-signature flow
+ * Thrown in case of problems when computing or verifying lollipop request through the
+ * http-signature flow
  */
 public class LollipopVerifierException extends Exception {
 
@@ -45,7 +46,6 @@ public class LollipopVerifierException extends Exception {
 
     /** Error codes to classify Lollipop Request Exceptions */
     public enum ErrorCode {
-
         MISSING_SIGNATURE,
 
         MISSING_SIGNATURE_INPUT

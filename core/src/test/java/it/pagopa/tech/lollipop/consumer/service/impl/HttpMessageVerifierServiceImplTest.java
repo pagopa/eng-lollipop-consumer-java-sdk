@@ -1,8 +1,8 @@
 /* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.service.impl;
 
-import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopDigestException;
@@ -23,7 +23,6 @@ class HttpMessageVerifierServiceImplTest {
     final String INVALID_PAYLOAD = "an invalid payload";
     final String INVALID_ENCODING = "UTF-326";
     final String VALID_ENCODING = "UTF-8";
-
 
     private LollipopConsumerRequestConfig httpMessageVerifierConfig;
     private HttpMessageVerifier httpMessageVerifier;
@@ -46,10 +45,14 @@ class HttpMessageVerifierServiceImplTest {
     public void beforeEach() throws LollipopDigestException, UnsupportedEncodingException {
         Mockito.reset(httpMessageVerifier);
         when(httpMessageVerifier.verifyDigest(
-                        Mockito.eq(VALID_DIGEST), Mockito.eq(VALID_PAYLOAD), Mockito.eq(VALID_ENCODING)))
+                        Mockito.eq(VALID_DIGEST),
+                        Mockito.eq(VALID_PAYLOAD),
+                        Mockito.eq(VALID_ENCODING)))
                 .thenReturn(true);
         when(httpMessageVerifier.verifyDigest(
-                Mockito.eq(VALID_DIGEST), Mockito.eq(INVALID_PAYLOAD), Mockito.eq(VALID_ENCODING)))
+                        Mockito.eq(VALID_DIGEST),
+                        Mockito.eq(INVALID_PAYLOAD),
+                        Mockito.eq(VALID_ENCODING)))
                 .thenReturn(false);
         this.httpMessageVerifierService =
                 new HttpMessageVerifierServiceImpl(httpMessageVerifier, httpMessageVerifierConfig);
@@ -58,7 +61,10 @@ class HttpMessageVerifierServiceImplTest {
     @Test
     public void validRequestIsProcessed() {
         assertThatNoException()
-                .isThrownBy(() -> httpMessageVerifierService.verifyHttpMessage(getLollipopConsumerRequest()));
+                .isThrownBy(
+                        () ->
+                                httpMessageVerifierService.verifyHttpMessage(
+                                        getLollipopConsumerRequest()));
     }
 
     @Test
@@ -66,17 +72,22 @@ class HttpMessageVerifierServiceImplTest {
         LollipopConsumerRequest lollipopConsumerRequest = getLollipopConsumerRequest();
         this.httpMessageVerifierConfig.setStrictDigestVerify(true);
         lollipopConsumerRequest.setRequestBody(INVALID_PAYLOAD);
-        lollipopConsumerRequest.getHeaderParams().put(
-                "Signature-Input",
-                "sig1=(\"x-pagopa-lollipop-original-method\" "
-                        + "\"x-pagopa-lollipop-original-url\");created=1678293988;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid="
-                        + "\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg");
+        lollipopConsumerRequest
+                .getHeaderParams()
+                .put(
+                        "Signature-Input",
+                        "sig1=(\"x-pagopa-lollipop-original-method\" "
+                            + "\"x-pagopa-lollipop-original-url\");created=1678293988;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid="
+                            + "\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg");
         // execute & verify
-        assertThatThrownBy(() -> httpMessageVerifierService.verifyHttpMessage(lollipopConsumerRequest))
+        assertThatThrownBy(
+                        () -> httpMessageVerifierService.verifyHttpMessage(lollipopConsumerRequest))
                 .isInstanceOfSatisfying(
                         LollipopDigestException.class,
                         e -> {
-                            assertThat(e).hasMessageContaining("Content-Digest does not match the request payload");
+                            assertThat(e)
+                                    .hasMessageContaining(
+                                            "Content-Digest does not match the request payload");
                             assertThat(e.getErrorCode())
                                     .isEqualTo(LollipopDigestException.ErrorCode.INCORRECT_DIGEST);
                         });
@@ -87,11 +98,14 @@ class HttpMessageVerifierServiceImplTest {
         LollipopConsumerRequest lollipopConsumerRequest = getLollipopConsumerRequest();
         lollipopConsumerRequest.setRequestBody(INVALID_PAYLOAD);
         // execute & verify
-        assertThatThrownBy(() -> httpMessageVerifierService.verifyHttpMessage(lollipopConsumerRequest))
+        assertThatThrownBy(
+                        () -> httpMessageVerifierService.verifyHttpMessage(lollipopConsumerRequest))
                 .isInstanceOfSatisfying(
                         LollipopDigestException.class,
                         e -> {
-                            assertThat(e).hasMessageContaining("Content-Digest does not match the request payload");
+                            assertThat(e)
+                                    .hasMessageContaining(
+                                            "Content-Digest does not match the request payload");
                             assertThat(e.getErrorCode())
                                     .isEqualTo(LollipopDigestException.ErrorCode.INCORRECT_DIGEST);
                         });
@@ -102,11 +116,14 @@ class HttpMessageVerifierServiceImplTest {
         LollipopConsumerRequest lollipopConsumerRequest = getLollipopConsumerRequest();
         lollipopConsumerRequest.getHeaderParams().remove("Content-Digest");
         // execute & verify
-        assertThatThrownBy(() -> httpMessageVerifierService.verifyHttpMessage(lollipopConsumerRequest))
+        assertThatThrownBy(
+                        () -> httpMessageVerifierService.verifyHttpMessage(lollipopConsumerRequest))
                 .isInstanceOfSatisfying(
                         LollipopDigestException.class,
                         e -> {
-                            assertThat(e).hasMessageContaining("Missing required Content-Digest for validation");
+                            assertThat(e)
+                                    .hasMessageContaining(
+                                            "Missing required Content-Digest for validation");
                             assertThat(e.getErrorCode())
                                     .isEqualTo(LollipopDigestException.ErrorCode.MISSING_DIGEST);
                         });
@@ -117,11 +134,14 @@ class HttpMessageVerifierServiceImplTest {
         LollipopConsumerRequest lollipopConsumerRequest = getLollipopConsumerRequest();
         lollipopConsumerRequest.setRequestBody(null);
         // execute & verify
-        assertThatThrownBy(() -> httpMessageVerifierService.verifyHttpMessage(lollipopConsumerRequest))
+        assertThatThrownBy(
+                        () -> httpMessageVerifierService.verifyHttpMessage(lollipopConsumerRequest))
                 .isInstanceOfSatisfying(
                         LollipopDigestException.class,
                         e -> {
-                            assertThat(e).hasMessageContaining("Missing required payload for digest validation");
+                            assertThat(e)
+                                    .hasMessageContaining(
+                                            "Missing required payload for digest validation");
                             assertThat(e.getErrorCode())
                                     .isEqualTo(LollipopDigestException.ErrorCode.MISSING_PAYLOAD);
                         });
@@ -132,13 +152,15 @@ class HttpMessageVerifierServiceImplTest {
         LollipopConsumerRequest lollipopConsumerRequest = getLollipopConsumerRequest();
         lollipopConsumerRequest.getHeaderParams().remove("Signature");
         // execute & verify
-        assertThatThrownBy(() -> httpMessageVerifierService.verifyHttpMessage(lollipopConsumerRequest))
+        assertThatThrownBy(
+                        () -> httpMessageVerifierService.verifyHttpMessage(lollipopConsumerRequest))
                 .isInstanceOfSatisfying(
                         LollipopVerifierException.class,
                         e -> {
                             assertThat(e).hasMessageContaining("Missing Signature Header");
                             assertThat(e.getErrorCode())
-                                    .isEqualTo(LollipopVerifierException.ErrorCode.MISSING_SIGNATURE);
+                                    .isEqualTo(
+                                            LollipopVerifierException.ErrorCode.MISSING_SIGNATURE);
                         });
     }
 
@@ -147,13 +169,16 @@ class HttpMessageVerifierServiceImplTest {
         LollipopConsumerRequest lollipopConsumerRequest = getLollipopConsumerRequest();
         lollipopConsumerRequest.getHeaderParams().remove("Signature-Input");
         // execute & verify
-        assertThatThrownBy(() -> httpMessageVerifierService.verifyHttpMessage(lollipopConsumerRequest))
+        assertThatThrownBy(
+                        () -> httpMessageVerifierService.verifyHttpMessage(lollipopConsumerRequest))
                 .isInstanceOfSatisfying(
                         LollipopVerifierException.class,
                         e -> {
                             assertThat(e).hasMessageContaining("Missing Signature-Input Header");
                             assertThat(e.getErrorCode())
-                                    .isEqualTo(LollipopVerifierException.ErrorCode.MISSING_SIGNATURE_INPUT);
+                                    .isEqualTo(
+                                            LollipopVerifierException.ErrorCode
+                                                    .MISSING_SIGNATURE_INPUT);
                         });
     }
 
@@ -168,12 +193,12 @@ class HttpMessageVerifierServiceImplTest {
                     + "\"x-pagopa-lollipop-original-url\");created=1678293988;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid="
                     + "\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg");
         lollipopHeaderParams.put(
-                "Signature", "sig1=:lTuoRytp53GuUMOB4Rz1z97Y96gfSeEOm/xVpO39d3HR6lLAy4KYiGq+1hZ7nmRFBt2bASWEpen7ov5O4wU3kQ==:");
+                "Signature",
+                "sig1=:lTuoRytp53GuUMOB4Rz1z97Y96gfSeEOm/xVpO39d3HR6lLAy4KYiGq+1hZ7nmRFBt2bASWEpen7ov5O4wU3kQ==:");
 
         return LollipopConsumerRequest.builder()
                 .requestBody(VALID_PAYLOAD)
                 .headerParams(lollipopHeaderParams)
                 .build();
     }
-
 }
