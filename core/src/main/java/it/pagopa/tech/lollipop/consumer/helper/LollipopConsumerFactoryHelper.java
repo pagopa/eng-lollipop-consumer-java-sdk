@@ -9,7 +9,6 @@ import it.pagopa.tech.lollipop.consumer.service.AssertionVerifierService;
 import it.pagopa.tech.lollipop.consumer.service.HttpMessageVerifierService;
 import it.pagopa.tech.lollipop.consumer.service.impl.AssertionVerifierServiceImpl;
 import it.pagopa.tech.lollipop.consumer.service.impl.HttpMessageVerifierServiceImpl;
-
 import javax.inject.Inject;
 
 /** Helper class for retrieving instances */
