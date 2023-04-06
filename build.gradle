@@ -20,6 +20,19 @@ allprojects {
 	apply plugin: 'nebula.lint'
 	gradleLint.rules = ['all-dependency']
 
+	configurations {
+		spotless {
+			resolutionStrategy {
+				disableDependencyVerification()
+			}
+		}
+		gradleLint {
+			resolutionStrategy {
+				disableDependencyVerification()
+			}
+		}
+	}
+
 	spotless {
 		// optional: limit format enforcement to just the files changed by this feature branch
 		ratchetFrom 'origin/main'
