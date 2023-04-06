@@ -1,0 +1,50 @@
+openapi: "3.0.1"
+info:
+  title: "identity-services"
+  version: "2022-09-06T20:08:39Z"
+  x-logo:
+    url: https://io.italia.it/assets/img/io-logo-blue.svg
+  description: |-
+    Client used to retrieve the public keys from the identity provider
+servers:
+  - url: "https://api.is.eng.pagopa.it"
+    x-amazon-apigateway-endpoint-configuration:
+      disableExecuteApiEndpoint: true
+paths:
+  /idp-keys/spid:
+    get:
+      responses:
+        "200":
+          description: "200 response"
+          content: {}
+  /idp-keys/cie:
+    get:
+      responses:
+        "200":
+          description: "200 response"
+          content: {}
+  /idp-keys/spid/{tag}:
+    get:
+      parameters:
+        - name: "tag"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          content: {}
+  /idp-keys/cie/{tag}:
+    get:
+      parameters:
+        - name: "tag"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          content: {}
+components: {}
