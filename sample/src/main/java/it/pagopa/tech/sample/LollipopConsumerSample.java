@@ -15,82 +15,48 @@ import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 
 import java.util.HashMap;
 
-public class LollipopConsumerSample {
+import static it.pagopa.tech.sample.Constants.*;
 
-    private static final String ENCODING = "UTF-8";
+public class LollipopConsumerSample {
 
     public static void main(String[] args) throws Exception {
         LollipopConsumerCommandBuilder commandBuilder = new LollipopConsumerCommandBuilderImpl(buildLollipopConsumerFactoryHelper());
         LollipopConsumerCommand command = commandBuilder.createCommand();
-        CommandResult commandResult = command.doExecute(buildValidLollipopRequest());
-        System.out.println("Validation of a valid Lollipop request ended with status code " + commandResult.getResultCode() + " and message " + commandResult.getResultMessage());
-        commandResult = command.doExecute(buildLollipopRequestWithInvalidDigestHeader());
-        System.out.println("Validation of a Lollipop request with invalid digest header ended with status code " + commandResult.getResultCode() + " and message " + commandResult.getResultMessage());
-        commandResult = command.doExecute(buildLollipopRequestWithInvalidContent());
-        System.out.println("Validation of a Lollipop request with invalid content ended with status code " + commandResult.getResultCode() + " and message " + commandResult.getResultMessage());
+
+        CommandResult commandResult = command.doExecute(buildLollipopRequest(VALID_CONTENT_DIGEST, VALID_ENCODING_UTF8, VALID_MESSAGE_PAYLOAD));
+        System.out.println(buildMessage(commandResult, "Validation of a valid Lollipop request ended with status code "));
+
+        commandResult = command.doExecute(buildLollipopRequest(INVALID_CONTENT_DIGEST, VALID_ENCODING_UTF8, VALID_MESSAGE_PAYLOAD));
+        System.out.println(buildMessage(commandResult, "Validation of a Lollipop request with invalid digest header ended with status code "));
+
+        commandResult = command.doExecute(buildLollipopRequest(VALID_CONTENT_DIGEST, VALID_ENCODING_UTF8, INVALID_MESSAGE_PAYLOAD));
+        System.out.println(buildMessage(commandResult, "Validation of a Lollipop request with invalid content ended with status code "));
+
+        commandResult = command.doExecute(buildLollipopRequest(VALID_CONTENT_DIGEST, INVALID_ENCODING_UTF_326, VALID_MESSAGE_PAYLOAD));
+        System.out.println(buildMessage(commandResult, "Validation of a Lollipop request with unsupported encoding ended with status code "));
     }
 
     private static LollipopConsumerFactoryHelper buildLollipopConsumerFactoryHelper() throws Exception {
-        HttpMessageVerifierFactory messageVerifierFactory = new VismaHttpMessageVerifierFactory(ENCODING);
+        HttpMessageVerifierFactory messageVerifierFactory = new VismaHttpMessageVerifierFactory(VALID_ENCODING_UTF8);
         IdpCertProviderFactory idpCertProviderFactory = new IdpCertProviderFactoryImplStub();
         AssertionServiceFactory assertionServiceFactory = new AssertionServiceFactoryImplStub();
         return new LollipopConsumerFactoryHelper(messageVerifierFactory, idpCertProviderFactory, assertionServiceFactory);
     }
 
-    private static LollipopConsumerRequest buildValidLollipopRequest() {
+    private static LollipopConsumerRequest buildLollipopRequest(String contentDigest, String encoding, String payload) {
         HashMap<String, String> lollipopHeaderParams = new HashMap<>();
-        lollipopHeaderParams.put("content-digest", "sha-256=:cpyRqJ1VhoVC+MSs9fq4/4wXs4c46EyEFriskys43Zw=:");
-        lollipopHeaderParams.put("content-encoding", ENCODING);
-        lollipopHeaderParams.put(
-                "signature-input",
-                "sig1=(\"content-digest\" \"x-pagopa-lollipop-original-method\" "
-                        + "\"x-pagopa-lollipop-original-url\");created=1678293988;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid="
-                        + "\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg");
-        lollipopHeaderParams.put(
-                "signature",
-                "sig1=:lTuoRytp53GuUMOB4Rz1z97Y96gfSeEOm/xVpO39d3HR6lLAy4KYiGq+1hZ7nmRFBt2bASWEpen7ov5O4wU3kQ==:");
+        lollipopHeaderParams.put(CONTENT_DIGEST, contentDigest);
+        lollipopHeaderParams.put(CONTENT_ENCODING, encoding);
+        lollipopHeaderParams.put(SIGNATURE_INPUT, SIGNATURE_INPUT_HEADER_VALUE);
+        lollipopHeaderParams.put(SIGNATURE, SIGNATURE_HEADER_VALUE);
 
         return LollipopConsumerRequest.builder()
-                .requestBody("{\"message\":\"a valid message payload\"}")
+                .requestBody(payload)
                 .headerParams(lollipopHeaderParams)
                 .build();
     }
 
-    private static LollipopConsumerRequest buildLollipopRequestWithInvalidDigestHeader() {
-        HashMap<String, String> lollipopHeaderParams = new HashMap<>();
-        lollipopHeaderParams.put("content-digest", "sha-256=:fadsfeagsdage76ad564=:");
-        lollipopHeaderParams.put("content-encoding", ENCODING);
-        lollipopHeaderParams.put(
-                "signature-input",
-                "sig1=(\"content-digest\" \"x-pagopa-lollipop-original-method\" "
-                        + "\"x-pagopa-lollipop-original-url\");created=1678293988;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid="
-                        + "\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg");
-        lollipopHeaderParams.put(
-                "signature",
-                "sig1=:lTuoRytp53GuUMOB4Rz1z97Y96gfSeEOm/xVpO39d3HR6lLAy4KYiGq+1hZ7nmRFBt2bASWEpen7ov5O4wU3kQ==:");
-
-        return LollipopConsumerRequest.builder()
-                .requestBody("{\"message\":\"a valid message payload\"}")
-                .headerParams(lollipopHeaderParams)
-                .build();
-    }
-
-    private static LollipopConsumerRequest buildLollipopRequestWithInvalidContent() {
-        HashMap<String, String> lollipopHeaderParams = new HashMap<>();
-        lollipopHeaderParams.put("content-digest", "sha-256=:cpyRqJ1VhoVC+MSs9fq4/4wXs4c46EyEFriskys43Zw=:");
-        lollipopHeaderParams.put("content-encoding", ENCODING);
-        lollipopHeaderParams.put(
-                "signature-input",
-                "sig1=(\"content-digest\" \"x-pagopa-lollipop-original-method\" "
-                        + "\"x-pagopa-lollipop-original-url\");created=1678293988;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid="
-                        + "\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg");
-        lollipopHeaderParams.put(
-                "signature",
-                "sig1=:lTuoRytp53GuUMOB4Rz1z97Y96gfSeEOm/xVpO39d3HR6lLAy4KYiGq+1hZ7nmRFBt2bASWEpen7ov5O4wU3kQ==:");
-
-        return LollipopConsumerRequest.builder()
-                .requestBody("{\"message\":\"an invalid message payload\"}")
-                .headerParams(lollipopHeaderParams)
-                .build();
+    private static String buildMessage(CommandResult commandResult, String s) {
+        return s + commandResult.getResultCode() + " and message " + commandResult.getResultMessage();
     }
 }
