@@ -7,6 +7,7 @@ import static org.mockserver.model.HttpResponse.response;
 
 import it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal.ApiClient;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopAssertionNotFoundException;
+import it.pagopa.tech.lollipop.consumer.exception.OidcAssertionNotSupported;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -159,7 +160,7 @@ class AssertionSimpleClientTest {
     }
 
     @Test
-    void samlAssertionFound() throws LollipopAssertionNotFoundException {
+    void samlAssertionFound() throws LollipopAssertionNotFoundException, OidcAssertionNotSupported {
         // setup
         String xmlResponse =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?> <saml2p:Response"
