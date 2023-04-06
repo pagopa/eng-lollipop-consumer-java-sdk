@@ -4,7 +4,6 @@ plugins {
 	id("com.diffplug.spotless") version "6.17.0"
 	id("nebula.lint") version "18.0.3"
 	id("org.kordamp.gradle.reproducible") version "0.50.0"
-	id("com.gradle.enterprise") version("3.9")
 }
 
 repositories {
@@ -32,14 +31,9 @@ allprojects {
 				disableDependencyVerification()
 			}
 		}
-	}
-
-	gradleEnterprise {
-		if (System.getenv("CI") != null) {
-			buildScan {
-				publishAlways()
-				termsOfServiceUrl = "https://gradle.com/terms-of-service"
-				termsOfServiceAgree = "yes"
+		gradleEnterprise {
+			resolutionStrategy {
+				disableDependencyVerification()
 			}
 		}
 	}
