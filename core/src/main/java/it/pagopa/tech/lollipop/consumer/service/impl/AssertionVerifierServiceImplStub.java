@@ -21,6 +21,7 @@ public class AssertionVerifierServiceImplStub implements AssertionVerifierServic
         this.assertionService = assertionService;
     }
 
+    /** TODO: stub */
     @Override
     public boolean validateLollipop(LollipopConsumerRequest request) {
         return true;

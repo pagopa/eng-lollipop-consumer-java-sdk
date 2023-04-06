@@ -22,8 +22,12 @@ public class LollipopConsumerSample {
     public static void main(String[] args) throws Exception {
         LollipopConsumerCommandBuilder commandBuilder = new LollipopConsumerCommandBuilderImpl(buildLollipopConsumerFactoryHelper());
         LollipopConsumerCommand command = commandBuilder.createCommand();
-        CommandResult commandResult = command.doExecute(buildLollipopRequest());
-        System.out.println("Validation ended with status code " + commandResult.getResultCode() + " and message " + commandResult.getResultMessage());
+        CommandResult commandResult = command.doExecute(buildValidLollipopRequest());
+        System.out.println("Validation of a valid Lollipop request ended with status code " + commandResult.getResultCode() + " and message " + commandResult.getResultMessage());
+        commandResult = command.doExecute(buildLollipopRequestWithInvalidDigestHeader());
+        System.out.println("Validation of a Lollipop request with invalid digest header ended with status code " + commandResult.getResultCode() + " and message " + commandResult.getResultMessage());
+        commandResult = command.doExecute(buildLollipopRequestWithInvalidContent());
+        System.out.println("Validation of a Lollipop request with invalid content ended with status code " + commandResult.getResultCode() + " and message " + commandResult.getResultMessage());
     }
 
     private static LollipopConsumerFactoryHelper buildLollipopConsumerFactoryHelper() throws Exception {
@@ -33,7 +37,7 @@ public class LollipopConsumerSample {
         return new LollipopConsumerFactoryHelper(messageVerifierFactory, idpCertProviderFactory, assertionServiceFactory);
     }
 
-    private static LollipopConsumerRequest buildLollipopRequest() {
+    private static LollipopConsumerRequest buildValidLollipopRequest() {
         HashMap<String, String> lollipopHeaderParams = new HashMap<>();
         lollipopHeaderParams.put("content-digest", "sha-256=:cpyRqJ1VhoVC+MSs9fq4/4wXs4c46EyEFriskys43Zw=:");
         lollipopHeaderParams.put("content-encoding", ENCODING);
@@ -48,6 +52,44 @@ public class LollipopConsumerSample {
 
         return LollipopConsumerRequest.builder()
                 .requestBody("{\"message\":\"a valid message payload\"}")
+                .headerParams(lollipopHeaderParams)
+                .build();
+    }
+
+    private static LollipopConsumerRequest buildLollipopRequestWithInvalidDigestHeader() {
+        HashMap<String, String> lollipopHeaderParams = new HashMap<>();
+        lollipopHeaderParams.put("content-digest", "sha-256=:fadsfeagsdage76ad564=:");
+        lollipopHeaderParams.put("content-encoding", ENCODING);
+        lollipopHeaderParams.put(
+                "signature-input",
+                "sig1=(\"content-digest\" \"x-pagopa-lollipop-original-method\" "
+                        + "\"x-pagopa-lollipop-original-url\");created=1678293988;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid="
+                        + "\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg");
+        lollipopHeaderParams.put(
+                "signature",
+                "sig1=:lTuoRytp53GuUMOB4Rz1z97Y96gfSeEOm/xVpO39d3HR6lLAy4KYiGq+1hZ7nmRFBt2bASWEpen7ov5O4wU3kQ==:");
+
+        return LollipopConsumerRequest.builder()
+                .requestBody("{\"message\":\"a valid message payload\"}")
+                .headerParams(lollipopHeaderParams)
+                .build();
+    }
+
+    private static LollipopConsumerRequest buildLollipopRequestWithInvalidContent() {
+        HashMap<String, String> lollipopHeaderParams = new HashMap<>();
+        lollipopHeaderParams.put("content-digest", "sha-256=:cpyRqJ1VhoVC+MSs9fq4/4wXs4c46EyEFriskys43Zw=:");
+        lollipopHeaderParams.put("content-encoding", ENCODING);
+        lollipopHeaderParams.put(
+                "signature-input",
+                "sig1=(\"content-digest\" \"x-pagopa-lollipop-original-method\" "
+                        + "\"x-pagopa-lollipop-original-url\");created=1678293988;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid="
+                        + "\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg");
+        lollipopHeaderParams.put(
+                "signature",
+                "sig1=:lTuoRytp53GuUMOB4Rz1z97Y96gfSeEOm/xVpO39d3HR6lLAy4KYiGq+1hZ7nmRFBt2bASWEpen7ov5O4wU3kQ==:");
+
+        return LollipopConsumerRequest.builder()
+                .requestBody("{\"message\":\"an invalid message payload\"}")
                 .headerParams(lollipopHeaderParams)
                 .build();
     }
