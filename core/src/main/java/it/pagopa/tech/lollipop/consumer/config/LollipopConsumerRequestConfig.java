@@ -8,9 +8,9 @@ import lombok.Data;
 @Data
 public class LollipopConsumerRequestConfig {
 
-    private String signatureHeader = "signature";
-    private String signatureInputHeader = "signature-input";
-    private String contentEncodingHeader = "content-encoding";
-    private String contentDigestHeader = "content-digest";
-    private boolean strictDigestVerify = false;
+    @Builder.Default private String signatureHeader = "signature";
+    @Builder.Default private String signatureInputHeader = "signature-input";
+    @Builder.Default private String contentEncodingHeader = "content-encoding";
+    @Builder.Default private String contentDigestHeader = "content-digest";
+    @Builder.Default private boolean strictDigestVerify = false;
 }

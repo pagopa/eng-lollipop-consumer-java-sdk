@@ -3,7 +3,7 @@ plugins {
 	id 'org.graalvm.buildtools.native' version '0.9.20'
 	id("com.diffplug.spotless") version "6.17.0"
 	id("nebula.lint") version "18.0.3"
-  id("org.kordamp.gradle.reproducible") version "0.50.0"
+	id("org.kordamp.gradle.reproducible") version "0.50.0"
 }
 
 repositories {
@@ -12,10 +12,10 @@ repositories {
 }
 
 allprojects {
-  version = "1.0.0-SNAPSHOT"
-  group = 'it.pagopa.tech'
-  sourceCompatibility = '11'
-  targetCompatibility = '11'
+	version = "1.0.0-SNAPSHOT"
+	group = 'it.pagopa.tech'
+	sourceCompatibility = '11'
+	targetCompatibility = '11'
 	apply plugin: 'com.diffplug.spotless'
 	apply plugin: 'nebula.lint'
 	gradleLint.rules = ['all-dependency']
@@ -37,7 +37,7 @@ allprojects {
 			// don't need to set target, it is inferred from java
 
 			// apply a specific flavor of google-java-format
-			googleJavaFormat('1.11.0').aosp().reflowLongStrings()
+			googleJavaFormat('1.15.0').aosp().reflowLongStrings()
 			// fix formatting of type annotations
 			formatAnnotations()
 			// make sure every file has the following copyright header.
@@ -58,54 +58,53 @@ tasks.withType(AbstractArchiveTask).configureEach {
 
 subprojects {
 
-    apply plugin: 'java'
-    apply plugin: 'org.kordamp.gradle.reproducible'
-    apply plugin: 'maven-publish'
-    apply plugin: 'org.graalvm.buildtools.native'
+	apply plugin: 'java'
+	apply plugin: 'org.kordamp.gradle.reproducible'
+	apply plugin: 'maven-publish'
+	apply plugin: 'org.graalvm.buildtools.native'
 
 
-    java {
-        withSourcesJar()
-        withJavadocJar()
-    }
-    
-    tasks.withType(JavaCompile) {
-		  options.compilerArgs.add('-Xlint:all')
-	  }
+	java {
+		withSourcesJar()
+		withJavadocJar()
+	}
 
-    config {
-        reproducible {
-            enabled
-            additionalProperties
-            additionalArtifacts
-        }
-    }
+	tasks.withType(JavaCompile) {
+		options.compilerArgs.add('-Xlint:all')
+	}
 
-    // Settings for allowing reproducible build
-    tasks.withType(AbstractArchiveTask).configureEach {
-        preserveFileTimestamps = false
-        reproducibleFileOrder = true
-    }
+	config {
+		reproducible {
+			enabled
+			additionalProperties
+			additionalArtifacts
+		}
+	}
+
+	// Settings for allowing reproducible build
+	tasks.withType(AbstractArchiveTask).configureEach {
+		preserveFileTimestamps = false
+		reproducibleFileOrder = true
+	}
 
 
-    // Generate MD5 checksum on eng-lollipop-consumer-java-sdk jar file
-    jar.doLast { task ->
-        ant.checksum file: task.archivePath
-    }
+	// Generate MD5 checksum on eng-lollipop-consumer-java-sdk jar file
+	jar.doLast { task ->
+		ant.checksum file: task.archivePath
+	}
 
-    publishing {
-        publications {
-            maven(MavenPublication) {
-                groupId project.group
-                artifactId project.name
-                version project.version
-                from components.java
-            }
-        }
-    }
+	publishing {
+		publications {
+			maven(MavenPublication) {
+				groupId project.group
+				artifactId project.name
+				version project.version
+				from components.java
+			}
+		}
+	}
 
 }
-
 
 graalvmNative {
 	binaries {
@@ -114,4 +113,3 @@ graalvmNative {
 		}
 	}
 }
-

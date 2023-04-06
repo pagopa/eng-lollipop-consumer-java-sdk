@@ -13,10 +13,7 @@ import java.util.Locale;
 import java.util.Map;
 import javax.inject.Inject;
 
-
-/**
- * Standard implementation of {@link HttpMessageVerifierService}
- */
+/** Standard implementation of {@link HttpMessageVerifierService} */
 public class HttpMessageVerifierServiceImpl implements HttpMessageVerifierService {
 
     private HttpMessageVerifier httpMessageVerifier;
@@ -31,24 +28,20 @@ public class HttpMessageVerifierServiceImpl implements HttpMessageVerifierServic
     }
 
     /**
-     * {@see HttpMessageVerifierService.verifyHttpMessage()}
-     * @param lollipopConsumerRequest
-     * @return
-     * @throws LollipopDigestException
-     * @throws UnsupportedEncodingException
-     * @throws LollipopVerifierException
+     * @see HttpMessageVerifierService#verifyHttpMessage(LollipopConsumerRequest)
      */
     @Override
     public boolean verifyHttpMessage(LollipopConsumerRequest lollipopConsumerRequest)
-            throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException {
+            throws LollipopDigestException, UnsupportedEncodingException,
+                    LollipopVerifierException {
 
         Map<String, String> headerParams = lollipopConsumerRequest.getHeaderParams();
 
-        String signature =
-                headerParams.get(lollipopConsumerRequestConfig.getSignatureHeader());
+        String signature = headerParams.get(lollipopConsumerRequestConfig.getSignatureHeader());
 
         if (signature == null) {
-            throw new LollipopVerifierException(LollipopVerifierException.ErrorCode.MISSING_SIGNATURE,
+            throw new LollipopVerifierException(
+                    LollipopVerifierException.ErrorCode.MISSING_SIGNATURE,
                     "Missing Signature Header");
         }
 
@@ -56,12 +49,13 @@ public class HttpMessageVerifierServiceImpl implements HttpMessageVerifierServic
                 headerParams.get(lollipopConsumerRequestConfig.getSignatureInputHeader());
 
         if (signatureInput == null) {
-            throw new LollipopVerifierException(LollipopVerifierException.ErrorCode.MISSING_SIGNATURE_INPUT,
+            throw new LollipopVerifierException(
+                    LollipopVerifierException.ErrorCode.MISSING_SIGNATURE_INPUT,
                     "Missing Signature-Input Header");
         }
 
-
-        if (lollipopConsumerRequestConfig.isStrictDigestVerify() || hasDigestInSignatureInput(signatureInput)) {
+        if (lollipopConsumerRequestConfig.isStrictDigestVerify()
+                || hasDigestInSignatureInput(signatureInput)) {
 
             String contentDigest =
                     headerParams.get(lollipopConsumerRequestConfig.getContentDigestHeader());
@@ -72,36 +66,47 @@ public class HttpMessageVerifierServiceImpl implements HttpMessageVerifierServic
                     headerParams.get(lollipopConsumerRequestConfig.getContentEncodingHeader());
 
             if (!verifyContentDigest(contentDigest, requestBody, contentEncoding)) {
-                throw new LollipopDigestException(LollipopDigestException.ErrorCode.INCORRECT_DIGEST,
+                throw new LollipopDigestException(
+                        LollipopDigestException.ErrorCode.INCORRECT_DIGEST,
                         "Content-Digest does not match the request payload");
             }
         }
 
         return verifyHttpSignature(lollipopConsumerRequest);
-
     }
 
     /**
-     * Checks if any of the signatures have the content-digest param within the signature input, to determine
-     * if in non-strict mode the digest should be validated
-     * @param signatureInput
+     * Checks if any of the signatures have the content-digest param within the signature input, to
+     * determine if in non-strict mode the digest should be validated
+     *
+     * @param signatureInput request Signature-Input content
      * @return flag to determine if the content-digest is present
      */
     private boolean hasDigestInSignatureInput(String signatureInput) {
-        return Arrays.stream(signatureInput.split(";")).anyMatch(
-                signaturePart -> signaturePart.contains("=") && signaturePart.toLowerCase(Locale.ROOT).contains(
-                lollipopConsumerRequestConfig.getContentDigestHeader().toLowerCase(Locale.ROOT)));
+        return Arrays.stream(signatureInput.split(";"))
+                .anyMatch(
+                        signaturePart ->
+                                signaturePart.contains("=")
+                                        && signaturePart
+                                                .toLowerCase(Locale.ROOT)
+                                                .contains(
+                                                        lollipopConsumerRequestConfig
+                                                                .getContentDigestHeader()
+                                                                .toLowerCase(Locale.ROOT)));
     }
 
     /**
-     * Checks for required params to be used within the digest validation process, and executes the validation
-     * through the usage of the provided implementation of the {@link HttpMessageVerifier}
-     * @param contentDigest
-     * @param requestBody
-     * @param contentEncoding
-     * @return
-     * @throws LollipopDigestException
-     * @throws UnsupportedEncodingException
+     * Checks for required params to be used within the digest validation process, and executes the
+     * validation through the usage of the provided implementation of the {@link
+     * HttpMessageVerifier}
+     *
+     * @param contentDigest content digest provided by the request to check
+     * @param requestBody payload to be used for digest verification
+     * @param contentEncoding encoding for the related payload, if necessary
+     * @return flag to determine if the content digest matches the calculated one with the provided
+     *     request Body
+     * @throws LollipopDigestException exceptions related to the digest validation process
+     * @throws UnsupportedEncodingException exceptions related to encoding errors
      */
     private boolean verifyContentDigest(
             String contentDigest, String requestBody, String contentEncoding)
@@ -114,7 +119,8 @@ public class HttpMessageVerifierServiceImpl implements HttpMessageVerifierServic
         }
 
         if (requestBody == null) {
-            throw new LollipopDigestException(LollipopDigestException.ErrorCode.MISSING_PAYLOAD,
+            throw new LollipopDigestException(
+                    LollipopDigestException.ErrorCode.MISSING_PAYLOAD,
                     "Missing required payload for digest validation");
         }
 

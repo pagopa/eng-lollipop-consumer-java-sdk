@@ -14,7 +14,6 @@ import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.service.AssertionVerifierService;
 import it.pagopa.tech.lollipop.consumer.service.HttpMessageVerifierService;
 import java.io.UnsupportedEncodingException;
-
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
 import org.mockito.*;
@@ -37,7 +36,8 @@ class LollipopConsumerCommandImplTest {
 
     @Test
     void failedHttpMessageValidationThrowDigestException()
-            throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException {
+            throws LollipopDigestException, UnsupportedEncodingException,
+                    LollipopVerifierException {
 
         doThrow(
                         new LollipopDigestException(
@@ -77,7 +77,8 @@ class LollipopConsumerCommandImplTest {
 
     @Test
     void failedHttpMessageValidationWithoutThrowingException()
-            throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException {
+            throws LollipopDigestException, UnsupportedEncodingException,
+                    LollipopVerifierException {
 
         doReturn(false)
                 .when(messageVerifierServiceMock)
@@ -96,7 +97,8 @@ class LollipopConsumerCommandImplTest {
 
     @Test
     void failedAssertionValidationWithoutThrowingException()
-            throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException {
+            throws LollipopDigestException, UnsupportedEncodingException,
+                    LollipopVerifierException {
 
         doReturn(true)
                 .when(messageVerifierServiceMock)
@@ -117,7 +119,8 @@ class LollipopConsumerCommandImplTest {
 
     @Test
     void successLollipopRequestValidation()
-            throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException {
+            throws LollipopDigestException, UnsupportedEncodingException,
+                    LollipopVerifierException {
 
         doReturn(true)
                 .when(messageVerifierServiceMock)
