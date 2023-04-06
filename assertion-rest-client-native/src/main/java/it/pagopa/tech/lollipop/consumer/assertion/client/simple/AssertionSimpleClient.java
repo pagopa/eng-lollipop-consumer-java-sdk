@@ -7,8 +7,10 @@ import it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal.ApiExce
 import it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal.api.DefaultApi;
 import it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal.model.AssertionRef;
 import it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal.model.LCUserInfo;
+import it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal.model.OidcUserInfo;
 import it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal.model.SamlUserInfo;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopAssertionNotFoundException;
+import it.pagopa.tech.lollipop.consumer.exception.OidcAssertionNotSupported;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
 import javax.inject.Inject;
 
@@ -33,7 +35,7 @@ public class AssertionSimpleClient implements AssertionClient {
      */
     @Override
     public SamlAssertion getAssertion(String jwt, String assertionRef)
-            throws LollipopAssertionNotFoundException {
+            throws LollipopAssertionNotFoundException, OidcAssertionNotSupported {
         AssertionRef ref = new AssertionRef(assertionRef);
 
         LCUserInfo responseAssertion;
@@ -52,6 +54,9 @@ public class AssertionSimpleClient implements AssertionClient {
             response.setAssertionRef(assertionRef);
             response.setAssertionData(assertionData);
             return response;
+        }
+        if (responseAssertion.getActualInstance().getClass().equals(OidcUserInfo.class)) {
+            throw new OidcAssertionNotSupported("OIDC Claims not supported yet.");
         }
 
         return null;
