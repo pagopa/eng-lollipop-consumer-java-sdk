@@ -13,7 +13,7 @@ repositories {
 
 allprojects {
 	version = "1.0.0-SNAPSHOT"
-	group = 'it.pagopa.tech'
+	group = 'it.pagopa.tech.lollipop-consumer-java-sdk'
 	sourceCompatibility = '11'
 	targetCompatibility = '11'
 	apply plugin: 'com.diffplug.spotless'

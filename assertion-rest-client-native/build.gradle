@@ -14,8 +14,6 @@ plugins {
 /*id("org.openapi.generator") version "6.5.0"*/
 }
 
-group 'it.pagopa.commons'
-
 repositories {
 	mavenLocal()
 	mavenCentral()
