@@ -3,3 +3,7 @@ FROM amazoncorretto:11
 RUN mkdir /app
 
 COPY core/build/libs/*.jar /app/
+COPY http-verifier/build/libs/*.jar /app/
+COPY redis-storage/build/libs/*.jar /app/
+COPY identity-service-rest-client-native/build/libs/*.jar /app/
+COPY assertion-rest-client-native/build/libs/*.jar /app/
