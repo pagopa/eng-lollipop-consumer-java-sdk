@@ -12,8 +12,8 @@ public class SimpleAssertionStorageProvider implements AssertionStorageProvider 
      * @return an instance of {@link SimpleAssertionStorage}
      */
     @Override
-    public AssertionStorage provideStorage() {
+    public AssertionStorage provideStorage(StorageConfig storageConfig) {
         return new SimpleAssertionStorage(
-                new HashMap<>(), new HashMap<>(), new StorageConfig(true, 60000L));
+                new HashMap<>(), new HashMap<>(), storageConfig);
     }
 }

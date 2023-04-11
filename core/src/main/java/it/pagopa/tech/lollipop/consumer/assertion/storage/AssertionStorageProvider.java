@@ -7,5 +7,5 @@ public interface AssertionStorageProvider {
     /**
      * @return instance of {@link AssertionStorage}
      */
-    AssertionStorage provideStorage();
+    AssertionStorage provideStorage(StorageConfig storageConfig);
 }

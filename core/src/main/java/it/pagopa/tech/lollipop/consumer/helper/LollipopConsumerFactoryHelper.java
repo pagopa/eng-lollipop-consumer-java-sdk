@@ -14,9 +14,9 @@ import javax.inject.Inject;
 /** Helper class for retrieving instances */
 public class LollipopConsumerFactoryHelper {
 
-    private HttpMessageVerifierFactory httpMessageVerifierFactory;
-    private IdpCertProviderFactory idpCertProviderFactory;
-    private AssertionServiceFactory assertionServiceFactory;
+    private final HttpMessageVerifierFactory httpMessageVerifierFactory;
+    private final IdpCertProviderFactory idpCertProviderFactory;
+    private final AssertionServiceFactory assertionServiceFactory;
 
     @Inject
     public LollipopConsumerFactoryHelper(

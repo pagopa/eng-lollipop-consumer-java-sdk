@@ -2,25 +2,27 @@
 package it.pagopa.tech.lollipop.consumer.assertion.storage;
 
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+
 import javax.inject.Inject;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 
 /** Implementation of the {@link AssertionStorage} interface as a simple in memory storage */
 public class SimpleAssertionStorage implements AssertionStorage {
 
     private final Map<String, SamlAssertion> assertionMap;
-    private final Map<String, Timer> timerMap;
+    private final Map<String, ScheduledFuture<?>> scheduledEvictionsMap;
     private final StorageConfig storageConfig;
 
     @Inject
     public SimpleAssertionStorage(
             Map<String, SamlAssertion> assertionMap,
-            Map<String, Timer> timerMap,
+            Map<String, ScheduledFuture<?>> scheduledEvictionsMap,
             StorageConfig storageConfig) {
         this.assertionMap = assertionMap;
-        this.timerMap = timerMap;
+        this.scheduledEvictionsMap = scheduledEvictionsMap;
         this.storageConfig = storageConfig;
     }
 
@@ -60,22 +62,22 @@ public class SimpleAssertionStorage implements AssertionStorage {
     }
 
     private void scheduleEviction(String assertionRef) {
-        TimerTask evictionTask =
-                new TimerTask() {
-                    public void run() {
-                        assertionMap.remove(assertionRef);
-                    }
-                };
-        Timer timer = new Timer();
-        long delay = 1000L;
-        timer.schedule(evictionTask, delay);
-        timerMap.put(assertionRef, timer);
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        ScheduledFuture<?> schedule = executorService.schedule(getEvictionTask(assertionRef), storageConfig.getStorageEvictionDelay(), storageConfig.getStorageEvictionDelayTimeUnit());
+        scheduledEvictionsMap.put(assertionRef, schedule);
     }
 
     private void delayEviction(String assertionRef) {
-        Timer timer = timerMap.get(assertionRef);
-        timer.cancel();
-        timerMap.remove(assertionRef);
+        ScheduledFuture<?> schedule = scheduledEvictionsMap.get(assertionRef);
+        schedule.cancel(false);
+        scheduledEvictionsMap.remove(assertionRef);
         scheduleEviction(assertionRef);
+    }
+
+    private Runnable getEvictionTask(String assertionRef) {
+        return () -> {
+            assertionMap.remove(assertionRef);
+            scheduledEvictionsMap.remove(assertionRef);
+        };
     }
 }

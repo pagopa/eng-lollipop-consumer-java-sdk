@@ -1,19 +1,22 @@
 /* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.assertion.storage;
 
+import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
+import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.*;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Timer;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 class SimpleAssertionStorageTest {
 
+    private static final long EVICTION_DELAY = 5000L;
     private static StorageConfig storageConfigMock;
     private AssertionStorage sut;
     private static final String ASSERTION_REF_1 = "assertionRef1";
@@ -21,28 +24,33 @@ class SimpleAssertionStorageTest {
     @BeforeEach
     void setUp() {
         storageConfigMock = mock(StorageConfig.class);
-        doReturn(10000L).when(storageConfigMock).getStorageEvictionDelay();
+        doReturn(EVICTION_DELAY).when(storageConfigMock).getStorageEvictionDelay();
+        doReturn(TimeUnit.MILLISECONDS).when(storageConfigMock).getStorageEvictionDelayTimeUnit();
     }
 
     @Test
-    void getExistingAssertionAndResetScheduleEvictionWithStorageEnabled() {
+    void getExistingAssertionAndResetScheduleEvictionWithStorageEnabled() throws InterruptedException, ExecutionException {
         doReturn(true).when(storageConfigMock).isAssertionStorageEnabled();
 
         Map<String, SamlAssertion> assertionMap = new HashMap<>();
         SamlAssertion samlAssertion = new SamlAssertion();
         assertionMap.put(ASSERTION_REF_1, samlAssertion);
-        Map<String, Timer> timerMap = new HashMap<>();
-        Timer timer = new Timer();
-        timerMap.put(ASSERTION_REF_1, timer);
+        Map<String, ScheduledFuture<?>> scheduledEvictionsMap = new HashMap<>();
+        ScheduledFuture<?> scheduledFutureMock = mock(ScheduledFuture.class);
+        scheduledEvictionsMap.put(ASSERTION_REF_1, scheduledFutureMock);
 
-        sut = new SimpleAssertionStorage(assertionMap, timerMap, storageConfigMock);
+        sut = new SimpleAssertionStorage(assertionMap, scheduledEvictionsMap, storageConfigMock);
 
         SamlAssertion result = sut.getAssertion(ASSERTION_REF_1);
 
         assertNotNull(result);
         assertEquals(samlAssertion, result);
-        assertEquals(1, timerMap.size());
-        assertNotEquals(timer, timerMap.get(ASSERTION_REF_1));
+        assertEquals(1, scheduledEvictionsMap.size());
+
+        CompletableFuture<Boolean> future = waitEvictionEnd(scheduledEvictionsMap);
+        assertEquals(true, future.get());
+        assertEquals(0, assertionMap.size());
+        assertEquals(0, scheduledEvictionsMap.size());
     }
 
     @Test
@@ -57,20 +65,25 @@ class SimpleAssertionStorageTest {
     }
 
     @Test
-    void saveAssertionAndScheduleEvictionWithStorageEnabled() {
+    void saveAssertionAndScheduleEvictionWithStorageEnabled() throws InterruptedException, ExecutionException {
         doReturn(true).when(storageConfigMock).isAssertionStorageEnabled();
 
         Map<String, SamlAssertion> assertionMap = new HashMap<>();
-        Map<String, Timer> timerMap = new HashMap<>();
+        Map<String, ScheduledFuture<?>> scheduledEvictionsMap = new HashMap<>();
 
-        sut = new SimpleAssertionStorage(assertionMap, timerMap, storageConfigMock);
+        sut = new SimpleAssertionStorage(assertionMap, scheduledEvictionsMap, storageConfigMock);
         SamlAssertion samlAssertion = new SamlAssertion();
 
         sut.saveAssertion(ASSERTION_REF_1, samlAssertion);
 
         assertEquals(1, assertionMap.size());
-        assertEquals(1, timerMap.size());
+        assertEquals(1, scheduledEvictionsMap.size());
         assertEquals(samlAssertion, assertionMap.get(ASSERTION_REF_1));
+
+        CompletableFuture<Boolean> future = waitEvictionEnd(scheduledEvictionsMap);
+        assertEquals(true, future.get());
+        assertEquals(0, assertionMap.size());
+        assertEquals(0, scheduledEvictionsMap.size());
     }
 
     @Test
@@ -89,13 +102,30 @@ class SimpleAssertionStorageTest {
         doReturn(false).when(storageConfigMock).isAssertionStorageEnabled();
 
         Map<String, SamlAssertion> assertionMap = new HashMap<>();
-        Map<String, Timer> timerMap = new HashMap<>();
+        Map<String, ScheduledFuture<?>> scheduledEvictionsMap = new HashMap<>();
 
-        sut = new SimpleAssertionStorage(assertionMap, timerMap, storageConfigMock);
+        sut = new SimpleAssertionStorage(assertionMap, scheduledEvictionsMap, storageConfigMock);
 
         sut.saveAssertion(ASSERTION_REF_1, new SamlAssertion());
 
         assertEquals(0, assertionMap.size());
-        assertEquals(0, timerMap.size());
+        assertEquals(0, scheduledEvictionsMap.size());
+    }
+
+    private CompletableFuture<Boolean> waitEvictionEnd(Map<String, ScheduledFuture<?>> scheduledEvictionsMap) {
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.submit(
+                new Runnable() {
+                    @SneakyThrows
+                    @Override
+                    public void run() {
+                        ScheduledFuture<?> scheduledFuture = scheduledEvictionsMap.get(ASSERTION_REF_1);
+                        scheduledFuture.get();
+                        future.complete(true);
+
+                    }
+                });
+        return future;
     }
 }

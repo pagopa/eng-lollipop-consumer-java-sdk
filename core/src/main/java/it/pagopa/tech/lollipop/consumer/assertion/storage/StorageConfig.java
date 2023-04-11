@@ -1,17 +1,15 @@
 /* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.assertion.storage;
 
-import lombok.Getter;
+import lombok.Data;
+
+import java.util.concurrent.TimeUnit;
 
 /** Configuration class for the assertion storage */
-@Getter
+@Data
 public class StorageConfig {
 
-    private final boolean assertionStorageEnabled;
-    private final long storageEvictionDelay;
-
-    public StorageConfig(boolean assertionStorageEnabled, long storageEvictionDelay) {
-        this.assertionStorageEnabled = assertionStorageEnabled;
-        this.storageEvictionDelay = storageEvictionDelay;
-    }
+    private boolean assertionStorageEnabled = true;
+    private long storageEvictionDelay = 1L;
+    private TimeUnit storageEvictionDelayTimeUnit = TimeUnit.MINUTES;
 }
