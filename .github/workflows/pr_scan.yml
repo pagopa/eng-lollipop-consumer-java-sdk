@@ -1,4 +1,4 @@
-name: Build Gradle project
+name: Check Build and Anchore on PR
 
 on:
   pull_request:
