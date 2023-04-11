@@ -1,20 +1,16 @@
 /* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.idp.client.simple;
 
-import it.pagopa.tech.lollipop.consumer.exception.LollipopAssertionNotFoundException;
-import it.pagopa.tech.lollipop.consumer.exception.OidcAssertionNotSupported;
 import it.pagopa.tech.lollipop.consumer.idp.client.IdpCertClient;
-import it.pagopa.tech.lollipop.consumer.idp.client.IdpCertClientProvider;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.ApiClient;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.ApiException;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.api.DefaultApi;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.model.CertData;
 import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
-import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import javax.inject.Inject;
 
 public class IdpCertSimpleClient implements IdpCertClient {
 
@@ -36,15 +32,17 @@ public class IdpCertSimpleClient implements IdpCertClient {
     public List<IdpCertData> getCertData(String entityId, String instant) {
         List<IdpCertData> listCertData = new ArrayList<>();
 
-        if (entityId.equals("https://idserver.servizicie.interno.gov.it/idp/profile/SAML2/POST/SSO")) { //TODO inserire entityID in config
+        if (entityId.equals("https://idserver.servizicie.interno.gov.it/idp/profile/SAML2/POST/SSO")) { //TODO inserire entityID in classe di configurazione
             List<String> tagList = getCIETagList(instant);
             for(String tag: tagList){
+                //TODO recupero storage
                 IdpCertData certData = getCIECertData(tag);
                 listCertData.add(certData);
             }
         } else {
             List<String> tagList = getSPIDTagList(instant);
             for(String tag: tagList){
+                //TODO recupero storage
                 IdpCertData certData = getSPIDCertData(tag, entityId);
                 listCertData.add(certData);
             }
