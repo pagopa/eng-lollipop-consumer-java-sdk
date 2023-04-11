@@ -1,0 +1,36 @@
+name: Build Gradle project
+
+on:
+  pull_request:
+  
+env:
+  DOCKERFILE: Dockerfile  
+
+jobs:
+  build-gradle-project:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout project sources
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0    
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+    - name: Make gradlew executable
+      run: chmod +x ./gradlew  
+    - name: Run build with Gradle Wrapper
+      run: ./gradlew build
+    - name: Build the Docker image
+      run: docker build . --file ${{ env.DOCKERFILE }} --tag localbuild/testimage:latest
+    - name: Run the Anchore Grype scan action
+      uses: anchore/scan-action@d5aa5b6cb9414b0c7771438046ff5bcfa2854ed7
+      id: scan
+      with:
+        image: "localbuild/testimage:latest"
+        fail-build: true
+        severity-cutoff: "high"
+    - name: Upload Anchore Scan Report
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: ${{ steps.scan.outputs.sarif }}
