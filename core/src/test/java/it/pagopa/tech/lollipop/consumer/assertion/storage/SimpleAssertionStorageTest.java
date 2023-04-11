@@ -1,18 +1,17 @@
 /* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.assertion.storage;
 
-import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
-import lombok.SneakyThrows;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.*;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+
+import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.*;
+import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class SimpleAssertionStorageTest {
 
@@ -29,7 +28,8 @@ class SimpleAssertionStorageTest {
     }
 
     @Test
-    void getExistingAssertionAndResetScheduleEvictionWithStorageEnabled() throws InterruptedException, ExecutionException {
+    void getExistingAssertionAndResetScheduleEvictionWithStorageEnabled()
+            throws InterruptedException, ExecutionException {
         doReturn(true).when(storageConfigMock).isAssertionStorageEnabled();
 
         Map<String, SamlAssertion> assertionMap = new HashMap<>();
@@ -65,7 +65,8 @@ class SimpleAssertionStorageTest {
     }
 
     @Test
-    void saveAssertionAndScheduleEvictionWithStorageEnabled() throws InterruptedException, ExecutionException {
+    void saveAssertionAndScheduleEvictionWithStorageEnabled()
+            throws InterruptedException, ExecutionException {
         doReturn(true).when(storageConfigMock).isAssertionStorageEnabled();
 
         Map<String, SamlAssertion> assertionMap = new HashMap<>();
@@ -112,7 +113,8 @@ class SimpleAssertionStorageTest {
         assertEquals(0, scheduledEvictionsMap.size());
     }
 
-    private CompletableFuture<Boolean> waitEvictionEnd(Map<String, ScheduledFuture<?>> scheduledEvictionsMap) {
+    private CompletableFuture<Boolean> waitEvictionEnd(
+            Map<String, ScheduledFuture<?>> scheduledEvictionsMap) {
         CompletableFuture<Boolean> future = new CompletableFuture<>();
         ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         executorService.submit(
@@ -120,10 +122,10 @@ class SimpleAssertionStorageTest {
                     @SneakyThrows
                     @Override
                     public void run() {
-                        ScheduledFuture<?> scheduledFuture = scheduledEvictionsMap.get(ASSERTION_REF_1);
+                        ScheduledFuture<?> scheduledFuture =
+                                scheduledEvictionsMap.get(ASSERTION_REF_1);
                         scheduledFuture.get();
                         future.complete(true);
-
                     }
                 });
         return future;

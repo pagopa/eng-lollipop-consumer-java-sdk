@@ -2,12 +2,11 @@
 package it.pagopa.tech.lollipop.consumer.assertion.storage;
 
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
-
-import javax.inject.Inject;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import javax.inject.Inject;
 
 /** Implementation of the {@link AssertionStorage} interface as a simple in memory storage */
 public class SimpleAssertionStorage implements AssertionStorage {
@@ -63,7 +62,11 @@ public class SimpleAssertionStorage implements AssertionStorage {
 
     private void scheduleEviction(String assertionRef) {
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        ScheduledFuture<?> schedule = executorService.schedule(getEvictionTask(assertionRef), storageConfig.getStorageEvictionDelay(), storageConfig.getStorageEvictionDelayTimeUnit());
+        ScheduledFuture<?> schedule =
+                executorService.schedule(
+                        getEvictionTask(assertionRef),
+                        storageConfig.getStorageEvictionDelay(),
+                        storageConfig.getStorageEvictionDelayTimeUnit());
         scheduledEvictionsMap.put(assertionRef, schedule);
     }
 

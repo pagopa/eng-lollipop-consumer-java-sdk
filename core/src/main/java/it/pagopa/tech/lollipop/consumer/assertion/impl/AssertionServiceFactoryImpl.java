@@ -6,7 +6,6 @@ import it.pagopa.tech.lollipop.consumer.assertion.AssertionServiceFactory;
 import it.pagopa.tech.lollipop.consumer.assertion.client.AssertionClientProvider;
 import it.pagopa.tech.lollipop.consumer.assertion.storage.AssertionStorageProvider;
 import it.pagopa.tech.lollipop.consumer.assertion.storage.StorageConfig;
-
 import javax.inject.Inject;
 
 /**
@@ -19,7 +18,10 @@ public class AssertionServiceFactoryImpl implements AssertionServiceFactory {
     private final StorageConfig storageConfig;
 
     @Inject
-    public AssertionServiceFactoryImpl(AssertionStorageProvider assertionStorageProvider, AssertionClientProvider assertionClientProvider, StorageConfig storageConfig) {
+    public AssertionServiceFactoryImpl(
+            AssertionStorageProvider assertionStorageProvider,
+            AssertionClientProvider assertionClientProvider,
+            StorageConfig storageConfig) {
         this.assertionStorageProvider = assertionStorageProvider;
         this.assertionClientProvider = assertionClientProvider;
         this.storageConfig = storageConfig;
@@ -33,6 +35,7 @@ public class AssertionServiceFactoryImpl implements AssertionServiceFactory {
     @Override
     public AssertionService create() {
         return new AssertionServiceImpl(
-                assertionStorageProvider.provideStorage(storageConfig), assertionClientProvider.provideClient());
+                assertionStorageProvider.provideStorage(storageConfig),
+                assertionClientProvider.provideClient());
     }
 }

@@ -1,9 +1,8 @@
 /* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.assertion.storage;
 
-import lombok.Data;
-
 import java.util.concurrent.TimeUnit;
+import lombok.Data;
 
 /** Configuration class for the assertion storage */
 @Data

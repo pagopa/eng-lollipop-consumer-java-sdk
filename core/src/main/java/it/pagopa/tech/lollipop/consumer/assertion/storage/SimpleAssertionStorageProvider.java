@@ -13,7 +13,6 @@ public class SimpleAssertionStorageProvider implements AssertionStorageProvider 
      */
     @Override
     public AssertionStorage provideStorage(StorageConfig storageConfig) {
-        return new SimpleAssertionStorage(
-                new HashMap<>(), new HashMap<>(), storageConfig);
+        return new SimpleAssertionStorage(new HashMap<>(), new HashMap<>(), storageConfig);
     }
 }
