@@ -7,7 +7,7 @@ env:
   DOCKERFILE: Dockerfile.test-only
 
 jobs:
-  build-gradle-project:
+  pr_scan:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout project sources
