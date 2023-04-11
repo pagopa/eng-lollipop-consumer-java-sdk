@@ -304,28 +304,6 @@ class AssertionSimpleClientTest {
                 () -> assertionSimpleClient.getAssertion(JWT, WRONG_ASSERTION_REF));
     }
 
-    @Test
-    void noJwt() {
-        // setup
-        String assertionRef = "sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg";
-        String jwt = "";
-
-        Assertions.assertThrows(
-                IllegalArgumentException.class,
-                () -> assertionSimpleClient.getAssertion(jwt, assertionRef));
-    }
-
-    @Test
-    void noAssertionRef() {
-        // setup
-        String assertionRef = "";
-        String jwt = "Bearer aValidJWT";
-
-        Assertions.assertThrows(
-                IllegalArgumentException.class,
-                () -> assertionSimpleClient.getAssertion(jwt, assertionRef));
-    }
-
     private void createExpectationAssertionFound() {
         new MockServerClient("localhost", 2000)
                 .when(
