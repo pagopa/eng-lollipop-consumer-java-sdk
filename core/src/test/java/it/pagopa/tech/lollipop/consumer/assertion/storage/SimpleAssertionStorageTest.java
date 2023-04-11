@@ -1,16 +1,16 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.assertion.storage;
-
-import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Timer;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+
+import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Timer;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class SimpleAssertionStorageTest {
 
@@ -43,7 +43,6 @@ class SimpleAssertionStorageTest {
         assertEquals(samlAssertion, result);
         assertEquals(1, timerMap.size());
         assertNotEquals(timer, timerMap.get(ASSERTION_REF_1));
-
     }
 
     @Test

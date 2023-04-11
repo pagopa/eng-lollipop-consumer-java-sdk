@@ -1,4 +1,9 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.assertion.impl;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 import it.pagopa.tech.lollipop.consumer.assertion.AssertionService;
 import it.pagopa.tech.lollipop.consumer.assertion.client.AssertionClient;
@@ -8,10 +13,6 @@ import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 
 class AssertionServiceImplTest {
 
@@ -67,11 +68,16 @@ class AssertionServiceImplTest {
     }
 
     @Test
-    void getAssertionFromClientWithLollipopAssertionNotFoundException() throws LollipopAssertionNotFoundException {
+    void getAssertionFromClientWithLollipopAssertionNotFoundException()
+            throws LollipopAssertionNotFoundException {
         doReturn(null).when(assertionStorageMock).getAssertion(ASSERTION_REF);
-        doThrow(LollipopAssertionNotFoundException.class).when(assertionClientMock).getAssertion(JWT, ASSERTION_REF);
+        doThrow(LollipopAssertionNotFoundException.class)
+                .when(assertionClientMock)
+                .getAssertion(JWT, ASSERTION_REF);
 
-        Assertions.assertThrows(LollipopAssertionNotFoundException.class, () -> sut.getAssertion(JWT, ASSERTION_REF));
+        Assertions.assertThrows(
+                LollipopAssertionNotFoundException.class,
+                () -> sut.getAssertion(JWT, ASSERTION_REF));
 
         verify(assertionStorageMock).getAssertion(ASSERTION_REF);
         verify(assertionClientMock).getAssertion(JWT, ASSERTION_REF);
@@ -80,7 +86,8 @@ class AssertionServiceImplTest {
 
     @Test
     void getAssertionWithEmptyJwtParameterFailure() throws LollipopAssertionNotFoundException {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> sut.getAssertion("", ASSERTION_REF));
+        Assertions.assertThrows(
+                IllegalArgumentException.class, () -> sut.getAssertion("", ASSERTION_REF));
 
         verify(assertionStorageMock, never()).getAssertion(anyString());
         verify(assertionClientMock, never()).getAssertion(JWT, ASSERTION_REF);
@@ -89,7 +96,8 @@ class AssertionServiceImplTest {
 
     @Test
     void getAssertionWithNullJwtParameterFailure() throws LollipopAssertionNotFoundException {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> sut.getAssertion(null, ASSERTION_REF));
+        Assertions.assertThrows(
+                IllegalArgumentException.class, () -> sut.getAssertion(null, ASSERTION_REF));
 
         verify(assertionStorageMock, never()).getAssertion(anyString());
         verify(assertionClientMock, never()).getAssertion(JWT, ASSERTION_REF);
@@ -97,7 +105,8 @@ class AssertionServiceImplTest {
     }
 
     @Test
-    void getAssertionWithEmptyAssertionRefParameterFailure() throws LollipopAssertionNotFoundException {
+    void getAssertionWithEmptyAssertionRefParameterFailure()
+            throws LollipopAssertionNotFoundException {
         Assertions.assertThrows(IllegalArgumentException.class, () -> sut.getAssertion(JWT, ""));
 
         verify(assertionStorageMock, never()).getAssertion(ASSERTION_REF);
@@ -106,7 +115,8 @@ class AssertionServiceImplTest {
     }
 
     @Test
-    void getAssertionWithNullAssertionRefParameterFailure() throws LollipopAssertionNotFoundException {
+    void getAssertionWithNullAssertionRefParameterFailure()
+            throws LollipopAssertionNotFoundException {
         Assertions.assertThrows(IllegalArgumentException.class, () -> sut.getAssertion(JWT, null));
 
         verify(assertionStorageMock, never()).getAssertion(ASSERTION_REF);

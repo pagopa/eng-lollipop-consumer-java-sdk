@@ -1,10 +1,9 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.assertion.storage;
 
 import lombok.Getter;
 
-/**
- * Configuration class for the assertion storage
- */
+/** Configuration class for the assertion storage */
 @Getter
 public class StorageConfig {
 

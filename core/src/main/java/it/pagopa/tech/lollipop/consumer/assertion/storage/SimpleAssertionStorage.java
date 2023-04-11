@@ -1,15 +1,13 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.assertion.storage;
 
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
-
-import javax.inject.Inject;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.inject.Inject;
 
-/**
- * Implementation of the {@link AssertionStorage} interface as a simple in memory storage
- */
+/** Implementation of the {@link AssertionStorage} interface as a simple in memory storage */
 public class SimpleAssertionStorage implements AssertionStorage {
 
     private final Map<String, SamlAssertion> assertionMap;
@@ -17,7 +15,10 @@ public class SimpleAssertionStorage implements AssertionStorage {
     private final StorageConfig storageConfig;
 
     @Inject
-    public SimpleAssertionStorage(Map<String, SamlAssertion> assertionMap, Map<String, Timer> timerMap, StorageConfig storageConfig) {
+    public SimpleAssertionStorage(
+            Map<String, SamlAssertion> assertionMap,
+            Map<String, Timer> timerMap,
+            StorageConfig storageConfig) {
         this.assertionMap = assertionMap;
         this.timerMap = timerMap;
         this.storageConfig = storageConfig;
@@ -25,6 +26,7 @@ public class SimpleAssertionStorage implements AssertionStorage {
 
     /**
      * Retrieve the assertion associated with the provided assertion reference
+     *
      * @param assertionRef the assertion reference
      * @return the SAML assertion if found, otherwise null
      */
@@ -43,6 +45,7 @@ public class SimpleAssertionStorage implements AssertionStorage {
 
     /**
      * Store the assertion
+     *
      * @param assertionRef the assertion reference
      * @param assertion the SAML assertion
      */
@@ -54,17 +57,17 @@ public class SimpleAssertionStorage implements AssertionStorage {
 
         assertionMap.put(assertionRef, assertion);
         scheduleEviction(assertionRef);
-
     }
 
     private void scheduleEviction(String assertionRef) {
-        TimerTask evictionTask = new TimerTask() {
-            public void run() {
-                assertionMap.remove(assertionRef);
-            }
-        };
+        TimerTask evictionTask =
+                new TimerTask() {
+                    public void run() {
+                        assertionMap.remove(assertionRef);
+                    }
+                };
         Timer timer = new Timer();
-        long delay  = 1000L;
+        long delay = 1000L;
         timer.schedule(evictionTask, delay);
         timerMap.put(assertionRef, timer);
     }

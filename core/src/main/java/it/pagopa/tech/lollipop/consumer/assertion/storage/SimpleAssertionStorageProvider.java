@@ -1,10 +1,9 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.assertion.storage;
 
 import java.util.HashMap;
 
-/**
- * Implementation of {@link AssertionStorageProvider} interface. It provides an instance of the
- */
+/** Implementation of {@link AssertionStorageProvider} interface. It provides an instance of the */
 public class SimpleAssertionStorageProvider implements AssertionStorageProvider {
 
     /**
@@ -14,6 +13,7 @@ public class SimpleAssertionStorageProvider implements AssertionStorageProvider 
      */
     @Override
     public AssertionStorage provideStorage() {
-        return new SimpleAssertionStorage(new HashMap<>(), new HashMap<>(), new StorageConfig(true, 60000L));
+        return new SimpleAssertionStorage(
+                new HashMap<>(), new HashMap<>(), new StorageConfig(true, 60000L));
     }
 }
