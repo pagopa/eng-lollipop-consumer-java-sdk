@@ -93,8 +93,10 @@ public class CertData extends AbstractOpenApiSchema {
                     // TODO: there is no validation against JSON schema constraints
                     // (min, max, enum, pattern...), this does not perform a strict JSON
                     // validation, which means the 'match' count may be higher than it should be.
-                    match++;
-                    log.log(Level.FINER, "Input data matches schema 'CIECertData'");
+                    if (((CIECertData) deserialized).getEntityDescriptor() != null) {
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'CIECertData'");
+                    }
                 }
             } catch (Exception e) {
                 // deserialization failed, continue
@@ -119,8 +121,10 @@ public class CertData extends AbstractOpenApiSchema {
                     // TODO: there is no validation against JSON schema constraints
                     // (min, max, enum, pattern...), this does not perform a strict JSON
                     // validation, which means the 'match' count may be higher than it should be.
-                    match++;
-                    log.log(Level.FINER, "Input data matches schema 'SPIDCertData'");
+                    if(((SPIDCertData) deserialized).getEntitiesDescriptor() != null){
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'SPIDCertData'");
+                    }
                 }
             } catch (Exception e) {
                 // deserialization failed, continue
