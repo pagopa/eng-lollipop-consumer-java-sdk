@@ -14,6 +14,7 @@ package it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.ApiClient;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.ApiException;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.ApiResponse;
@@ -34,6 +35,7 @@ import java.util.function.Consumer;
 public class DefaultApi {
   private final HttpClient memberVarHttpClient;
   private final ObjectMapper memberVarObjectMapper;
+  private final XmlMapper memberVarXMLMapper;
   private final String memberVarBaseUri;
   private final Consumer<HttpRequest.Builder> memberVarInterceptor;
   private final Duration memberVarReadTimeout;
@@ -47,6 +49,7 @@ public class DefaultApi {
   public DefaultApi(ApiClient apiClient) {
     memberVarHttpClient = apiClient.getHttpClient();
     memberVarObjectMapper = apiClient.getObjectMapper();
+    memberVarXMLMapper = apiClient.getXmlMapper();
     memberVarBaseUri = apiClient.getBaseUri();
     memberVarInterceptor = apiClient.getRequestInterceptor();
     memberVarReadTimeout = apiClient.getReadTimeout();
@@ -167,7 +170,7 @@ public class DefaultApi {
         return new ApiResponse<CertData>(
           localVarResponse.statusCode(),
           localVarResponse.headers().map(),
-          localVarResponse.body() == null ? null : memberVarObjectMapper.readValue(localVarResponse.body(), new TypeReference<CertData>() {}) // closes the InputStream
+          localVarResponse.body() == null ? null : memberVarXMLMapper.readValue(localVarResponse.body(), new TypeReference<CertData>() {}) // closes the InputStream
         );
       } finally {
       }
@@ -304,7 +307,7 @@ public class DefaultApi {
         return new ApiResponse<CertData>(
           localVarResponse.statusCode(),
           localVarResponse.headers().map(),
-          localVarResponse.body() == null ? null : memberVarObjectMapper.readValue(localVarResponse.body(), new TypeReference<CertData>() {}) // closes the InputStream
+          localVarResponse.body() == null ? null : memberVarXMLMapper.readValue(localVarResponse.body(), new TypeReference<CertData>() {}) // closes the InputStream
         );
       } finally {
       }

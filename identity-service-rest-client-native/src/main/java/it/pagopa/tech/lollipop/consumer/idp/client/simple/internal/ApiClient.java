@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.openapitools.jackson.nullable.JsonNullableModule;
 
@@ -56,6 +57,7 @@ public class ApiClient {
 
   private HttpClient.Builder builder;
   private ObjectMapper mapper;
+  private XmlMapper xmlMapper;
   private String scheme;
   private String host;
   private int port;
@@ -166,6 +168,7 @@ public class ApiClient {
   public ApiClient() {
     this.builder = createDefaultHttpClientBuilder();
     this.mapper = createDefaultObjectMapper();
+    this.xmlMapper = createDefaultXmlMapper();
     updateBaseUri(getDefaultBaseUri());
     interceptor = null;
     readTimeout = null;
@@ -181,9 +184,10 @@ public class ApiClient {
    * @param mapper Object mapper.
    * @param baseUri Base URI
    */
-  public ApiClient(HttpClient.Builder builder, ObjectMapper mapper, String baseUri) {
+  public ApiClient(HttpClient.Builder builder, ObjectMapper mapper, XmlMapper xmlMapper, String baseUri) {
     this.builder = builder;
     this.mapper = mapper;
+    this.xmlMapper = xmlMapper;
     updateBaseUri(baseUri != null ? baseUri : getDefaultBaseUri());
     interceptor = null;
     readTimeout = null;
@@ -203,6 +207,11 @@ public class ApiClient {
     mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
     mapper.registerModule(new JavaTimeModule());
     mapper.registerModule(new JsonNullableModule());
+    return mapper;
+  }
+
+  protected XmlMapper createDefaultXmlMapper() {
+    XmlMapper mapper = new XmlMapper();
     return mapper;
   }
 
@@ -265,6 +274,13 @@ public class ApiClient {
   public ObjectMapper getObjectMapper() {
     return mapper.copy();
   }
+
+  public ApiClient setXmlMapper(XmlMapper mapper) {
+    this.xmlMapper = mapper;
+    return this;
+  }
+
+  public XmlMapper getXmlMapper() { return xmlMapper.copy(); }
 
   /**
    * Set a custom host name for the target service.
