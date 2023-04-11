@@ -2,4 +2,4 @@ FROM openjdk:11-jre-slim
 
 RUN mkdir /app
 
-COPY core/build/libs/*.jar /app/core.jar
+COPY core/build/libs/*.jar /app/
