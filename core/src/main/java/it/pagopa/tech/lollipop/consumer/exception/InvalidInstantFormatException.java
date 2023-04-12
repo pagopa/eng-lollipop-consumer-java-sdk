@@ -1,3 +1,4 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.exception;
 
 /** Thrown when the given instant is not a valid timestamp */

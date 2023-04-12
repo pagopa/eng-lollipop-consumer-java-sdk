@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface IdpCertClient {
 
-    List<IdpCertData> getCertData(String entityId, String instant) throws CertDataNotFoundException, CertDataTagListNotFoundException;
+    List<IdpCertData> getCertData(String entityId, String instant)
+            throws CertDataNotFoundException, CertDataTagListNotFoundException;
 }

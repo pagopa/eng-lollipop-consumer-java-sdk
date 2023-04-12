@@ -4,17 +4,16 @@ package it.pagopa.tech.lollipop.consumer.idp.client.simple;
 import it.pagopa.tech.lollipop.consumer.idp.client.IdpCertClient;
 import it.pagopa.tech.lollipop.consumer.idp.client.IdpCertClientProvider;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.ApiClient;
-
 import javax.inject.Inject;
 
 /** Provider class for retrieving an instance of {@link IdpCertSimpleClient} */
 public class IdpCertSimpleClientProvider implements IdpCertClientProvider {
 
-    private final IdpCertSimpleClientConfig entityConfig;
+    private final IdpCertSimpleClientConfig idpClientConfig;
 
     @Inject
-    public IdpCertSimpleClientProvider(IdpCertSimpleClientConfig entityConfig){
-        this.entityConfig = entityConfig;
+    public IdpCertSimpleClientProvider(IdpCertSimpleClientConfig config) {
+        this.idpClientConfig = config;
     }
     /**
      * Provide an instance of {@link IdpCertSimpleClient}
@@ -23,6 +22,6 @@ public class IdpCertSimpleClientProvider implements IdpCertClientProvider {
      */
     @Override
     public IdpCertClient provideClient() {
-        return new IdpCertSimpleClient(new ApiClient(), this.entityConfig);
+        return new IdpCertSimpleClient(new ApiClient(this.idpClientConfig), this.idpClientConfig);
     }
 }

@@ -1,7 +1,8 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.exception;
 
 /** Thrown in case of problems retrieving idp certification tag list */
-public class CertDataTagListNotFoundException extends Exception{
+public class CertDataTagListNotFoundException extends Exception {
     /**
      * Constructs new exception with provided message and cause
      *
