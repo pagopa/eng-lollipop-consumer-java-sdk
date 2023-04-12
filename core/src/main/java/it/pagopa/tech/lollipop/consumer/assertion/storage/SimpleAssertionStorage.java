@@ -8,7 +8,15 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import javax.inject.Inject;
 
-/** Implementation of the {@link AssertionStorage} interface as a simple in memory storage */
+/**
+ * Implementation of the {@link AssertionStorage} interface as a simple in memory storage.
+ *
+ * <p>The storage can be configured via the {@link StorageConfig} configuration class.
+ *
+ * <p>It store in a in memory {@link java.util.HashMap} the assertions and the associated scheduled
+ * eviction operations, every time an assertion is accessed the associated eviction operation is
+ * rescheduled.
+ */
 public class SimpleAssertionStorage implements AssertionStorage {
 
     private final Map<String, SamlAssertion> assertionMap;
@@ -26,10 +34,15 @@ public class SimpleAssertionStorage implements AssertionStorage {
     }
 
     /**
-     * Retrieve the assertion associated with the provided assertion reference
+     * Retrieve the assertion associated with the provided assertion reference if the storage is
+     * enabled {@link StorageConfig}, otherwise no operation is performed.
+     *
+     * <p>Before the assertion is returned the associated eviction operation is rescheduled with the
+     * delay configured via {@link StorageConfig}
      *
      * @param assertionRef the assertion reference
-     * @return the SAML assertion if found, otherwise null
+     * @return the SAML assertion if found, null if the assertion is not present in the storage or
+     *     the storage is disabled
      */
     @Override
     public SamlAssertion getAssertion(String assertionRef) {
@@ -45,7 +58,11 @@ public class SimpleAssertionStorage implements AssertionStorage {
     }
 
     /**
-     * Store the assertion
+     * Store the assertion if the storage is enabled {@link StorageConfig}, otherwise no operation
+     * is performed.
+     *
+     * <p>Once the assertion is stored an eviction operation is scheduled with a delay configured
+     * via {@link StorageConfig}
      *
      * @param assertionRef the assertion reference
      * @param assertion the SAML assertion

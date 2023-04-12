@@ -9,6 +9,7 @@ public class SimpleAssertionStorageProvider implements AssertionStorageProvider 
     /**
      * {@inheritDoc}
      *
+     * @param storageConfig the storage configuration
      * @return an instance of {@link SimpleAssertionStorage}
      */
     @Override
