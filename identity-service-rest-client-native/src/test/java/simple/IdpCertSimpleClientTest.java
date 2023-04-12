@@ -1,6 +1,8 @@
 package simple;
 
 
+import it.pagopa.tech.lollipop.consumer.exception.CertDataNotFoundException;
+import it.pagopa.tech.lollipop.consumer.exception.CertDataTagListNotFoundException;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.IdpCertSimpleClient;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.ApiClient;
 import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
@@ -25,14 +27,14 @@ class IdpCertSimpleClientTest {
         idpCertSimpleClient = new IdpCertSimpleClient(client);
     }
     @Test
-    void getSPIDCertData() {
+    void getSPIDCertData() throws CertDataTagListNotFoundException, CertDataNotFoundException {
         List<IdpCertData> response = idpCertSimpleClient.getCertData(SPID_ENTITY_ID, instant);
 
         Assertions.assertNotNull(response);
     }
 
     @Test
-    void getCIECertData() {
+    void getCIECertData() throws CertDataTagListNotFoundException, CertDataNotFoundException {
         List<IdpCertData> response = idpCertSimpleClient.getCertData(CIE_ENTITY_ID, instant);
 
         Assertions.assertNotNull(response);
