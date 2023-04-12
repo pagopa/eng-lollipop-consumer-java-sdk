@@ -33,9 +33,14 @@ public class IdpCertSimpleClient implements IdpCertClient {
     }
 
     /**
-     * @param entityId
-     * @param instant
-     * @return
+     * Retrieve the certification data of the given entityId issued
+     * in the same timeframe as the issue instant of the SAML assertion
+     *
+     * @param entityId Identity Provider ID
+     * @param instant  Assertion Issue Instant
+     * @return the certifications issued before and after the timestamp instant
+     * @throws CertDataTagListNotFoundException if an error occurred retrieving the list of tags or filtering the tags with the instant
+     * @throws CertDataNotFoundException        if an error occurred retrieving the certification XML or if data for the given entityId were not found
      */
     @Override
     public List<IdpCertData> getCertData(String entityId, String instant) throws CertDataNotFoundException, CertDataTagListNotFoundException {
@@ -58,7 +63,7 @@ public class IdpCertSimpleClient implements IdpCertClient {
                 try {
                     IdpCertData certData = getCIECertData(tag, entityId);
 
-                    if(certData != null){
+                    if (certData != null) {
                         listCertData.add(certData);
                     }
                 } catch (ApiException | EntityIdNotFoundException e) {
@@ -77,7 +82,7 @@ public class IdpCertSimpleClient implements IdpCertClient {
                 try {
                     IdpCertData certData = getSPIDCertData(tag, entityId);
 
-                    if(certData != null){
+                    if (certData != null) {
                         listCertData.add(certData);
                     }
                 } catch (ApiException | EntityIdNotFoundException e) {
@@ -102,7 +107,7 @@ public class IdpCertSimpleClient implements IdpCertClient {
 
         responseAssertion = this.defaultApi.idpKeysSpidTagGet(tag);
 
-        return getEntityData(((EntitiesDescriptor)responseAssertion.getActualInstance()), tag, entityId);
+        return getEntityData(((EntitiesDescriptor) responseAssertion.getActualInstance()), tag, entityId);
     }
 
     private List<String> getCIETagList(String instant) throws TagListSearchOutOfBoundException {
@@ -118,17 +123,17 @@ public class IdpCertSimpleClient implements IdpCertClient {
 
         responseAssertion = this.defaultApi.idpKeysCieTagGet(tag);
 
-        return getEntityData(((EntitiesDescriptor)responseAssertion.getActualInstance()), tag, entityId);
+        return getEntityData(((EntitiesDescriptor) responseAssertion.getActualInstance()), tag, entityId);
     }
 
     private IdpCertData getEntityData(EntitiesDescriptor data, String tag, String entityId) throws EntityIdNotFoundException {
         IdpCertData newData = new IdpCertData();
 
         for (EntityDescriptor entity : data.getEntityList()) {
-            if (entity.getEntityID().equals(entityId)){
+            if (entity.getEntityID().equals(entityId)) {
                 newData.setEntityId(entityId);
                 newData.setTag(tag);
-                newData.setCertData("test");
+                newData.setCertData(entity.getSignature());
 
                 return newData;
             }
@@ -149,13 +154,13 @@ public class IdpCertSimpleClient implements IdpCertClient {
 
         Collections.sort(tagList);
 
-        if(latestRemoved){
+        if (latestRemoved) {
             tagList.add(0, "latest");
         }
 
         boolean notFound = true;
         while (notFound) {
-            try{
+            try {
                 String upperTag = tagList.get(index);
                 String lowerTag = tagList.get(index - 1);
                 if (Long.valueOf(instant) <= Long.valueOf(upperTag) || upperTag.equals("latest")) {
@@ -169,7 +174,7 @@ public class IdpCertSimpleClient implements IdpCertClient {
                 } else {
                     index += 1;
                 }
-            } catch (Exception e){
+            } catch (Exception e) {
                 throw new TagListSearchOutOfBoundException("Error finding the tags relative to assertion instant " + instant);
             }
         }

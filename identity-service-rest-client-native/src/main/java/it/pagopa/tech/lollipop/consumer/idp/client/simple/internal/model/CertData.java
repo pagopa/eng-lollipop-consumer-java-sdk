@@ -78,9 +78,8 @@ public class CertData extends AbstractOpenApiSchema {
             EntitiesDescriptor entitiesDescriptor = new EntitiesDescriptor();
             // deserialize CIECertData
             try {
+
                 deserialized = tree.traverse(jp.getCodec()).readValueAs(EntityDescriptor.class);
-
-
 
                 if (((EntityDescriptor) deserialized).getEntityID() != null) {
                     List<EntityDescriptor> entityList = Arrays.asList(((EntityDescriptor)deserialized));

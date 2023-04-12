@@ -32,6 +32,7 @@ public class AssertionSimpleClient implements AssertionClient {
      * @param assertionRef Assertion unique identification
      * @return the retrieved assertion or null if the assertion is not supported (not SAML)
      * @throws LollipopAssertionNotFoundException if some error occurred in the request
+     * @throws OidcAssertionNotSupported if the assertion retrieved is a OIDC token
      */
     @Override
     public SamlAssertion getAssertion(String jwt, String assertionRef)

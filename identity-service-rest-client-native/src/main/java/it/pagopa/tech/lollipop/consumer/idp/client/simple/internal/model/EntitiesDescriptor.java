@@ -20,14 +20,12 @@ import lombok.Setter;
 
 import java.util.List;
 
-
 /**
  * EntitiesDescriptor
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-04-11T16:21:49.277208500+02:00[Europe/Paris]")
 public class EntitiesDescriptor {
 
   @JsonProperty("EntityDescriptor")
