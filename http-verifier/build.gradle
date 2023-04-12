@@ -18,6 +18,13 @@ group 'it.pagopa.tech.lollipop.sdk.impls'
 repositories {
 	mavenLocal()
 	mavenCentral()
+	maven {
+		url = uri("https://maven.pkg.github.com/pagopa/eng-http-signatures")
+		credentials {
+			username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+			password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+		}
+	}
 }
 
 configurations {
@@ -48,6 +55,7 @@ dependencies {
 	// Use JUnit Jupiter for testing.
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
 	testImplementation 'org.assertj:assertj-core:3.24.2'
+	implementation 'it.pagopa.tech:http-signatures:1.1.2'
 	implementation project(':core')
 }
 
