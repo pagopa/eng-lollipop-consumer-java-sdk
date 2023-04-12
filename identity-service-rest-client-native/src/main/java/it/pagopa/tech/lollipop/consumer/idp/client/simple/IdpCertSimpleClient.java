@@ -10,39 +10,38 @@ import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.model.CertDat
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.model.EntitiesDescriptor;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.model.EntityDescriptor;
 import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
-
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.inject.Inject;
 
 public class IdpCertSimpleClient implements IdpCertClient {
 
-    private final ApiClient apiClient;
     private final DefaultApi defaultApi;
 
     private final IdpCertSimpleClientConfig entityConfig;
 
-
     @Inject
     public IdpCertSimpleClient(ApiClient client, IdpCertSimpleClientConfig entityConfig) {
-        this.apiClient = client;
         this.defaultApi = new DefaultApi(client);
         this.entityConfig = entityConfig;
     }
 
     /**
-     * Retrieve the certification data of the given entityId issued
-     * in the same timeframe as the issue instant of the SAML assertion
+     * Retrieve the certification data of the given entityId issued in the same timeframe as the
+     * issue instant of the SAML assertion
      *
      * @param entityId Identity Provider ID
-     * @param instant  Assertion Issue Instant
+     * @param instant Assertion Issue Instant
      * @return the certifications issued before and after the timestamp instant
-     * @throws CertDataTagListNotFoundException if an error occurred retrieving the list of tags or filtering the tags with the instant
-     * @throws CertDataNotFoundException        if an error occurred retrieving the certification XML or if data for the given entityId were not found
+     * @throws CertDataTagListNotFoundException if an error occurred retrieving the list of tags or
+     *     filtering the tags with the instant
+     * @throws CertDataNotFoundException if an error occurred retrieving the certification XML or if
+     *     data for the given entityId were not found
      */
     @Override
-    public List<IdpCertData> getCertData(String entityId, String instant) throws CertDataNotFoundException, CertDataTagListNotFoundException {
+    public List<IdpCertData> getCertData(String entityId, String instant)
+            throws CertDataNotFoundException, CertDataTagListNotFoundException {
         List<IdpCertData> listCertData = new ArrayList<>();
         List<String> tagList;
 
@@ -53,8 +52,11 @@ public class IdpCertSimpleClient implements IdpCertClient {
         if (entityConfig.getCieEntityId().contains(entityId)) {
             try {
                 tagList = getCIETagList(instant);
-            } catch (ApiException | TagListSearchOutOfBoundException | InvalidInstantFormatException e) {
-                throw new CertDataTagListNotFoundException("Error retrieving certificate's tag list: " + e.getMessage(), e);
+            } catch (ApiException
+                    | TagListSearchOutOfBoundException
+                    | InvalidInstantFormatException e) {
+                throw new CertDataTagListNotFoundException(
+                        "Error retrieving certificate's tag list: " + e.getMessage(), e);
             }
 
             for (String tag : tagList) {
@@ -63,15 +65,22 @@ public class IdpCertSimpleClient implements IdpCertClient {
 
                     listCertData.add(certData);
                 } catch (ApiException | EntityIdNotFoundException e) {
-                    throw new CertDataNotFoundException("Error retrieving certificate data for tag " + tag + ": " + e.getMessage(), e);
+                    throw new CertDataNotFoundException(
+                            "Error retrieving certificate data for tag "
+                                    + tag
+                                    + ": "
+                                    + e.getMessage(),
+                            e);
                 }
-
             }
         } else {
             try {
                 tagList = getSPIDTagList(instant);
-            } catch (ApiException | TagListSearchOutOfBoundException | InvalidInstantFormatException e) {
-                throw new CertDataTagListNotFoundException("Error retrieving certificate's tag list: " + e.getMessage(), e);
+            } catch (ApiException
+                    | TagListSearchOutOfBoundException
+                    | InvalidInstantFormatException e) {
+                throw new CertDataTagListNotFoundException(
+                        "Error retrieving certificate's tag list: " + e.getMessage(), e);
             }
 
             for (String tag : tagList) {
@@ -80,15 +89,20 @@ public class IdpCertSimpleClient implements IdpCertClient {
 
                     listCertData.add(certData);
                 } catch (ApiException | EntityIdNotFoundException e) {
-                    throw new CertDataNotFoundException("Error retrieving certificate data for tag " + tag + ": " + e.getMessage(), e);
+                    throw new CertDataNotFoundException(
+                            "Error retrieving certificate data for tag "
+                                    + tag
+                                    + ": "
+                                    + e.getMessage(),
+                            e);
                 }
-
             }
         }
         return listCertData;
     }
 
-    private List<String> getSPIDTagList(String instant) throws TagListSearchOutOfBoundException, InvalidInstantFormatException {
+    private List<String> getSPIDTagList(String instant)
+            throws TagListSearchOutOfBoundException, InvalidInstantFormatException {
         List<String> responseAssertion;
 
         responseAssertion = this.defaultApi.idpKeysSpidGet();
@@ -96,15 +110,18 @@ public class IdpCertSimpleClient implements IdpCertClient {
         return getTagsFromInstant(responseAssertion, instant);
     }
 
-    private IdpCertData getSPIDCertData(String tag, String entityId) throws EntityIdNotFoundException {
+    private IdpCertData getSPIDCertData(String tag, String entityId)
+            throws EntityIdNotFoundException {
         CertData responseAssertion = null;
 
         responseAssertion = this.defaultApi.idpKeysSpidTagGet(tag);
 
-        return getEntityData(((EntitiesDescriptor) responseAssertion.getActualInstance()), tag, entityId);
+        return getEntityData(
+                ((EntitiesDescriptor) responseAssertion.getActualInstance()), tag, entityId);
     }
 
-    private List<String> getCIETagList(String instant) throws TagListSearchOutOfBoundException, InvalidInstantFormatException {
+    private List<String> getCIETagList(String instant)
+            throws TagListSearchOutOfBoundException, InvalidInstantFormatException {
         List<String> responseAssertion;
 
         responseAssertion = this.defaultApi.idpKeysCieGet();
@@ -112,15 +129,18 @@ public class IdpCertSimpleClient implements IdpCertClient {
         return getTagsFromInstant(responseAssertion, instant);
     }
 
-    private IdpCertData getCIECertData(String tag, String entityId) throws EntityIdNotFoundException {
+    private IdpCertData getCIECertData(String tag, String entityId)
+            throws EntityIdNotFoundException {
         CertData responseAssertion;
 
         responseAssertion = this.defaultApi.idpKeysCieTagGet(tag);
 
-        return getEntityData(((EntitiesDescriptor) responseAssertion.getActualInstance()), tag, entityId);
+        return getEntityData(
+                ((EntitiesDescriptor) responseAssertion.getActualInstance()), tag, entityId);
     }
 
-    private IdpCertData getEntityData(EntitiesDescriptor data, String tag, String entityId) throws EntityIdNotFoundException {
+    private IdpCertData getEntityData(EntitiesDescriptor data, String tag, String entityId)
+            throws EntityIdNotFoundException {
         IdpCertData newData = new IdpCertData();
 
         for (EntityDescriptor entity : data.getEntityList()) {
@@ -136,7 +156,8 @@ public class IdpCertSimpleClient implements IdpCertClient {
         throw new EntityIdNotFoundException("Cert for entityID " + entityId + " not found");
     }
 
-    private List<String> getTagsFromInstant(List<String> tagList, String instant) throws TagListSearchOutOfBoundException, InvalidInstantFormatException {
+    private List<String> getTagsFromInstant(List<String> tagList, String instant)
+            throws TagListSearchOutOfBoundException, InvalidInstantFormatException {
         List<String> newTagList = new ArrayList<>();
         String latest = "latest";
         long longInstant;
@@ -144,7 +165,8 @@ public class IdpCertSimpleClient implements IdpCertClient {
         try {
             longInstant = Long.parseLong(instant);
         } catch (Exception e) {
-            throw new InvalidInstantFormatException("The given insant " + instant + " is not a valid timestamp");
+            throw new InvalidInstantFormatException(
+                    "The given insant " + instant + " is not a valid timestamp");
         }
 
         boolean latestRemoved = tagList.remove(latest);
@@ -162,7 +184,8 @@ public class IdpCertSimpleClient implements IdpCertClient {
             try {
                 if (tagList.size() <= 2) {
                     String firstTimestamp = tagList.get(0);
-                    if (firstTimestamp.equals(latest) || Long.parseLong(firstTimestamp) <= longInstant) {
+                    if (firstTimestamp.equals(latest)
+                            || Long.parseLong(firstTimestamp) <= longInstant) {
                         return tagList;
                     }
                 }
@@ -181,7 +204,8 @@ public class IdpCertSimpleClient implements IdpCertClient {
                     index += 1;
                 }
             } catch (Exception e) {
-                throw new TagListSearchOutOfBoundException("Error finding the tags relative to assertion instant " + instant);
+                throw new TagListSearchOutOfBoundException(
+                        "Error finding the tags relative to assertion instant " + instant);
             }
         }
 
