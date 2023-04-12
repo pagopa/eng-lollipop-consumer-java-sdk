@@ -12,5 +12,8 @@ public class LollipopConsumerRequestConfig {
     @Builder.Default private String signatureInputHeader = "signature-input";
     @Builder.Default private String contentEncodingHeader = "content-encoding";
     @Builder.Default private String contentDigestHeader = "content-digest";
+    @Builder.Default private String lollipopKeyHeader = "x-pagopa-lollipop-public-key";
     @Builder.Default private boolean strictDigestVerify = false;
+
+
 }
