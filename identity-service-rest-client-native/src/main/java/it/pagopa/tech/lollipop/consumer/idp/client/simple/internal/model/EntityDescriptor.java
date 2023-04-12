@@ -13,6 +13,7 @@
 
 package it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -29,6 +30,7 @@ import java.util.StringJoiner;
 @JsonPropertyOrder({
   EntityDescriptor.JSON_PROPERTY_ENTITY_I_D
 })
+@JsonIgnoreProperties(ignoreUnknown = true)
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-04-11T16:21:49.277208500+02:00[Europe/Paris]")
 public class EntityDescriptor {
   public static final String JSON_PROPERTY_ENTITY_I_D = "entityID";
