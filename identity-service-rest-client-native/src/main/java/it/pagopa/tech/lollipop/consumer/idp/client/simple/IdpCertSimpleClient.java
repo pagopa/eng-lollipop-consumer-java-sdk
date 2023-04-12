@@ -55,7 +55,6 @@ public class IdpCertSimpleClient implements IdpCertClient {
             }
 
             for (String tag : tagList) {
-                //TODO recupero storage
                 try {
                     IdpCertData certData = getCIECertData(tag, entityId);
 
@@ -75,7 +74,6 @@ public class IdpCertSimpleClient implements IdpCertClient {
             }
 
             for (String tag : tagList) {
-                //TODO recupero storage
                 try {
                     IdpCertData certData = getSPIDCertData(tag, entityId);
 
