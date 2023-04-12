@@ -16,6 +16,7 @@ import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class IdpCertSimpleClient implements IdpCertClient {
@@ -62,7 +63,7 @@ public class IdpCertSimpleClient implements IdpCertClient {
                         listCertData.add(certData);
                     }
                 } catch (ApiException | EntityIdNotFoundException e) {
-                    throw new CertDataNotFoundException("Error retrieving certificate data for tag" + tag + ": " + e.getMessage(), e);
+                    throw new CertDataNotFoundException("Error retrieving certificate data for tag " + tag + ": " + e.getMessage(), e);
                 }
 
             }
@@ -82,7 +83,7 @@ public class IdpCertSimpleClient implements IdpCertClient {
                         listCertData.add(certData);
                     }
                 } catch (ApiException | EntityIdNotFoundException e) {
-                    throw new CertDataNotFoundException("Error retrieving certificate data for tag" + tag + ": " + e.getMessage(), e);
+                    throw new CertDataNotFoundException("Error retrieving certificate data for tag " + tag + ": " + e.getMessage(), e);
                 }
 
             }
@@ -135,7 +136,7 @@ public class IdpCertSimpleClient implements IdpCertClient {
             }
         }
 
-        throw new EntityIdNotFoundException("Cert for entityID" + entityId + " not found");
+        throw new EntityIdNotFoundException("Cert for entityID " + entityId + " not found");
     }
 
     private List<String> getTagsFromInstant(List<String> tagList, String instant) throws TagListSearchOutOfBoundException {
@@ -146,30 +147,34 @@ public class IdpCertSimpleClient implements IdpCertClient {
         }
 
         int index = tagList.size() / 2;
+        boolean latestRemoved = tagList.remove("latest");
 
-        //TODO ordinamento tag
+        Collections.sort(tagList);
+
+        if(latestRemoved){
+            tagList.add(0, "latest");
+        }
+
         boolean notFound = true;
         while (notFound) {
-            String upperTag = tagList.get(index);
-            String lowerTag = tagList.get(index + 1);
-            if (Long.valueOf(instant) <= Long.valueOf(upperTag) || upperTag.equals("latest")) {
-                if (Long.valueOf(instant) >= Long.valueOf(lowerTag)) {
-                    notFound = false;
-                    newTagList.add(upperTag);
-                    newTagList.add(lowerTag);
+            try{
+                String upperTag = tagList.get(index);
+                String lowerTag = tagList.get(index - 1);
+                if (Long.valueOf(instant) <= Long.valueOf(upperTag) || upperTag.equals("latest")) {
+                    if (Long.valueOf(instant) >= Long.valueOf(lowerTag)) {
+                        notFound = false;
+                        newTagList.add(upperTag);
+                        newTagList.add(lowerTag);
+                    } else {
+                        index -= 1;
+                    }
                 } else {
                     index += 1;
                 }
-            } else {
-                index -= 1;
+            } catch (Exception e){
+                throw new TagListSearchOutOfBoundException("Error finding the tags relative to assertion instant " + instant);
             }
-
-            if (index < 0 || index >= tagList.size()) {
-                throw new TagListSearchOutOfBoundException("Error finding the tags relative to assertion instant" + instant);
-            }
-
         }
-
 
         return newTagList;
     }
