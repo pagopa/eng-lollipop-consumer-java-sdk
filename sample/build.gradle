@@ -16,16 +16,14 @@ application {
     mainClassName = "it.pagopa.tech.sample.LollipopConsumerSample"
 }
 
-group 'it.pagopa.tech'
-
 repositories {
     mavenLocal()
     mavenCentral()
 }
 
 dependencies {
-    implementation 'it.pagopa.tech:core:1.0.0-SNAPSHOT'
-    implementation 'it.pagopa.tech:http-verifier:1.0.0-SNAPSHOT'
+    implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:core:1.0.0-SNAPSHOT'
+    implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:http-verifier:1.0.0-SNAPSHOT'
     // Use JUnit Jupiter for testing.
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
 }

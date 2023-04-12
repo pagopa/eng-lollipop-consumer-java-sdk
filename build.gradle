@@ -13,12 +13,30 @@ repositories {
 
 allprojects {
 	version = "1.0.0-SNAPSHOT"
-	group = 'it.pagopa.tech'
+	group = 'it.pagopa.tech.lollipop-consumer-java-sdk'
 	sourceCompatibility = '11'
 	targetCompatibility = '11'
 	apply plugin: 'com.diffplug.spotless'
 	apply plugin: 'nebula.lint'
 	gradleLint.rules = ['all-dependency']
+
+	configurations {
+		spotless {
+			resolutionStrategy {
+				disableDependencyVerification()
+			}
+		}
+		gradleLint {
+			resolutionStrategy {
+				disableDependencyVerification()
+			}
+		}
+		gradleEnterprise {
+			resolutionStrategy {
+				disableDependencyVerification()
+			}
+		}
+	}
 
 	spotless {
 		// optional: limit format enforcement to just the files changed by this feature branch
@@ -100,6 +118,16 @@ subprojects {
 				artifactId project.name
 				version project.version
 				from components.java
+			}
+		}
+		repositories {
+			maven {
+				name = "GitHubPackages"
+				url = "https://maven.pkg.github.com/pagopa/eng-lollipop-consumer-java-sdk"
+				credentials {
+					username = System.getenv("GITHUB_ACTOR")
+					password = System.getenv("GITHUB_TOKEN")
+				}
 			}
 		}
 	}

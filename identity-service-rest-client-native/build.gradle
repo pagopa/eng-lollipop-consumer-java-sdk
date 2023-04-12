@@ -12,7 +12,7 @@ plugins {
 	id("io.freefair.lombok") version "8.0.0-rc4"
 }
 
-group 'it.pagopa.tech'
+group 'it.pagopa.tech.lollipop.sdk.impls'
 
 repositories {
 	mavenLocal()
