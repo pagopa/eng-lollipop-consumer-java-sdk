@@ -15,7 +15,7 @@ public class VismaHttpMessageVerifierTest {
     @Test
     public void correctDigestIsVerified() {
         // setup
-        var content = new String(new byte[] {1, 2, 123});
+        var content = new String(new byte[] {1, 2, 4});
         var header =
                 "md5=:V9tg6T+1JldSH4+Zy8c5jw==:,sha-256=:1LKaloxAFzY43tjRdMhpV6+iEb5HnO4CDbpd/hJ9kco=:";
 
