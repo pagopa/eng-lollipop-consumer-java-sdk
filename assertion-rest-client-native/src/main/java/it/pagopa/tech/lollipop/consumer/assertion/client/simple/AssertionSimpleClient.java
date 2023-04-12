@@ -15,12 +15,10 @@ import javax.inject.Inject;
 /** Implementation of the @AssertionClient using generated openAPI REST Client */
 public class AssertionSimpleClient implements AssertionClient {
 
-    ApiClient apiClient;
-    DefaultApi defaultApi;
+    private final DefaultApi defaultApi;
 
     @Inject
     public AssertionSimpleClient(ApiClient client) {
-        this.apiClient = client;
         this.defaultApi = new DefaultApi(client);
     }
 
@@ -37,10 +35,6 @@ public class AssertionSimpleClient implements AssertionClient {
     public SamlAssertion getAssertion(String jwt, String assertionRef)
             throws LollipopAssertionNotFoundException {
         AssertionRef ref = new AssertionRef(assertionRef);
-
-        if (jwt.isEmpty() || assertionRef.isEmpty()) {
-            throw new IllegalArgumentException("Jwt or Assertion Ref missing");
-        }
 
         LCUserInfo responseAssertion;
 
