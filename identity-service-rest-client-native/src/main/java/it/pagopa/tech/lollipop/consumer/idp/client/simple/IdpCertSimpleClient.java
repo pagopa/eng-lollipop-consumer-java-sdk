@@ -155,7 +155,7 @@ public class IdpCertSimpleClient implements IdpCertClient {
         Collections.sort(tagList);
 
         if (latestRemoved) {
-            tagList.add(0, "latest");
+            tagList.add("latest");
         }
 
         boolean notFound = true;
@@ -163,7 +163,7 @@ public class IdpCertSimpleClient implements IdpCertClient {
             try {
                 String upperTag = tagList.get(index);
                 String lowerTag = tagList.get(index - 1);
-                if (Long.valueOf(instant) <= Long.valueOf(upperTag) || upperTag.equals("latest")) {
+                if (upperTag.equals("latest") || Long.valueOf(instant) <= Long.valueOf(upperTag)) {
                     if (Long.valueOf(instant) >= Long.valueOf(lowerTag)) {
                         notFound = false;
                         newTagList.add(upperTag);
