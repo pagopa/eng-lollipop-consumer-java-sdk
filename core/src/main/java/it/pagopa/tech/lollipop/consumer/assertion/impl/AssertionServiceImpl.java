@@ -5,6 +5,7 @@ import it.pagopa.tech.lollipop.consumer.assertion.AssertionService;
 import it.pagopa.tech.lollipop.consumer.assertion.client.AssertionClient;
 import it.pagopa.tech.lollipop.consumer.assertion.storage.AssertionStorage;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopAssertionNotFoundException;
+import it.pagopa.tech.lollipop.consumer.exception.OidcAssertionNotSupported;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
 import javax.inject.Inject;
 
@@ -38,7 +39,7 @@ public class AssertionServiceImpl implements AssertionService {
      */
     @Override
     public SamlAssertion getAssertion(String jwt, String assertionRef)
-            throws LollipopAssertionNotFoundException {
+            throws LollipopAssertionNotFoundException, OidcAssertionNotSupported {
 
         if (jwt == null || jwt.isBlank() || assertionRef == null || assertionRef.isBlank()) {
             String errMsg =

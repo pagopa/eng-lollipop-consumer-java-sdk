@@ -28,10 +28,7 @@ public class DefaultApi {
     private final Duration memberVarReadTimeout;
     private final Consumer<HttpResponse<InputStream>> memberVarResponseInterceptor;
     private final Consumer<HttpResponse<String>> memberVarAsyncResponseInterceptor;
-
-    public DefaultApi() {
-        this(new ApiClient());
-    }
+    private final String memberAssertionRequestEndpoint;
 
     public DefaultApi(ApiClient apiClient) {
         memberVarHttpClient = apiClient.getHttpClient();
@@ -41,6 +38,7 @@ public class DefaultApi {
         memberVarReadTimeout = apiClient.getReadTimeout();
         memberVarResponseInterceptor = apiClient.getResponseInterceptor();
         memberVarAsyncResponseInterceptor = apiClient.getAsyncResponseInterceptor();
+        memberAssertionRequestEndpoint = apiClient.getAssertionRequestEndpoint();
     }
 
     protected ApiException getApiException(String operationId, HttpResponse<InputStream> response)
@@ -134,10 +132,12 @@ public class DefaultApi {
         HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();
 
         String localVarPath =
-                "/assertions/{assertion_ref}"
-                        .replace(
-                                "{assertion_ref}",
-                                ApiClient.urlEncode(assertionRef.getActualInstance().toString()));
+                memberAssertionRequestEndpoint
+                        + "/{assertion_ref}"
+                                .replace(
+                                        "{assertion_ref}",
+                                        ApiClient.urlEncode(
+                                                assertionRef.getActualInstance().toString()));
 
         localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));
 

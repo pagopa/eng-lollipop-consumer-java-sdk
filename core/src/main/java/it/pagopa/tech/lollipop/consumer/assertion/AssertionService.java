@@ -2,6 +2,7 @@
 package it.pagopa.tech.lollipop.consumer.assertion;
 
 import it.pagopa.tech.lollipop.consumer.exception.LollipopAssertionNotFoundException;
+import it.pagopa.tech.lollipop.consumer.exception.OidcAssertionNotSupported;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
 
 /** Interface of the assertion service, it defines the methods for managing the assertions */
@@ -16,5 +17,5 @@ public interface AssertionService {
      * @throws LollipopAssertionNotFoundException if some error occurred retrieving the request
      */
     SamlAssertion getAssertion(String jwt, String assertionRef)
-            throws LollipopAssertionNotFoundException;
+            throws LollipopAssertionNotFoundException, OidcAssertionNotSupported;
 }
