@@ -13,13 +13,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
 import java.util.List;
 
 class IdpCertSimpleClientTest {
 
     private static IdpCertSimpleClient idpCertSimpleClient;
 
-    private static final String INSTANT = "1679072970";
+    private static final String INSTANT = String.valueOf(Instant.now().getEpochSecond());
     private static final String SPID_ENTITY_ID = "https://posteid.poste.it";
     private static final String CIE_ENTITY_ID = "https://idserver.servizicie.interno.gov.it/idp/profile/SAML2/POST/SSO";
 
