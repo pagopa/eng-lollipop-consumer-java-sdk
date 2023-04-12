@@ -14,7 +14,7 @@ plugins {
 /*id("org.openapi.generator") version "6.5.0"*/
 }
 
-group 'it.pagopa.commons'
+group 'it.pagopa.tech'
 
 repositories {
 	mavenLocal()
@@ -41,9 +41,9 @@ abstract class InstrumentedJarsRule implements AttributeCompatibilityRule<Librar
 
 dependencies {
 	attributesSchema {
-	attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE) {
-		compatibilityRules.add(InstrumentedJarsRule)
-	}
+		attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE) {
+			compatibilityRules.add(InstrumentedJarsRule)
+		}
 	}
 	implementation project(path: ':core')
 
