@@ -1,14 +1,14 @@
 package it.pagopa.tech.lollipop.consumer.exception;
 
-/** Thrown in case of problems finding the right data for the given entityId */
-public class EntityIdNotFoundException extends Exception{
+/** Thrown when the given instant is not a valid timestamp */
+public class InvalidInstantFormatException extends Exception {
 
     /**
      * Constructs new exception with provided message
      *
      * @param message Detail message
      */
-    public EntityIdNotFoundException(String message) {
+    public InvalidInstantFormatException(String message) {
         super(message);
     }
 }
