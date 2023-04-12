@@ -13,7 +13,7 @@ plugins {
 	/*id("org.openapi.generator") version "6.5.0"*/
 }
 
-group 'it.pagopa.tech'
+group 'it.pagopa.tech.lollipop.sdk.impls'
 
 repositories {
 	mavenLocal()
