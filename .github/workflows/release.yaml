@@ -9,9 +9,17 @@ jobs:
       contents: read
       packages: write
     steps:
+      - uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
+        id: cache
+        with:
+          key: OpenJDK11U-jdk_x64_linux_hotspot_11.0.18_10.tar.gz
+          path: |
+            - ${{ runner.temp }}/jdkfile.tar.gz
+            - ${{ runner.temp }}/jdkfile.sha256
       - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       # jdkfile version hash was locally computed and checked against https://github.com/paketo-buildpacks/adoptium/releases
-      - run: |
+      - if: steps.cache.outputs.cache-hit != 'true'
+        run: |
           echo "4a29efda1d702b8ff38e554cf932051f40ec70006caed5c4857a8cbc7a0b7db7  ${{ runner.temp }}/jdkfile.tar.gz" >> ${{ runner.temp }}/jdkfile.sha256
           echo {{ runner.temp }}/jdkfile.sha256
           curl -L "https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.18%2B10/OpenJDK11U-jdk_x64_linux_hotspot_11.0.18_10.tar.gz" -o "${{ runner.temp }}/jdkfile.tar.gz"
