@@ -45,7 +45,6 @@ dependencies {
 	implementation project(path: ':core')
 	// Use JUnit Jupiter for testing.
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
-	implementation 'com.fasterxml.jackson.core:jackson-databind:2.7.0'
 }
 
 tasks.named('test') {
