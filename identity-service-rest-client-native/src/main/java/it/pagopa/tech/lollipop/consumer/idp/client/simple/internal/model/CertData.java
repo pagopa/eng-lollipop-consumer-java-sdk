@@ -76,7 +76,7 @@ public class CertData extends AbstractOpenApiSchema {
             int match = 0;
             JsonToken token = tree.traverse(jp.getCodec()).nextToken();
             EntitiesDescriptor entitiesDescriptor = new EntitiesDescriptor();
-            // deserialize CIECertData
+
             try {
 
                 deserialized = tree.traverse(jp.getCodec()).readValueAs(EntityDescriptor.class);
