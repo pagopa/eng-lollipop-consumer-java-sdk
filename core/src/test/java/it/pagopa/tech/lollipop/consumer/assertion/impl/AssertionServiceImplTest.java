@@ -9,6 +9,7 @@ import it.pagopa.tech.lollipop.consumer.assertion.AssertionService;
 import it.pagopa.tech.lollipop.consumer.assertion.client.AssertionClient;
 import it.pagopa.tech.lollipop.consumer.assertion.storage.AssertionStorage;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopAssertionNotFoundException;
+import it.pagopa.tech.lollipop.consumer.exception.OidcAssertionNotSupported;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +32,8 @@ class AssertionServiceImplTest {
     }
 
     @Test
-    void getAssertionFromStorageWithSuccess() throws LollipopAssertionNotFoundException {
+    void getAssertionFromStorageWithSuccess()
+            throws LollipopAssertionNotFoundException, OidcAssertionNotSupported {
         SamlAssertion assertion = new SamlAssertion();
         doReturn(assertion).when(assertionStorageMock).getAssertion(ASSERTION_REF);
 
@@ -43,7 +45,8 @@ class AssertionServiceImplTest {
     }
 
     @Test
-    void getAssertionFromClientWithSuccess() throws LollipopAssertionNotFoundException {
+    void getAssertionFromClientWithSuccess()
+            throws LollipopAssertionNotFoundException, OidcAssertionNotSupported {
         SamlAssertion assertion = new SamlAssertion();
         doReturn(null).when(assertionStorageMock).getAssertion(ASSERTION_REF);
         doReturn(assertion).when(assertionClientMock).getAssertion(JWT, ASSERTION_REF);
@@ -56,7 +59,8 @@ class AssertionServiceImplTest {
     }
 
     @Test
-    void getUnsupportedAssertionFromClient() throws LollipopAssertionNotFoundException {
+    void getUnsupportedAssertionFromClient()
+            throws LollipopAssertionNotFoundException, OidcAssertionNotSupported {
         doReturn(null).when(assertionStorageMock).getAssertion(ASSERTION_REF);
         doReturn(null).when(assertionClientMock).getAssertion(JWT, ASSERTION_REF);
 
@@ -69,7 +73,7 @@ class AssertionServiceImplTest {
 
     @Test
     void getAssertionFromClientWithLollipopAssertionNotFoundException()
-            throws LollipopAssertionNotFoundException {
+            throws LollipopAssertionNotFoundException, OidcAssertionNotSupported {
         doReturn(null).when(assertionStorageMock).getAssertion(ASSERTION_REF);
         doThrow(LollipopAssertionNotFoundException.class)
                 .when(assertionClientMock)
@@ -85,7 +89,8 @@ class AssertionServiceImplTest {
     }
 
     @Test
-    void getAssertionWithEmptyJwtParameterFailure() throws LollipopAssertionNotFoundException {
+    void getAssertionWithEmptyJwtParameterFailure()
+            throws LollipopAssertionNotFoundException, OidcAssertionNotSupported {
         Assertions.assertThrows(
                 IllegalArgumentException.class, () -> sut.getAssertion("", ASSERTION_REF));
 
@@ -95,7 +100,8 @@ class AssertionServiceImplTest {
     }
 
     @Test
-    void getAssertionWithNullJwtParameterFailure() throws LollipopAssertionNotFoundException {
+    void getAssertionWithNullJwtParameterFailure()
+            throws LollipopAssertionNotFoundException, OidcAssertionNotSupported {
         Assertions.assertThrows(
                 IllegalArgumentException.class, () -> sut.getAssertion(null, ASSERTION_REF));
 
@@ -106,7 +112,7 @@ class AssertionServiceImplTest {
 
     @Test
     void getAssertionWithEmptyAssertionRefParameterFailure()
-            throws LollipopAssertionNotFoundException {
+            throws LollipopAssertionNotFoundException, OidcAssertionNotSupported {
         Assertions.assertThrows(IllegalArgumentException.class, () -> sut.getAssertion(JWT, ""));
 
         verify(assertionStorageMock, never()).getAssertion(ASSERTION_REF);
@@ -116,7 +122,7 @@ class AssertionServiceImplTest {
 
     @Test
     void getAssertionWithNullAssertionRefParameterFailure()
-            throws LollipopAssertionNotFoundException {
+            throws LollipopAssertionNotFoundException, OidcAssertionNotSupported {
         Assertions.assertThrows(IllegalArgumentException.class, () -> sut.getAssertion(JWT, null));
 
         verify(assertionStorageMock, never()).getAssertion(ASSERTION_REF);

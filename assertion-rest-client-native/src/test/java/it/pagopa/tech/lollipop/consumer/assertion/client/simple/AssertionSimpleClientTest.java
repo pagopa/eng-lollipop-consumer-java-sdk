@@ -13,6 +13,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Header;
@@ -20,6 +21,7 @@ import org.mockserver.model.Header;
 class AssertionSimpleClientTest {
 
     private static AssertionSimpleClient assertionSimpleClient;
+    private static AssertionSimpleClientConfig assertionConfig;
     private static ClientAndServer mockServer;
     private static final String XML_STRING =
             "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?> <saml2p:Response"
@@ -271,8 +273,9 @@ class AssertionSimpleClientTest {
 
     @BeforeAll
     public static void startServer() {
-        ApiClient client = new ApiClient();
-        client.updateBaseUri("http://localhost:2000");
+        assertionConfig = Mockito.spy(AssertionSimpleClientConfig.builder().build());
+        assertionConfig.setBaseUri("http://localhost:2000");
+        ApiClient client = new ApiClient(assertionConfig);
         assertionSimpleClient = new AssertionSimpleClient(client);
         mockServer = startClientAndServer(2000);
     }
