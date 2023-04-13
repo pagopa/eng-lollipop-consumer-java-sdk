@@ -3,12 +3,14 @@ package it.pagopa.tech.lollipop.consumer.service.impl;
 
 import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopDigestException;
+import it.pagopa.tech.lollipop.consumer.exception.LollipopSignatureException;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopVerifierException;
 import it.pagopa.tech.lollipop.consumer.http_verifier.HttpMessageVerifier;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.service.HttpMessageVerifierService;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import javax.inject.Inject;
@@ -32,8 +34,8 @@ public class HttpMessageVerifierServiceImpl implements HttpMessageVerifierServic
      */
     @Override
     public boolean verifyHttpMessage(LollipopConsumerRequest lollipopConsumerRequest)
-            throws LollipopDigestException, UnsupportedEncodingException,
-                    LollipopVerifierException {
+            throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException,
+                    LollipopSignatureException {
 
         Map<String, String> headerParams = lollipopConsumerRequest.getHeaderParams();
 
@@ -72,7 +74,7 @@ public class HttpMessageVerifierServiceImpl implements HttpMessageVerifierServic
             }
         }
 
-        return verifyHttpSignature(lollipopConsumerRequest);
+        return verifyHttpSignature(signature, signatureInput, headerParams);
     }
 
     /**
@@ -128,8 +130,20 @@ public class HttpMessageVerifierServiceImpl implements HttpMessageVerifierServic
         return httpMessageVerifier.verifyDigest(contentDigest, requestBody, contentEncoding);
     }
 
-    /** TODO: stub */
-    private boolean verifyHttpSignature(LollipopConsumerRequest lollipopConsumerRequest) {
-        return true;
+    /**
+     * @param signature
+     * @param signatureInput
+     * @param headerParams
+     * @return
+     * @throws LollipopSignatureException
+     */
+    private boolean verifyHttpSignature(
+            String signature, String signatureInput, Map<String, String> headerParams)
+            throws LollipopSignatureException {
+
+        HashMap<String, String> headersToProcess = new HashMap<>(headerParams);
+        headersToProcess.remove(lollipopConsumerRequestConfig.getSignatureHeader());
+        headersToProcess.remove(lollipopConsumerRequestConfig.getSignatureInputHeader());
+        return httpMessageVerifier.verifyHttpSignature(signature, signatureInput, headersToProcess);
     }
 }

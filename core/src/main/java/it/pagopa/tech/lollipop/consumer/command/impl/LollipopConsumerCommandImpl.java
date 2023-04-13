@@ -5,6 +5,7 @@ import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommand;
 import it.pagopa.tech.lollipop.consumer.enumeration.AssertionVerificationResultCode;
 import it.pagopa.tech.lollipop.consumer.enumeration.HttpMessageVerificationResultCode;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopDigestException;
+import it.pagopa.tech.lollipop.consumer.exception.LollipopSignatureException;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopVerifierException;
 import it.pagopa.tech.lollipop.consumer.model.CommandResult;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
@@ -80,6 +81,14 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
                             e.getErrorCode(), e.getMessage());
             return buildCommandResult(
                     HttpMessageVerificationResultCode.DIGEST_VALIDATION_ERROR.name(), message);
+        } catch (LollipopSignatureException e) {
+            String message =
+                    String.format(
+                            "HTTP message validation failed on verifying signatures with message:"
+                                    + " %s",
+                            e.getMessage());
+            return buildCommandResult(
+                    HttpMessageVerificationResultCode.SIGNATURE_VALIDATION_ERROR.name(), message);
         } catch (UnsupportedEncodingException e) {
             String message =
                     String.format(
