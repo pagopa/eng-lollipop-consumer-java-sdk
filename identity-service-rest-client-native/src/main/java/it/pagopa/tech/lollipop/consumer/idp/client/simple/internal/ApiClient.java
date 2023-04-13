@@ -1,5 +1,5 @@
-/* (C)2023 */
-package it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal;
+/* (C)2022-2023 */
+package it.pagopa.tech.lollipop.consumer.idp.client.simple.internal;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -7,8 +7,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import it.pagopa.tech.lollipop.consumer.assertion.client.simple.AssertionSimpleClientConfig;
+import it.pagopa.tech.lollipop.consumer.idp.client.simple.IdpCertSimpleClientConfig;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -36,11 +37,12 @@ import org.openapitools.jackson.nullable.JsonNullableModule;
 @Getter
 @javax.annotation.Generated(
         value = "org.openapitools.codegen.languages.JavaClientCodegen",
-        date = "2023-04-04T15:48:28.175942900+02:00[Europe/Paris]")
+        date = "2023-04-11T16:21:49.277208500+02:00[Europe/Paris]")
 public class ApiClient {
 
     private HttpClient.Builder builder;
     private ObjectMapper mapper;
+    private XmlMapper xmlMapper;
     private String scheme;
     private String host;
     private int port;
@@ -50,7 +52,8 @@ public class ApiClient {
     private Consumer<HttpResponse<String>> asyncResponseInterceptor;
     private Duration readTimeout;
     private Duration connectTimeout;
-    private String assertionRequestEndpoint;
+    private String idpKeysCieEndpoint;
+    private String idpKeysSpidEndpoint;
 
     /**
      * URL encode a string in the UTF-8 encoding.
@@ -63,16 +66,18 @@ public class ApiClient {
     }
 
     /** Create an instance of ApiClient. */
-    public ApiClient(AssertionSimpleClientConfig config) {
+    public ApiClient(IdpCertSimpleClientConfig config) {
         this.builder = createDefaultHttpClientBuilder();
         this.mapper = createDefaultObjectMapper();
+        this.xmlMapper = createDefaultXmlMapper();
         updateBaseUri(config.getBaseUri());
         interceptor = null;
         readTimeout = null;
         connectTimeout = null;
         responseInterceptor = null;
         asyncResponseInterceptor = null;
-        this.assertionRequestEndpoint = config.getAssertionRequestEndpoint();
+        this.idpKeysCieEndpoint = config.getIdpKeysCieEndpoint();
+        this.idpKeysSpidEndpoint = config.getIdpKeysSpidEndpoint();
     }
 
     protected ObjectMapper createDefaultObjectMapper() {
@@ -86,6 +91,11 @@ public class ApiClient {
         mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
         mapper.registerModule(new JavaTimeModule());
         mapper.registerModule(new JsonNullableModule());
+        return mapper;
+    }
+
+    protected XmlMapper createDefaultXmlMapper() {
+        XmlMapper mapper = new XmlMapper();
         return mapper;
     }
 
@@ -119,6 +129,11 @@ public class ApiClient {
      */
     public ObjectMapper getObjectMapper() {
         return mapper.copy();
+    }
+
+    public ApiClient setXmlMapper(XmlMapper mapper) {
+        this.xmlMapper = mapper;
+        return this;
     }
 
     /**

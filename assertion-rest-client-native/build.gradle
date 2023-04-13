@@ -14,8 +14,6 @@ plugins {
 /*id("org.openapi.generator") version "6.5.0"*/
 }
 
-group 'it.pagopa.commons'
-
 repositories {
 	mavenLocal()
 	mavenCentral()
@@ -59,6 +57,9 @@ dependencies {
 	// Use JUnit Jupiter for testing.
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
 	testImplementation 'org.assertj:assertj-core:3.24.2'
+
+	testImplementation 'org.mockito:mockito-core:5.2.0'
+	testImplementation 'org.mockito:mockito-junit-jupiter:5.2.0'
 	//Mockserver for testing api
 	testImplementation 'org.mock-server:mockserver-netty:5.15.0'
 }
