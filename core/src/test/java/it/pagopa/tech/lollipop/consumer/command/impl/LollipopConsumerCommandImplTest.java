@@ -8,6 +8,7 @@ import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommand;
 import it.pagopa.tech.lollipop.consumer.enumeration.AssertionVerificationResultCode;
 import it.pagopa.tech.lollipop.consumer.enumeration.HttpMessageVerificationResultCode;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopDigestException;
+import it.pagopa.tech.lollipop.consumer.exception.LollipopSignatureException;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopVerifierException;
 import it.pagopa.tech.lollipop.consumer.model.CommandResult;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
@@ -36,8 +37,8 @@ class LollipopConsumerCommandImplTest {
 
     @Test
     void failedHttpMessageValidationThrowDigestException()
-            throws LollipopDigestException, UnsupportedEncodingException,
-                    LollipopVerifierException {
+            throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException,
+                    LollipopSignatureException {
 
         doThrow(
                         new LollipopDigestException(
@@ -49,6 +50,28 @@ class LollipopConsumerCommandImplTest {
 
         Assertions.assertEquals(
                 HttpMessageVerificationResultCode.DIGEST_VALIDATION_ERROR.name(),
+                commandResult.getResultCode());
+
+        verify(messageVerifierServiceMock).verifyHttpMessage(any(LollipopConsumerRequest.class));
+        verify(assertionVerifierServiceMock, never())
+                .validateLollipop(any(LollipopConsumerRequest.class));
+    }
+
+    @Test
+    void failedHttpMessageValidationThrowSignatureException()
+            throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException,
+                    LollipopSignatureException {
+
+        doThrow(
+                        new LollipopSignatureException(
+                                LollipopSignatureException.ErrorCode.INVALID_SIGNATURE, "error"))
+                .when(messageVerifierServiceMock)
+                .verifyHttpMessage(any(LollipopConsumerRequest.class));
+
+        CommandResult commandResult = sut.doExecute(LollipopConsumerRequest.builder().build());
+
+        Assertions.assertEquals(
+                HttpMessageVerificationResultCode.SIGNATURE_VALIDATION_ERROR.name(),
                 commandResult.getResultCode());
 
         verify(messageVerifierServiceMock).verifyHttpMessage(any(LollipopConsumerRequest.class));
@@ -77,8 +100,8 @@ class LollipopConsumerCommandImplTest {
 
     @Test
     void failedHttpMessageValidationWithoutThrowingException()
-            throws LollipopDigestException, UnsupportedEncodingException,
-                    LollipopVerifierException {
+            throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException,
+                    LollipopSignatureException {
 
         doReturn(false)
                 .when(messageVerifierServiceMock)
@@ -97,8 +120,8 @@ class LollipopConsumerCommandImplTest {
 
     @Test
     void failedAssertionValidationWithoutThrowingException()
-            throws LollipopDigestException, UnsupportedEncodingException,
-                    LollipopVerifierException {
+            throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException,
+                    LollipopSignatureException {
 
         doReturn(true)
                 .when(messageVerifierServiceMock)
@@ -119,8 +142,8 @@ class LollipopConsumerCommandImplTest {
 
     @Test
     void successLollipopRequestValidation()
-            throws LollipopDigestException, UnsupportedEncodingException,
-                    LollipopVerifierException {
+            throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException,
+                    LollipopSignatureException {
 
         doReturn(true)
                 .when(messageVerifierServiceMock)

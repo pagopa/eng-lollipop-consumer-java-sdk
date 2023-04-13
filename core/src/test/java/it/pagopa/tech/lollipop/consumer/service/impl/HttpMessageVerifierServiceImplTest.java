@@ -6,11 +6,13 @@ import static org.mockito.Mockito.when;
 
 import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopDigestException;
+import it.pagopa.tech.lollipop.consumer.exception.LollipopSignatureException;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopVerifierException;
 import it.pagopa.tech.lollipop.consumer.http_verifier.HttpMessageVerifier;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -18,10 +20,19 @@ import org.mockito.MockitoAnnotations;
 
 class HttpMessageVerifierServiceImplTest {
 
+    final String VALID_SIGNATURE_INPUT =
+            "sig1=(\"content-digest\" \"x-pagopa-lollipop-original-method\" "
+                + "\"x-pagopa-lollipop-original-url\");created=1678293988;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid="
+                + "\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg";
+    final String VALID_SIGNATURE =
+            "sig1=:lTuoRytp53GuUMOB4Rz1z97Y96gfSeEOm/xVpO39d3HR6lLAy4KYiGq+1hZ7nmRFBt2bASWEpen7ov5O4wU3kQ==:";
+
+    final String INVALID_SIGNATURE =
+            "sig1=:aTuoRytp53GuUMOB4Rz1z97Y96gfSeEOm/xVpO39d3HR6lLAy4KYiGq+1hZ7nmRFBt2bASWEpen7ov5O4wU3kQ==:";
+
     final String VALID_DIGEST = "sha-256=:cpyRqJ1VhoVC+MSs9fq4/4wXs4c46EyEFriskys43Zw=";
     final String VALID_PAYLOAD = "a valid message payload";
     final String INVALID_PAYLOAD = "an invalid payload";
-    final String INVALID_ENCODING = "UTF-326";
     final String VALID_ENCODING = "UTF-8";
 
     private LollipopConsumerRequestConfig httpMessageVerifierConfig;
@@ -42,13 +53,25 @@ class HttpMessageVerifierServiceImplTest {
     }
 
     @BeforeEach
-    public void beforeEach() throws LollipopDigestException, UnsupportedEncodingException {
+    public void beforeEach()
+            throws LollipopDigestException, UnsupportedEncodingException,
+                    LollipopSignatureException {
         Mockito.reset(httpMessageVerifier);
         when(httpMessageVerifier.verifyDigest(
                         Mockito.eq(VALID_DIGEST),
                         Mockito.eq(VALID_PAYLOAD),
                         Mockito.eq(VALID_ENCODING)))
                 .thenReturn(true);
+        when(httpMessageVerifier.verifyHttpSignature(
+                        Mockito.eq(VALID_SIGNATURE),
+                        Mockito.eq(VALID_SIGNATURE_INPUT),
+                        Mockito.any()))
+                .thenReturn(true);
+        when(httpMessageVerifier.verifyHttpSignature(
+                        Mockito.eq(INVALID_SIGNATURE),
+                        Mockito.eq(VALID_SIGNATURE_INPUT),
+                        Mockito.any()))
+                .thenReturn(false);
         when(httpMessageVerifier.verifyDigest(
                         Mockito.eq(VALID_DIGEST),
                         Mockito.eq(INVALID_PAYLOAD),
@@ -182,19 +205,27 @@ class HttpMessageVerifierServiceImplTest {
                         });
     }
 
+    @Test
+    public void requestWithInvalidSignatureRetunsFalse() {
+        AtomicBoolean result = new AtomicBoolean(false);
+        LollipopConsumerRequest lollipopConsumerRequest = getLollipopConsumerRequest();
+        lollipopConsumerRequest.getHeaderParams().put("Signature", INVALID_SIGNATURE);
+        assertThatNoException()
+                .isThrownBy(
+                        () ->
+                                result.set(
+                                        httpMessageVerifierService.verifyHttpMessage(
+                                                lollipopConsumerRequest)));
+        assertThat(result).isFalse();
+    }
+
     private LollipopConsumerRequest getLollipopConsumerRequest() {
 
         HashMap<String, String> lollipopHeaderParams = new HashMap<>();
         lollipopHeaderParams.put("Content-Digest", VALID_DIGEST);
         lollipopHeaderParams.put("Content-Encoding", VALID_ENCODING);
-        lollipopHeaderParams.put(
-                "Signature-Input",
-                "sig1=(\"content-digest\" \"x-pagopa-lollipop-original-method\" "
-                    + "\"x-pagopa-lollipop-original-url\");created=1678293988;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid="
-                    + "\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg");
-        lollipopHeaderParams.put(
-                "Signature",
-                "sig1=:lTuoRytp53GuUMOB4Rz1z97Y96gfSeEOm/xVpO39d3HR6lLAy4KYiGq+1hZ7nmRFBt2bASWEpen7ov5O4wU3kQ==:");
+        lollipopHeaderParams.put("Signature-Input", VALID_SIGNATURE_INPUT);
+        lollipopHeaderParams.put("Signature", VALID_SIGNATURE);
 
         return LollipopConsumerRequest.builder()
                 .requestBody(VALID_PAYLOAD)
