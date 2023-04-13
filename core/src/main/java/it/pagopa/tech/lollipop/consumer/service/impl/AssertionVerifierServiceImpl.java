@@ -9,8 +9,13 @@ import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
 import it.pagopa.tech.lollipop.consumer.service.AssertionVerifierService;
+
 import javax.inject.Inject;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class AssertionVerifierServiceImpl implements AssertionVerifierService {
 
@@ -40,7 +45,6 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         }
 
 
-
         return true;
     }
 
@@ -48,7 +52,19 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         return null;
     }
 
-    private boolean validateAssertionPeriod(String notBefore) {
+    public boolean validateAssertionPeriod(String notBefore) throws ParseException {
+        long notBeforeMilliseconds = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").parse(notBefore).getTime(); //TODO configurazione format date
+
+        long dateNowMilliseconds = new Date().getTime();
+
+        long expiresAfterMilliseconds = TimeUnit.DAYS.toMillis(30); //TODO configurazione giorni scadenza
+
+        long dateNowLessNotBefore = (dateNowMilliseconds - notBeforeMilliseconds);
+
+        if (0 <= dateNowLessNotBefore && (dateNowLessNotBefore <= expiresAfterMilliseconds)) {
+            return true;
+        }
+
         return false;
     }
 
