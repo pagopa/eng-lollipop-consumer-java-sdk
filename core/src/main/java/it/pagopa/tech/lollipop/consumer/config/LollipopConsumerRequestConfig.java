@@ -14,6 +14,4 @@ public class LollipopConsumerRequestConfig {
     @Builder.Default private String contentDigestHeader = "content-digest";
     @Builder.Default private String lollipopKeyHeader = "x-pagopa-lollipop-public-key";
     @Builder.Default private boolean strictDigestVerify = false;
-
-
 }
