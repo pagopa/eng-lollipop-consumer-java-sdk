@@ -1,6 +1,7 @@
 /* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.service;
 
+import it.pagopa.tech.lollipop.consumer.exception.LollipopValidationException;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 
 /**
@@ -16,5 +17,5 @@ public interface AssertionVerifierService {
      * @param request
      * @return
      */
-    boolean validateLollipop(LollipopConsumerRequest request);
+    boolean validateLollipop(LollipopConsumerRequest request) throws LollipopValidationException;
 }
