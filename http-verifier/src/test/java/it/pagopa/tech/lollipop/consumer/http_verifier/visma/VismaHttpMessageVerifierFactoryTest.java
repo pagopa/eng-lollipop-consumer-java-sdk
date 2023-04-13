@@ -7,7 +7,9 @@ import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VismaHttpMessageVerifierFactoryTest {
 
     LollipopConsumerRequestConfig lollipopConsumerRequestConfig;
@@ -19,7 +21,10 @@ class VismaHttpMessageVerifierFactoryTest {
 
     @Test
     public void encodingInCostructorIsInvalid() {
-        assertThatThrownBy(() -> new VismaHttpMessageVerifierFactory("UTF-326",lollipopConsumerRequestConfig))
+        assertThatThrownBy(
+                        () ->
+                                new VismaHttpMessageVerifierFactory(
+                                        "UTF-326", lollipopConsumerRequestConfig))
                 .isInstanceOfSatisfying(
                         Exception.class,
                         e -> assertThat(e).hasMessageContaining("Unavailable Encoding: UTF-326"));
@@ -27,13 +32,19 @@ class VismaHttpMessageVerifierFactoryTest {
 
     @Test
     public void encodingInCostructorIsValid() {
-        assertThatNoException().isThrownBy(() -> new VismaHttpMessageVerifierFactory("UTF-8",lollipopConsumerRequestConfig));
+        assertThatNoException()
+                .isThrownBy(
+                        () ->
+                                new VismaHttpMessageVerifierFactory(
+                                        "UTF-8", lollipopConsumerRequestConfig));
     }
 
     @SneakyThrows
     @Test
     public void instanceIsCreated() {
-        assertThat(new VismaHttpMessageVerifierFactory("UTF-8",lollipopConsumerRequestConfig).create())
+        assertThat(
+                        new VismaHttpMessageVerifierFactory("UTF-8", lollipopConsumerRequestConfig)
+                                .create())
                 .isInstanceOf(VismaHttpMessageVerifier.class);
     }
 }

@@ -12,8 +12,9 @@ public class VismaHttpMessageVerifierFactory implements HttpMessageVerifierFacto
     private final String defaultEncoding;
     private final LollipopConsumerRequestConfig lollipopConsumerRequestConfig;
 
-    public VismaHttpMessageVerifierFactory(String defaultEncoding,
-                                           LollipopConsumerRequestConfig lollipopConsumerRequestConfig) throws Exception {
+    public VismaHttpMessageVerifierFactory(
+            String defaultEncoding, LollipopConsumerRequestConfig lollipopConsumerRequestConfig)
+            throws Exception {
         if (Charset.availableCharsets().get(defaultEncoding) == null) {
             throw new Exception("Unavailable Encoding: " + defaultEncoding);
         }

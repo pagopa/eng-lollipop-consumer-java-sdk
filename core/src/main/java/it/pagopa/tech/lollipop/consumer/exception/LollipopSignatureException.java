@@ -46,7 +46,9 @@ public class LollipopSignatureException extends Exception {
 
     /** Error codes to classify Signature Exceptions */
     public enum ErrorCode {
-
-        INVALID_SIGNATURE_NUMBER, INVALID_SIGNATURE_ALG, MISSING_PUBLIC_KEY, INVALID_SIGNATURE,
+        INVALID_SIGNATURE_NUMBER,
+        INVALID_SIGNATURE_ALG,
+        MISSING_PUBLIC_KEY,
+        INVALID_SIGNATURE,
     }
 }

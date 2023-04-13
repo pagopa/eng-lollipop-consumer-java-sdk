@@ -51,11 +51,10 @@ dependencies {
 			compatibilityRules.add(InstrumentedJarsRule)
 		}
 	}
-	implementation 'net.visma.autopay:http-signatures:1.1.0'
+	implementation 'it.pagopa.tech:http-signatures:1.1.4'
 	// Use JUnit Jupiter for testing.
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
 	testImplementation 'org.assertj:assertj-core:3.24.2'
-	implementation 'it.pagopa.tech:http-signatures:1.1.2'
 	implementation 'com.nimbusds:nimbus-jose-jwt:9.31'
 	implementation project(':core')
 }
