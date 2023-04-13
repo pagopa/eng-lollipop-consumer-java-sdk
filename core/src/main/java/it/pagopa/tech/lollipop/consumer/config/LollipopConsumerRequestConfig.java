@@ -12,7 +12,6 @@ public class LollipopConsumerRequestConfig {
     @Builder.Default private String signatureInputHeader = "signature-input";
     @Builder.Default private String contentEncodingHeader = "content-encoding";
     @Builder.Default private String contentDigestHeader = "content-digest";
-    @Builder.Default private String lollipopKeyHeader = "x-pagopa-lollipop-public-key";
     @Builder.Default private boolean strictDigestVerify = false;
 
     @Builder.Default private String originalMethodHeader = "x-pagopa-lollipop-original-method";
@@ -24,6 +23,6 @@ public class LollipopConsumerRequestConfig {
     @Builder.Default private String authJWTHeader = "x-pagopa-lollipop-auth-jwt";
 
     @Builder.Default private String expectedFirstLcOriginalMethod = "POST";
-    @Builder.Default private String expectedFirstLcOriginalUrl = " https://api-app.io.pagopa.it/first-lollipop/sign";
+    @Builder.Default private String expectedFirstLcOriginalUrl = "https://api-app.io.pagopa.it/first-lollipop/sign";
 
 }
