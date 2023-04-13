@@ -5,6 +5,8 @@ on:
   
 env:
   DOCKERFILE: Dockerfile.test-only
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+  GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
 
 jobs:
   pr_scan:
@@ -37,6 +39,3 @@ jobs:
       if: always()
       with:
         sarif_file: ${{ steps.scan.outputs.sarif }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-        GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
