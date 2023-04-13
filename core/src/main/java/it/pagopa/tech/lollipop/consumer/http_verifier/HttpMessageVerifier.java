@@ -2,6 +2,7 @@
 package it.pagopa.tech.lollipop.consumer.http_verifier;
 
 import it.pagopa.tech.lollipop.consumer.exception.LollipopDigestException;
+import it.pagopa.tech.lollipop.consumer.exception.LollipopSignatureException;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
@@ -30,11 +31,12 @@ public interface HttpMessageVerifier {
      * Checks whether the calculated signatures of the required parameter matches with those
      * provided within the Signature param
      *
-     * @param signature
-     * @param signatureInput
-     * @param parameters
+     * @param signature Input parameter containing the expected signature
+     * @param signatureInput Input parameter containing the expected signature base for validation
+     * @param parameters Header parameters to be used in signature validation
      * @return boolean set to true if the signature check is valid
      */
     boolean verifyHttpSignature(
-            String signature, String signatureInput, Map<String, String> parameters);
+            String signature, String signatureInput, Map<String, String> parameters)
+            throws LollipopSignatureException;
 }
