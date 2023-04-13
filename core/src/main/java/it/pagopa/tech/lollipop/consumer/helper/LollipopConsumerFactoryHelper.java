@@ -7,7 +7,7 @@ import it.pagopa.tech.lollipop.consumer.http_verifier.HttpMessageVerifierFactory
 import it.pagopa.tech.lollipop.consumer.idp.IdpCertProviderFactory;
 import it.pagopa.tech.lollipop.consumer.service.AssertionVerifierService;
 import it.pagopa.tech.lollipop.consumer.service.HttpMessageVerifierService;
-import it.pagopa.tech.lollipop.consumer.service.impl.AssertionVerifierServiceImplStub;
+import it.pagopa.tech.lollipop.consumer.service.impl.AssertionVerifierServiceImpl;
 import it.pagopa.tech.lollipop.consumer.service.impl.HttpMessageVerifierServiceImpl;
 import javax.inject.Inject;
 
@@ -35,7 +35,9 @@ public class LollipopConsumerFactoryHelper {
      */
     public HttpMessageVerifierService getHttpMessageVerifierService() {
         return new HttpMessageVerifierServiceImpl(
-                getHttpMessageVerifierFactory().create(), getLollipopConsumerRequestConfig());
+                getHttpMessageVerifierFactory().create(),
+                getLollipopConsumerRequestConfig()
+        );
     }
 
     /**
@@ -44,8 +46,11 @@ public class LollipopConsumerFactoryHelper {
      * @return an instance of {@link AssertionVerifierService}
      */
     public AssertionVerifierService getAssertionVerifierService() {
-        return new AssertionVerifierServiceImplStub(
-                getIdpCertProviderFactory().create(), getAssertionServiceFactory().create());
+        return new AssertionVerifierServiceImpl(
+                getIdpCertProviderFactory().create(),
+                getAssertionServiceFactory().create(),
+                getLollipopConsumerRequestConfig()
+        );
     }
 
     public HttpMessageVerifierFactory getHttpMessageVerifierFactory() {
