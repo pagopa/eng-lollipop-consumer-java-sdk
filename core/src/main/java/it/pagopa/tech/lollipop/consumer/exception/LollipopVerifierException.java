@@ -47,7 +47,30 @@ public class LollipopVerifierException extends Exception {
     /** Error codes to classify Lollipop Request Exceptions */
     public enum ErrorCode {
         MISSING_SIGNATURE,
+        INVALID_SIGNATURE_HEADER,
 
-        MISSING_SIGNATURE_INPUT
+        MISSING_SIGNATURE_INPUT,
+        INVALID_SIGNATURE_INPUT,
+
+        MISSING_ASSERTION_REF,
+        INVALID_ASSERTION_REF,
+
+        MISSING_ASSERTION_TYPE,
+        INVALID_ASSERTION_TYPE,
+
+        MISSING_USER_ID,
+        INVALID_USER_ID,
+
+        MISSING_AUTH_JWT,
+        INVALID_AUTH_JWT,
+
+        MISSING_ORIGINAL_METHOD,
+        INVALID_ORIGINAL_METHOD,
+
+        MISSING_ORIGINAL_URL,
+        INVALID_ORIGINAL_URL,
+
+        MISSING_PUBLIC_KEY,
+        INVALID_PUBLIC_KEY
     }
 }
