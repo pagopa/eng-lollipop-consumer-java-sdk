@@ -45,6 +45,6 @@ public class LollipopValidationException extends Exception {
 
     /** Error codes to classify Lollipop Request Exceptions */
     public enum ErrorCode {
-        UNEXPECTED_METHOD_OR_URL,
+        UNEXPECTED_METHOD_OR_URL
     }
 }
