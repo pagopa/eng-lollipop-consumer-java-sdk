@@ -7,7 +7,7 @@ import it.pagopa.tech.lollipop.consumer.helper.LollipopConsumerFactoryHelper;
 import javax.inject.Inject;
 
 /**
- * Implementation of {@link LollipopConsumerCommandBuilder}, used to create istances of {@link
+ * Implementation of {@link LollipopConsumerCommandBuilder}, used to create instances of {@link
  * LollipopConsumerCommandImpl}
  */
 public class LollipopConsumerCommandBuilderImpl implements LollipopConsumerCommandBuilder {

@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal.model.*;
-import java.text.DateFormat;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.openapitools.jackson.nullable.JsonNullableModule;
@@ -31,40 +29,6 @@ public class JSON {
         mapper.registerModule(new JavaTimeModule());
         JsonNullableModule jnm = new JsonNullableModule();
         mapper.registerModule(jnm);
-    }
-
-    /**
-     * Set the date format for JSON (de)serialization with Date properties.
-     *
-     * @param dateFormat Date format
-     */
-    public void setDateFormat(DateFormat dateFormat) {
-        mapper.setDateFormat(dateFormat);
-    }
-
-    /**
-     * Get the object mapper
-     *
-     * @return object mapper
-     */
-    public ObjectMapper getMapper() {
-        return mapper;
-    }
-
-    /**
-     * Returns the target model class that should be used to deserialize the input data. The
-     * discriminator mappings are used to determine the target model class.
-     *
-     * @param node The input data.
-     * @param modelClass The class that contains the discriminator mappings.
-     * @return the target model class.
-     */
-    public static Class<?> getClassForElement(JsonNode node, Class<?> modelClass) {
-        ClassDiscriminatorMapping cdm = modelDiscriminators.get(modelClass);
-        if (cdm != null) {
-            return cdm.getClassForElement(node, new HashSet<Class<?>>());
-        }
-        return null;
     }
 
     /** Helper class to register the discriminator mappings. */
@@ -198,20 +162,6 @@ public class JSON {
     private static Map<Class<?>, Map<String, Class<?>>> modelDescendants = new HashMap<>();
 
     /**
-     * Register a model class discriminator.
-     *
-     * @param modelClass the model class
-     * @param discriminatorPropertyName the name of the discriminator property
-     * @param mappings a map with the discriminator mappings.
-     */
-    public static void registerDiscriminator(
-            Class<?> modelClass, String discriminatorPropertyName, Map<String, Class<?>> mappings) {
-        ClassDiscriminatorMapping m =
-                new ClassDiscriminatorMapping(modelClass, discriminatorPropertyName, mappings);
-        modelDiscriminators.put(modelClass, m);
-    }
-
-    /**
      * Register the oneOf/anyOf descendants of the modelClass.
      *
      * @param modelClass the model class
@@ -225,23 +175,5 @@ public class JSON {
 
     static {
         json = new JSON();
-    }
-
-    /**
-     * Get the default JSON instance.
-     *
-     * @return the default JSON instance
-     */
-    public static JSON getDefault() {
-        return json;
-    }
-
-    /**
-     * Set the default JSON instance.
-     *
-     * @param json JSON instance to be used
-     */
-    public static void setDefault(JSON json) {
-        JSON.json = json;
     }
 }

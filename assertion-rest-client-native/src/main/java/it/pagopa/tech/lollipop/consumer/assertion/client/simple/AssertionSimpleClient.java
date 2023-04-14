@@ -7,20 +7,20 @@ import it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal.ApiExce
 import it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal.api.DefaultApi;
 import it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal.model.AssertionRef;
 import it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal.model.LCUserInfo;
+import it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal.model.OidcUserInfo;
 import it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal.model.SamlUserInfo;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopAssertionNotFoundException;
+import it.pagopa.tech.lollipop.consumer.exception.OidcAssertionNotSupported;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
 import javax.inject.Inject;
 
 /** Implementation of the @AssertionClient using generated openAPI REST Client */
 public class AssertionSimpleClient implements AssertionClient {
 
-    ApiClient apiClient;
-    DefaultApi defaultApi;
+    private final DefaultApi defaultApi;
 
     @Inject
     public AssertionSimpleClient(ApiClient client) {
-        this.apiClient = client;
         this.defaultApi = new DefaultApi(client);
     }
 
@@ -32,15 +32,12 @@ public class AssertionSimpleClient implements AssertionClient {
      * @param assertionRef Assertion unique identification
      * @return the retrieved assertion or null if the assertion is not supported (not SAML)
      * @throws LollipopAssertionNotFoundException if some error occurred in the request
+     * @throws OidcAssertionNotSupported if the assertion retrieved is a OIDC token
      */
     @Override
     public SamlAssertion getAssertion(String jwt, String assertionRef)
-            throws LollipopAssertionNotFoundException {
+            throws LollipopAssertionNotFoundException, OidcAssertionNotSupported {
         AssertionRef ref = new AssertionRef(assertionRef);
-
-        if (jwt.isEmpty() || assertionRef.isEmpty()) {
-            throw new IllegalArgumentException("Jwt or Assertion Ref missing");
-        }
 
         LCUserInfo responseAssertion;
 
@@ -58,6 +55,9 @@ public class AssertionSimpleClient implements AssertionClient {
             response.setAssertionRef(assertionRef);
             response.setAssertionData(assertionData);
             return response;
+        }
+        if (responseAssertion.getActualInstance().getClass().equals(OidcUserInfo.class)) {
+            throw new OidcAssertionNotSupported("OIDC Claims not supported yet.");
         }
 
         return null;

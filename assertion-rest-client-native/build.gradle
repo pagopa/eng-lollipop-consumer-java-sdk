@@ -14,7 +14,7 @@ plugins {
 /*id("org.openapi.generator") version "6.5.0"*/
 }
 
-group 'it.pagopa.commons'
+group 'it.pagopa.tech'
 
 repositories {
 	mavenLocal()
@@ -41,9 +41,9 @@ abstract class InstrumentedJarsRule implements AttributeCompatibilityRule<Librar
 
 dependencies {
 	attributesSchema {
-	attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE) {
-		compatibilityRules.add(InstrumentedJarsRule)
-	}
+		attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE) {
+			compatibilityRules.add(InstrumentedJarsRule)
+		}
 	}
 	implementation project(path: ':core')
 
@@ -59,6 +59,9 @@ dependencies {
 	// Use JUnit Jupiter for testing.
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
 	testImplementation 'org.assertj:assertj-core:3.24.2'
+
+	testImplementation 'org.mockito:mockito-core:5.2.0'
+	testImplementation 'org.mockito:mockito-junit-jupiter:5.2.0'
 	//Mockserver for testing api
 	testImplementation 'org.mock-server:mockserver-netty:5.15.0'
 }

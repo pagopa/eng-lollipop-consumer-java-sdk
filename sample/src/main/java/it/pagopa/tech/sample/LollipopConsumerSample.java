@@ -1,10 +1,15 @@
 package it.pagopa.tech.sample;
 
 import it.pagopa.tech.lollipop.consumer.assertion.AssertionServiceFactory;
-import it.pagopa.tech.lollipop.consumer.assertion.impl.AssertionServiceFactoryImplStub;
+import it.pagopa.tech.lollipop.consumer.assertion.client.AssertionClientProvider;
+import it.pagopa.tech.lollipop.consumer.assertion.client.simple.AssertionSimpleClientConfig;
+import it.pagopa.tech.lollipop.consumer.assertion.client.simple.AssertionSimpleClientProvider;
+import it.pagopa.tech.lollipop.consumer.assertion.impl.AssertionServiceFactoryImpl;
+import it.pagopa.tech.lollipop.consumer.assertion.storage.*;
 import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommand;
 import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommandBuilder;
 import it.pagopa.tech.lollipop.consumer.command.impl.LollipopConsumerCommandBuilderImpl;
+import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
 import it.pagopa.tech.lollipop.consumer.helper.LollipopConsumerFactoryHelper;
 import it.pagopa.tech.lollipop.consumer.http_verifier.HttpMessageVerifierFactory;
 import it.pagopa.tech.lollipop.consumer.http_verifier.visma.VismaHttpMessageVerifierFactory;
@@ -14,8 +19,10 @@ import it.pagopa.tech.lollipop.consumer.model.CommandResult;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 
 import java.util.HashMap;
+import java.util.logging.Logger;
 
-import static it.pagopa.tech.sample.Constants.*;
+import static it.pagopa.tech.sample.LollipopConstants.*;
+
 
 public class LollipopConsumerSample {
 
@@ -23,32 +30,65 @@ public class LollipopConsumerSample {
         LollipopConsumerCommandBuilder commandBuilder = new LollipopConsumerCommandBuilderImpl(buildLollipopConsumerFactoryHelper());
         LollipopConsumerCommand command = commandBuilder.createCommand();
 
-        CommandResult commandResult = command.doExecute(buildLollipopRequest(VALID_CONTENT_DIGEST, VALID_ENCODING_UTF8, VALID_MESSAGE_PAYLOAD));
-        System.out.println(buildMessage(commandResult, "Validation of a valid Lollipop request ended with status code "));
+        CommandResult commandResult = command.doExecute(buildLollipopRequest(
+                VALID_CONTENT_DIGEST, VALID_ENCODING_UTF8, VALID_MESSAGE_PAYLOAD, ECDSA_LOLLIPOP_JWT_KEY, SIGNATURE_INPUT_HEADER_VALUE, SIGNATURE_HEADER_VALUE));
+        Logger.getGlobal().info(buildMessage(commandResult, "Validation of a valid Lollipop request ended with status code: "));
 
-        commandResult = command.doExecute(buildLollipopRequest(INVALID_CONTENT_DIGEST, VALID_ENCODING_UTF8, VALID_MESSAGE_PAYLOAD));
-        System.out.println(buildMessage(commandResult, "Validation of a Lollipop request with invalid digest header ended with status code "));
+        commandResult = command.doExecute(buildLollipopRequest(
+                INVALID_CONTENT_DIGEST, VALID_ENCODING_UTF8, VALID_MESSAGE_PAYLOAD, ECDSA_LOLLIPOP_JWT_KEY, SIGNATURE_INPUT_HEADER_VALUE, SIGNATURE_HEADER_VALUE));
+        Logger.getGlobal().info(buildMessage(commandResult, "Validation of a Lollipop request with invalid digest header ended with status code: "));
 
-        commandResult = command.doExecute(buildLollipopRequest(VALID_CONTENT_DIGEST, VALID_ENCODING_UTF8, INVALID_MESSAGE_PAYLOAD));
-        System.out.println(buildMessage(commandResult, "Validation of a Lollipop request with invalid content ended with status code "));
+        commandResult = command.doExecute(buildLollipopRequest(
+                VALID_CONTENT_DIGEST, VALID_ENCODING_UTF8, INVALID_MESSAGE_PAYLOAD, ECDSA_LOLLIPOP_JWT_KEY, SIGNATURE_INPUT_HEADER_VALUE, SIGNATURE_HEADER_VALUE));
+        Logger.getGlobal().info(buildMessage(commandResult, "Validation of a Lollipop request with invalid content ended with status code: "));
 
-        commandResult = command.doExecute(buildLollipopRequest(VALID_CONTENT_DIGEST, INVALID_ENCODING_UTF_326, VALID_MESSAGE_PAYLOAD));
-        System.out.println(buildMessage(commandResult, "Validation of a Lollipop request with unsupported encoding ended with status code "));
+        commandResult = command.doExecute(buildLollipopRequest(
+                VALID_CONTENT_DIGEST, INVALID_ENCODING_UTF_326, VALID_MESSAGE_PAYLOAD, ECDSA_LOLLIPOP_JWT_KEY, SIGNATURE_INPUT_HEADER_VALUE, SIGNATURE_HEADER_VALUE));
+        Logger.getGlobal().info(buildMessage(commandResult, "Validation of a Lollipop request with unsupported encoding ended with status code: "));
+
+        commandResult = command.doExecute(buildLollipopRequest(
+                VALID_CONTENT_DIGEST, VALID_ENCODING_UTF8, VALID_MESSAGE_PAYLOAD, ECDSA_LOLLIPOP_JWT_KEY, SIGNATURE_INPUT_HEADER_VALUE, INVALID_SIGNATURE_HEADER_VALUE));
+        Logger.getGlobal().info(buildMessage(commandResult, "Validation of a Lollipop request with invalid signature ended with status code: "));
+
+        commandResult = command.doExecute(buildLollipopRequest(
+                VALID_CONTENT_DIGEST, VALID_ENCODING_UTF8, VALID_MESSAGE_PAYLOAD, ECDSA_LOLLIPOP_JWT_KEY, VALID_MULTI_ECDSA_IGNATURE_INPUT, VALID_MULTI_ECDSA_SIGNATURE));
+        Logger.getGlobal().info(buildMessage(commandResult, "Validation of a valid Lollipop request with ecdsa multi-signature ended with status code: "));
+
+        commandResult = command.doExecute(buildLollipopRequest(
+                VALID_CONTENT_DIGEST, VALID_ENCODING_UTF8, VALID_MESSAGE_PAYLOAD, LOLLIPOP_RSA_PUBKEY, VALID_RSA_PSS_SIGNATURE_INPUT, VALID_RSA_PSS_SIGNATURE));
+        Logger.getGlobal().info(buildMessage(commandResult, "Validation of a valid Lollipop request with rsa-pss-256 signature ended with status code: "));
+
     }
 
     private static LollipopConsumerFactoryHelper buildLollipopConsumerFactoryHelper() throws Exception {
-        HttpMessageVerifierFactory messageVerifierFactory = new VismaHttpMessageVerifierFactory(VALID_ENCODING_UTF8);
+        HttpMessageVerifierFactory messageVerifierFactory = new VismaHttpMessageVerifierFactory(VALID_ENCODING_UTF8,
+                LollipopConsumerRequestConfig.builder().build());
+        AssertionStorageProvider assertionStorageProvider = new SimpleAssertionStorageProvider();
+        AssertionClientProvider assertionClientProvider =
+                new AssertionSimpleClientProvider(AssertionSimpleClientConfig.builder().build());
         IdpCertProviderFactory idpCertProviderFactory = new IdpCertProviderFactoryImplStub();
-        AssertionServiceFactory assertionServiceFactory = new AssertionServiceFactoryImplStub();
+        AssertionServiceFactory assertionServiceFactory = new AssertionServiceFactoryImpl(
+                assertionStorageProvider, assertionClientProvider, new StorageConfig());
         return new LollipopConsumerFactoryHelper(messageVerifierFactory, idpCertProviderFactory, assertionServiceFactory);
     }
 
-    private static LollipopConsumerRequest buildLollipopRequest(String contentDigest, String encoding, String payload) {
+    private static LollipopConsumerRequest buildLollipopRequest(
+            String contentDigest,
+            String encoding,
+            String payload,
+            String lollipopKey,
+            String signatureInput,
+            String signature) {
         HashMap<String, String> lollipopHeaderParams = new HashMap<>();
         lollipopHeaderParams.put(CONTENT_DIGEST, contentDigest);
         lollipopHeaderParams.put(CONTENT_ENCODING, encoding);
-        lollipopHeaderParams.put(SIGNATURE_INPUT, SIGNATURE_INPUT_HEADER_VALUE);
-        lollipopHeaderParams.put(SIGNATURE, SIGNATURE_HEADER_VALUE);
+        lollipopHeaderParams.put(SIGNATURE_INPUT, signatureInput);
+        lollipopHeaderParams.put(SIGNATURE, signature);
+        lollipopHeaderParams.put(LOLLIPOP_KEY, lollipopKey);
+        lollipopHeaderParams.put(LOLLIPOP_ORIGIN_METHOD, EXPECTED_ORIGIN_METHOD);
+        lollipopHeaderParams.put(LOLLIPOP_ORIGIN_URL, EXCPECTED_ORIGIN_URL);
+        lollipopHeaderParams.put("X-io-sign-qtspclauses","anIoSignClauses");
+
 
         return LollipopConsumerRequest.builder()
                 .requestBody(payload)
@@ -57,6 +97,6 @@ public class LollipopConsumerSample {
     }
 
     private static String buildMessage(CommandResult commandResult, String s) {
-        return s + commandResult.getResultCode() + " and message " + commandResult.getResultMessage();
+        return s + commandResult.getResultCode() + " and message: " + commandResult.getResultMessage();
     }
 }

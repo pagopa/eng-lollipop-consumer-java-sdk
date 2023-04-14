@@ -9,6 +9,9 @@ public enum HttpMessageVerificationResultCode {
     /** Digest validation failed throwing an exception */
     DIGEST_VALIDATION_ERROR,
 
+    /** Signature validation failed throwing an exception */
+    SIGNATURE_VALIDATION_ERROR,
+
     /** No supported encoding detected when encoding request body */
     UNSUPPORTED_ENCODING,
 
@@ -16,5 +19,5 @@ public enum HttpMessageVerificationResultCode {
     HTTP_MESSAGE_VALIDATION_FAILED,
 
     /** HTTP message validation completed successfully */
-    HTTP_MESSAGE_VALIDATION_SUCCESS
+    HTTP_MESSAGE_VALIDATION_SUCCESS;
 }

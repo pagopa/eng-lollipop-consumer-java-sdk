@@ -2,6 +2,7 @@
 package it.pagopa.tech.lollipop.consumer.service;
 
 import it.pagopa.tech.lollipop.consumer.exception.LollipopDigestException;
+import it.pagopa.tech.lollipop.consumer.exception.LollipopSignatureException;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopVerifierException;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import java.io.UnsupportedEncodingException;
@@ -22,5 +23,6 @@ public interface HttpMessageVerifierService {
      * @throws LollipopVerifierException thrown for general errors in the verification process
      */
     boolean verifyHttpMessage(LollipopConsumerRequest request)
-            throws UnsupportedEncodingException, LollipopDigestException, LollipopVerifierException;
+            throws UnsupportedEncodingException, LollipopDigestException, LollipopVerifierException,
+                    LollipopSignatureException;
 }
