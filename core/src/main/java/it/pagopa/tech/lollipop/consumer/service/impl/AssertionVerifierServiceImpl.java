@@ -21,7 +21,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.inject.Inject;
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -30,7 +29,6 @@ import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -93,7 +91,7 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
     }
 
     private boolean validateAssertionPeriod(Document assertionDoc) throws AssertionPeriodException {
-        NodeList listElements = assertionDoc.getElementsByTagNameNS(lollipopRequestConfig.getSamlNamespaceAssertion(), lollipopRequestConfig.getAssertionNotBeforeDateFormat());
+        NodeList listElements = assertionDoc.getElementsByTagNameNS(lollipopRequestConfig.getSamlNamespaceAssertion(), lollipopRequestConfig.getAssertionNotBeforeTag());
         if (listElements == null || listElements.getLength() <= 0) {
             return false;
         }
@@ -198,15 +196,15 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         boolean matchesSHA512 = AssertionRefAlgorithms.SHA512.getPattern().matcher(inResponseTo).matches();
 
         if (matchesSHA256) {
-            return AssertionRefAlgorithms.SHA256.getAlgorithmName();
+            return AssertionRefAlgorithms.SHA256.getHashAlgorithm();
         }
         if (matchesSHA384) {
-            return AssertionRefAlgorithms.SHA384.getAlgorithmName();
+            return AssertionRefAlgorithms.SHA384.getHashAlgorithm();
         }
         if (matchesSHA512) {
-            return AssertionRefAlgorithms.SHA512.getAlgorithmName();
+            return AssertionRefAlgorithms.SHA512.getHashAlgorithm();
         }
-        throw new AssertionThumbprintException(AssertionThumbprintException.ErrorCode.IN_RESPONSE_TO_NOT_VALID, "InResponseTo in the assertion do not contains a valid Assertion Ref.");
+        throw new AssertionThumbprintException(AssertionThumbprintException.ErrorCode.IN_RESPONSE_TO_ALGORITHM_NOT_VALID, "InResponseTo in the assertion do not contains a valid Assertion Ref or it contains an invalid algorithm.");
 
     }
 
@@ -218,9 +216,10 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
             String errMsg = String.format("Can not calculate JwkThumbprint: %S", e.getMessage());
             throw new AssertionThumbprintException(AssertionThumbprintException.ErrorCode.ERROR_CALCULATING_ASSERTION_THUMBPRINT, errMsg, e);
         }
-        String calculatedThumbprint = String.format("%s-%s", inResponseToAlgorithm, thumbprint.decodeToString());
-        if (!AssertionRefAlgorithms.valueOf(inResponseToAlgorithm.toUpperCase(Locale.ROOT)).getPattern().matcher(calculatedThumbprint).matches()) {
-            throw new AssertionThumbprintException(AssertionThumbprintException.ErrorCode.ERROR_CALCULATING_ASSERTION_THUMBPRINT,  "Error calculating the hash of the provided public key");
+        AssertionRefAlgorithms algo = AssertionRefAlgorithms.getAlgorithmFromHash(inResponseToAlgorithm);
+        String calculatedThumbprint = String.format("%s-%s", algo.getAlgorithmName(), thumbprint);
+        if (!algo.getPattern().matcher(calculatedThumbprint).matches()) {
+            throw new AssertionThumbprintException(AssertionThumbprintException.ErrorCode.ERROR_CALCULATING_ASSERTION_THUMBPRINT,  "The calculated thumbprint does not match the expected pattern: " + calculatedThumbprint);
         }
         return calculatedThumbprint;
     }
