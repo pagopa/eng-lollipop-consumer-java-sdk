@@ -1,13 +1,11 @@
-/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.exception;
 
 import java.util.Objects;
 
 /**
- * Thrown in case of problems when computing or verifying lollipop request through the
- * http-signature flow
+ * Thrown in case of problems when verifying assertion thumbprint
  */
-public class LollipopVerifierException extends Exception {
+public class AssertionThumbprintException extends Exception {
 
     /** Error code of this exception */
     private final ErrorCode errorCode;
@@ -18,7 +16,7 @@ public class LollipopVerifierException extends Exception {
      * @param errorCode Error code
      * @param message Detail message
      */
-    public LollipopVerifierException(ErrorCode errorCode, String message) {
+    public AssertionThumbprintException(ErrorCode errorCode, String message) {
         super(message);
         this.errorCode = Objects.requireNonNull(errorCode);
     }
@@ -30,7 +28,7 @@ public class LollipopVerifierException extends Exception {
      * @param message Detail message
      * @param cause Exception causing the constructed one
      */
-    public LollipopVerifierException(ErrorCode errorCode, String message, Throwable cause) {
+    public AssertionThumbprintException(ErrorCode errorCode, String message, Throwable cause) {
         super(message, cause);
         this.errorCode = Objects.requireNonNull(errorCode);
     }
@@ -46,8 +44,9 @@ public class LollipopVerifierException extends Exception {
 
     /** Error codes to classify Lollipop Request Exceptions */
     public enum ErrorCode {
-        MISSING_SIGNATURE,
-
-        MISSING_SIGNATURE_INPUT
+        IN_RESPONSE_TO_FIELD_NOT_FOUND,
+        IN_RESPONSE_TO_NOT_VALID,
+        ERROR_CALCULATING_ASSERTION_THUMBPRINT,
+        INVALID_IN_RESPONSE_TO
     }
 }

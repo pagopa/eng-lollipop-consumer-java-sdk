@@ -3,7 +3,7 @@ package it.pagopa.tech.lollipop.consumer.enumeration;
 /**
  * Supported assertion type
  */
-public enum AssertionTypeEnum {
+public enum AssertionType {
     SAML,
     //TODO: OIDC
 
