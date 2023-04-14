@@ -4,6 +4,7 @@ plugins {
 	id("com.diffplug.spotless") version "6.17.0"
 	id("nebula.lint") version "18.0.3"
 	id("org.kordamp.gradle.reproducible") version "0.50.0"
+	id "org.sonarqube" version "3.5.0.2730"
 }
 
 repositories {
@@ -127,6 +128,13 @@ subprojects {
 				credentials {
 					username = System.getenv("GITHUB_ACTOR")
 					password = System.getenv("GITHUB_TOKEN")
+				}
+			}
+		}
+		subprojects {
+			sonar {
+				properties {
+					property "sonar.sources", "src"
 				}
 			}
 		}
