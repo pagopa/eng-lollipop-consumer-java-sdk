@@ -32,7 +32,7 @@ jobs:
     - name: Make gradlew executable
       run: chmod +x ./gradlew  
     - name: Run build with Gradle Wrapper
-      run: ./gradlew build sonar
+      run: ./gradlew build testCodeCoverageReport
         -Dsonar.organization=pagopa
         -Dsonar.projectKey=${{ env.PROJECT_KEY }}
         -Dsonar.host.url=https://sonarcloud.io
@@ -40,6 +40,14 @@ jobs:
         -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
         -Dsonar.pullrequest.branch=${{ github.head_ref }}
         -Dsonar.pullrequest.base=${{ github.base_ref }}
+    - name: Add coverage to PR
+      id: jacoco
+      uses: madrapps/jacoco-report@v1.3
+      with:
+        paths: ${{ github.workspace }}/test-coverage/build/reports/jacoco/testCoverage/testCoverage.xml
+        token: ${{ secrets.GITHUB_TOKEN }}
+        min-coverage-overall: 40
+        min-coverage-changed-files: 60
     - name: Build the Docker image
       run: docker build . --file ${{ env.DOCKERFILE }} --tag localbuild/testimage:latest
     - name: Run the Anchore Grype scan action
@@ -54,3 +62,12 @@ jobs:
       if: always()
       with:
         sarif_file: ${{ steps.scan.outputs.sarif }}
+    - name: Run Sonar Scanner
+      run: ./gradlew sonar
+        -Dsonar.organization=pagopa
+        -Dsonar.projectKey=${{ env.PROJECT_KEY }}
+        -Dsonar.host.url=https://sonarcloud.io
+        -Dsonar.login=${{ env.SONAR_TOKEN }}
+        -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
+        -Dsonar.pullrequest.branch=${{ github.head_ref }}
+        -Dsonar.pullrequest.base=${{ github.base_ref }}
