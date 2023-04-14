@@ -33,18 +33,11 @@ jobs:
       run: chmod +x ./gradlew  
     - name: Run build with Gradle Wrapper
       run: ./gradlew build testCodeCoverageReport
-        -Dsonar.organization=pagopa
-        -Dsonar.projectKey=${{ env.PROJECT_KEY }}
-        -Dsonar.host.url=https://sonarcloud.io
-        -Dsonar.login=${{ env.SONAR_TOKEN }}
-        -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
-        -Dsonar.pullrequest.branch=${{ github.head_ref }}
-        -Dsonar.pullrequest.base=${{ github.base_ref }}
     - name: Add coverage to PR
       id: jacoco
-      uses: madrapps/jacoco-report@v1.3
+      uses: madrapps/jacoco-report@7a334255fbce42f385d7567c25d986a9c62e2971
       with:
-        paths: ${{ github.workspace }}/test-coverage/build/reports/jacoco/testCoverage/testCoverage.xml
+        paths: ${{ github.workspace }}/test-coverage/build/reports/jacoco/testCoverageReport/testCoverageReport.xml
         token: ${{ secrets.GITHUB_TOKEN }}
         min-coverage-overall: 40
         min-coverage-changed-files: 60
