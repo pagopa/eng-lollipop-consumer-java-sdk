@@ -45,11 +45,11 @@ public class LollipopRequestContentValidationException extends Exception {
 
     /** Error codes to classify Lollipop Request Exceptions */
     public enum ErrorCode {
-        UNEXPECTED_METHOD_OR_URL,
-
+        UNEXPECTED_ORIGINAL_METHOD,
+        UNEXPECTED_ORIGINAL_URL,
 
         MISSING_SIGNATURE,
-        INVALID_SIGNATURE_HEADER,
+        INVALID_SIGNATURE,
 
         MISSING_SIGNATURE_INPUT,
         INVALID_SIGNATURE_INPUT,
