@@ -1,16 +1,21 @@
 package it.pagopa.tech.lollipop.consumer.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
 import it.pagopa.tech.lollipop.consumer.enumeration.AssertionRefAlgorithms;
 import it.pagopa.tech.lollipop.consumer.enumeration.AssertionType;
 import it.pagopa.tech.lollipop.consumer.enumeration.LollipopRequestMethod;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopRequestContentValidationException;
+import it.pagopa.tech.lollipop.consumer.model.ECPublicKey;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
+import it.pagopa.tech.lollipop.consumer.model.RSAPublicKey;
+import it.pagopa.tech.lollipop.consumer.service.LollipopConsumerRequestValidationService;
 
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public class LollipopConsumerRequestValidationServiceImpl implements it.pagopa.tech.lollipop.consumer.service.LollipopConsumerRequestValidationService {
+public class LollipopConsumerRequestValidationServiceImpl implements LollipopConsumerRequestValidationService {
 
     private final LollipopConsumerRequestConfig config;
 
@@ -21,8 +26,6 @@ public class LollipopConsumerRequestValidationServiceImpl implements it.pagopa.t
     @Override
     public void validateLollipopRequest(LollipopConsumerRequest request) throws LollipopRequestContentValidationException {
         Map<String, String> headerParams = request.getHeaderParams();
-
-        validatesOriginalMethodAndURL(headerParams.get(this.config.getOriginalMethodHeader()), headerParams.get(this.config.getOriginalURLHeader()));
 
         validatePublicKey(headerParams.get(this.config.getPublicKeyHeader()));
 
@@ -36,26 +39,23 @@ public class LollipopConsumerRequestValidationServiceImpl implements it.pagopa.t
         validateSignatureHeader(headerParams.get(this.config.getSignatureHeader()));
     }
 
-    private void validatesOriginalMethodAndURL(String originalMethod, String originalUrl) throws LollipopRequestContentValidationException {
-
-        if (!originalMethod.equals(this.config.getExpectedFirstLcOriginalMethod()) && !originalUrl.equals(this.config.getExpectedFirstLcOriginalUrl())) {
-            String errMsg = String.format("Unexpected original method and/or original url: %s, %s", originalMethod, originalUrl);
-            throw new LollipopRequestContentValidationException(LollipopRequestContentValidationException.ErrorCode.UNEXPECTED_METHOD_OR_URL, errMsg);
-        }
-    }
-
     private void validatePublicKey(String publicKey) throws LollipopRequestContentValidationException {
         if (publicKey == null ) {
             throw new LollipopRequestContentValidationException(LollipopRequestContentValidationException.ErrorCode.MISSING_PUBLIC_KEY, "Missing Public Key Header");
         }
 
-        if (isNotValidPublicKey(publicKey)) {
+        if (isNotValidPublicKey(publicKey, ECPublicKey.class) && isNotValidPublicKey(publicKey, RSAPublicKey.class)) {
             throw new LollipopRequestContentValidationException(LollipopRequestContentValidationException.ErrorCode.INVALID_PUBLIC_KEY, "Invalid Public Key Header value");
         }
     }
 
-    private boolean isNotValidPublicKey(String publicKey) {
-        // TODO
+    private boolean isNotValidPublicKey(String publicKey, Class<?> clazz) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            mapper.readValue(publicKey, clazz);
+        } catch (JsonProcessingException e) {
+            return true;
+        }
         return false;
     }
 
@@ -127,6 +127,11 @@ public class LollipopConsumerRequestValidationServiceImpl implements it.pagopa.t
         if (!isRequestMethodSupported(originalMethod)) {
             throw new LollipopRequestContentValidationException(LollipopRequestContentValidationException.ErrorCode.INVALID_ORIGINAL_METHOD, "Invalid Original Method Header value, method not supported");
         }
+
+        if (!originalMethod.equals(this.config.getExpectedFirstLcOriginalMethod())) {
+            String errMsg = String.format("Unexpected original method: %s", originalMethod);
+            throw new LollipopRequestContentValidationException(LollipopRequestContentValidationException.ErrorCode.UNEXPECTED_ORIGINAL_METHOD, errMsg);
+        }
     }
 
     private boolean isRequestMethodSupported(String originalMethod) {
@@ -146,10 +151,15 @@ public class LollipopConsumerRequestValidationServiceImpl implements it.pagopa.t
         if (isNotValidOriginalURL(originalURL)) {
             throw new LollipopRequestContentValidationException(LollipopRequestContentValidationException.ErrorCode.INVALID_ORIGINAL_URL, "Invalid Original URL Header value");
         }
+
+        if (!originalURL.equals(this.config.getExpectedFirstLcOriginalUrl())) {
+            String errMsg = String.format("Unexpected original url: %s", originalURL);
+            throw new LollipopRequestContentValidationException(LollipopRequestContentValidationException.ErrorCode.UNEXPECTED_ORIGINAL_URL, errMsg);
+        }
     }
 
     private boolean isNotValidOriginalURL(String originalURL) {
-        return !Pattern.compile("^https://").matcher(originalURL).matches();
+        return !Pattern.compile("^https://\\S+").matcher(originalURL).matches();
     }
 
     private void validateSignatureInputHeader(String signatureInput) throws LollipopRequestContentValidationException {
@@ -172,7 +182,7 @@ public class LollipopConsumerRequestValidationServiceImpl implements it.pagopa.t
         }
 
         if (isNotValidSignature(signature)) {
-            throw new LollipopRequestContentValidationException(LollipopRequestContentValidationException.ErrorCode.INVALID_SIGNATURE_HEADER, "Invalid Signature Header value");
+            throw new LollipopRequestContentValidationException(LollipopRequestContentValidationException.ErrorCode.INVALID_SIGNATURE, "Invalid Signature Header value");
         }
     }
 

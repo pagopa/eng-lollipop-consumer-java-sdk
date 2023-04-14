@@ -29,8 +29,7 @@ class AssertionVerifierServiceImplTest {
     private AssertionVerifierService sut;
 
     private static final String VALID_FISCAL_CODE = "AAAAAA89S20I111X";
-    private static final String INVALID_JWK = "{  alg: \"\",  e: \"e\",  kty: \"RSA\",  n: \"n\"}";
-    private static final String VALID_JWK = "{  kty: \"EC\",  crv: \"P-256\",  x: \"SVqB4JcUD6lsfvqMr-OKUNUphdNn64Eay60978ZlL74\",  y: \"lf0u0pMj4lGAzZix5u4Cm5CMQIgMNpkwy163wtKYVKI\"}";
+    private static final String VALID_JWK = "{  \"kty\": \"EC\",  \"crv\": \"P-256\",  \"x\": \"SVqB4JcUD6lsfvqMr-OKUNUphdNn64Eay60978ZlL74\",  \"y\": \"lf0u0pMj4lGAzZix5u4Cm5CMQIgMNpkwy163wtKYVKI\"}";
     private static final String VALID_SHA_256_ASSERTION_REF = "sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg";
     private static final String VALID_SHA_384_ASSERTION_REF = "sha384-lqxC_2kqMdwiBWoD-Us63Fha6e3bE1Y3yUz8G6IJTldohJCIBVDfvS8acB3GJBhw";
     private static final String VALID_SHA_512_ASSERTION_REF = "sha512-nX5CfUc5R-FoYKYZwvQMuc4Tt-heb7vHi_O-AMUSqHNVCw9kNaN2SVuN-DXtGXyUhrcVcQdCyY6FVzl_vyWXNA";
@@ -235,8 +234,8 @@ class AssertionVerifierServiceImplTest {
     }
 
     @Test
-    void validateLollipopValidateThumbprintFailureWithInvalidPublicKey() throws OidcAssertionNotSupported, LollipopAssertionNotFoundException {
-        LollipopConsumerRequest request = getLollipopConsumerRequest("", INVALID_JWK, VALID_FISCAL_CODE);
+    void validateLollipopValidateThumbprintFailureWithDifferentAssertionRefAndCalculatedThumbprint() throws OidcAssertionNotSupported, LollipopAssertionNotFoundException {
+        LollipopConsumerRequest request = getLollipopConsumerRequest("", VALID_JWK, VALID_FISCAL_CODE);
 
         SamlAssertion assertion = new SamlAssertion();
         assertion.setAssertionData(ASSERTION_XML_WITH_VALID_INRESPONSETO_SHA256_ALGORITHM);
