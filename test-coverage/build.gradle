@@ -35,9 +35,9 @@ tasks.named('check') {
 testCodeCoverageReport {
 	getClassDirectories().setFrom(files(
 			[project(':http-verifier'),
-			 project(':identity-service-rest-client-native'),
-			 project(':assertion-rest-client-native'),
-			 project(':core')
+			project(':identity-service-rest-client-native'),
+			project(':assertion-rest-client-native'),
+			project(':core')
 			].collect {
 				it.fileTree(dir: "${it.buildDir}/classes", exclude: [
 						"**/config/*","**/*Mock*","**/model/**","**/entity/*","**/*Stub*","**/*Config*"
