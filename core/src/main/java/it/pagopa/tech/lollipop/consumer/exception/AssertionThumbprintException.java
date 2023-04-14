@@ -45,7 +45,7 @@ public class AssertionThumbprintException extends Exception {
     /** Error codes to classify Lollipop Request Exceptions */
     public enum ErrorCode {
         IN_RESPONSE_TO_FIELD_NOT_FOUND,
-        IN_RESPONSE_TO_NOT_VALID,
+        IN_RESPONSE_TO_ALGORITHM_NOT_VALID,
         ERROR_CALCULATING_ASSERTION_THUMBPRINT,
         INVALID_IN_RESPONSE_TO
     }
