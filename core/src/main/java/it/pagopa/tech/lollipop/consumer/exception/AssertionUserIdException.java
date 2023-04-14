@@ -3,10 +3,10 @@ package it.pagopa.tech.lollipop.consumer.exception;
 import java.util.Objects;
 
 /**
- * Thrown in case of problems when computing or verifying lollipop request through the
- *  assertion flow
+ * Thrown in case of problems when verifying assertion user id
  */
-public class LollipopValidationException extends Exception {
+public class AssertionUserIdException extends Exception {
+
 
     /** Error code of this exception */
     private final ErrorCode errorCode;
@@ -17,7 +17,7 @@ public class LollipopValidationException extends Exception {
      * @param errorCode Error code
      * @param message Detail message
      */
-    public LollipopValidationException(ErrorCode errorCode, String message) {
+    public AssertionUserIdException(ErrorCode errorCode, String message) {
         super(message);
         this.errorCode = Objects.requireNonNull(errorCode);
     }
@@ -29,7 +29,7 @@ public class LollipopValidationException extends Exception {
      * @param message Detail message
      * @param cause Exception causing the constructed one
      */
-    public LollipopValidationException(ErrorCode errorCode, String message, Throwable cause) {
+    public AssertionUserIdException(ErrorCode errorCode, String message, Throwable cause) {
         super(message, cause);
         this.errorCode = Objects.requireNonNull(errorCode);
     }
@@ -45,6 +45,7 @@ public class LollipopValidationException extends Exception {
 
     /** Error codes to classify Lollipop Request Exceptions */
     public enum ErrorCode {
-        UNEXPECTED_METHOD_OR_URL
+        INVALID_USER_ID,
+        FISCAL_CODE_FIELD_NOT_FOUND
     }
 }

@@ -1,13 +1,11 @@
-/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.exception;
 
 import java.util.Objects;
 
 /**
- * Thrown in case of problems when computing or verifying lollipop request through the
- * http-signature flow
+ * Thrown in case of problems on retrieving the assertion
  */
-public class LollipopVerifierException extends Exception {
+public class ErrorRetrievingAssertionException extends Exception {
 
     /** Error code of this exception */
     private final ErrorCode errorCode;
@@ -18,7 +16,7 @@ public class LollipopVerifierException extends Exception {
      * @param errorCode Error code
      * @param message Detail message
      */
-    public LollipopVerifierException(ErrorCode errorCode, String message) {
+    public ErrorRetrievingAssertionException(ErrorCode errorCode, String message) {
         super(message);
         this.errorCode = Objects.requireNonNull(errorCode);
     }
@@ -30,7 +28,7 @@ public class LollipopVerifierException extends Exception {
      * @param message Detail message
      * @param cause Exception causing the constructed one
      */
-    public LollipopVerifierException(ErrorCode errorCode, String message, Throwable cause) {
+    public ErrorRetrievingAssertionException(ErrorCode errorCode, String message, Throwable cause) {
         super(message, cause);
         this.errorCode = Objects.requireNonNull(errorCode);
     }
@@ -46,8 +44,8 @@ public class LollipopVerifierException extends Exception {
 
     /** Error codes to classify Lollipop Request Exceptions */
     public enum ErrorCode {
-        MISSING_SIGNATURE,
-
-        MISSING_SIGNATURE_INPUT
+        SAML_ASSERTION_NOT_FOUND,
+        OIDC_TYPE_NOT_SUPPORTED,
+        ERROR_PARSING_ASSERTION
     }
 }

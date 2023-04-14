@@ -3,7 +3,7 @@ package it.pagopa.tech.lollipop.consumer.enumeration;
 /**
  * Supported Lollipop request methods
  */
-public enum LollipopMethodEnum {
+public enum LollipopRequestMethod {
     GET,
     POST,
     PUT,
