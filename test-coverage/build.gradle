@@ -1,0 +1,47 @@
+plugins {
+	id 'base'
+	id 'jacoco-report-aggregation'
+}
+
+repositories {
+	mavenLocal()
+	mavenCentral()
+	maven {
+		url = uri("https://maven.pkg.github.com/pagopa/eng-http-signatures")
+		credentials {
+			username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+			password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+		}
+	}}
+
+dependencies {
+	jacocoAggregation project(':http-verifier')
+	jacocoAggregation project(':identity-service-rest-client-native')
+	jacocoAggregation project(':assertion-rest-client-native')
+}
+
+reporting {
+	reports {
+		testCodeCoverageReport(JacocoCoverageReport) {
+			testType = TestSuiteType.UNIT_TEST
+		}
+	}
+}
+
+tasks.named('check') {
+	dependsOn tasks.named('testCodeCoverageReport', JacocoReport)
+}
+
+testCodeCoverageReport {
+	getClassDirectories().setFrom(files(
+			[project(':http-verifier'),
+			 project(':identity-service-rest-client-native'),
+			 project(':assertion-rest-client-native'),
+			 project(':core')
+			].collect {
+				it.fileTree(dir: "${it.buildDir}/classes", exclude: [
+						"**/config/*","**/*Mock*","**/model/**","**/entity/*","**/*Stub*","**/*Config*"
+				])
+			}
+	))
+}

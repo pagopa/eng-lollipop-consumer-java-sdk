@@ -18,6 +18,13 @@ group 'it.pagopa.tech.lollipop.sdk.impls'
 repositories {
 	mavenLocal()
 	mavenCentral()
+	maven {
+		url = uri("https://maven.pkg.github.com/pagopa/eng-http-signatures")
+		credentials {
+			username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+			password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+		}
+	}
 }
 
 configurations {
