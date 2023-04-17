@@ -72,7 +72,7 @@ public class VismaHttpMessageVerifier implements HttpMessageVerifier {
         parameters.remove(lollipopConsumerRequestConfig.getSignatureInputHeader());
         parameters.remove(lollipopConsumerRequestConfig.getSignatureHeader());
 
-        String lollipopKey = parameters.get(lollipopConsumerRequestConfig.getLollipopKeyHeader());
+        String lollipopKey = parameters.get(lollipopConsumerRequestConfig.getPublicKeyHeader());
         if (lollipopKey == null) {
             throw new LollipopSignatureException(
                     LollipopSignatureException.ErrorCode.MISSING_PUBLIC_KEY,
