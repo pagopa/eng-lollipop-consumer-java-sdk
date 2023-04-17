@@ -1,10 +1,9 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.exception;
 
 import java.util.Objects;
 
-/**
- * Thrown in case of problems when verifying assertion period
- */
+/** Thrown in case of problems when verifying assertion period */
 public class AssertionPeriodException extends Exception {
 
     /** Error code of this exception */

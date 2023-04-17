@@ -1,12 +1,10 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.exception;
 
 import java.util.Objects;
 
-/**
- * Thrown in case of problem during Lollipop request header and body validation
- */
+/** Thrown in case of problem during Lollipop request header and body validation */
 public class LollipopRequestContentValidationException extends Exception {
-
 
     /** Error code of this exception */
     private final ErrorCode errorCode;
@@ -29,7 +27,8 @@ public class LollipopRequestContentValidationException extends Exception {
      * @param message Detail message
      * @param cause Exception causing the constructed one
      */
-    public LollipopRequestContentValidationException(ErrorCode errorCode, String message, Throwable cause) {
+    public LollipopRequestContentValidationException(
+            ErrorCode errorCode, String message, Throwable cause) {
         super(message, cause);
         this.errorCode = Objects.requireNonNull(errorCode);
     }

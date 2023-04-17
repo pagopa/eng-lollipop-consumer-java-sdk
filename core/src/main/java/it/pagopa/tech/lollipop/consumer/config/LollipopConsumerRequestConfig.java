@@ -10,7 +10,7 @@ public class LollipopConsumerRequestConfig {
 
     @Builder.Default private boolean strictDigestVerify = false;
 
-    //request headers
+    // request headers
     @Builder.Default private String signatureHeader = "signature";
     @Builder.Default private String signatureInputHeader = "signature-input";
     @Builder.Default private String contentEncodingHeader = "content-encoding";
@@ -24,16 +24,18 @@ public class LollipopConsumerRequestConfig {
     @Builder.Default private String authJWTHeader = "x-pagopa-lollipop-auth-jwt";
 
     @Builder.Default private String expectedFirstLcOriginalMethod = "POST";
-    @Builder.Default private String expectedFirstLcOriginalUrl = "https://api-app.io.pagopa.it/first-lollipop/sign";
+
+    @Builder.Default
+    private String expectedFirstLcOriginalUrl = "https://api-app.io.pagopa.it/first-lollipop/sign";
 
     // assertion validation parameters
     @Builder.Default private int assertionExpireInDays = 30;
     @Builder.Default private String assertionNotBeforeDateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-    @Builder.Default private String samlNamespaceAssertion = "urn:oasis:names:tc:SAML:2.0:assertion";
+
+    @Builder.Default
+    private String samlNamespaceAssertion = "urn:oasis:names:tc:SAML:2.0:assertion";
+
     @Builder.Default private String assertionNotBeforeTag = "Conditions";
     @Builder.Default private String assertionFiscalCodeTag = "Attribute";
     @Builder.Default private String assertionInResponseToTag = "SubjectConfirmationData";
-
-
-
 }

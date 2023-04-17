@@ -29,7 +29,6 @@ public class LollipopConsumerCommandBuilderImpl implements LollipopConsumerComma
         return new LollipopConsumerCommandImpl(
                 factoryHelper.getHttpMessageVerifierService(),
                 factoryHelper.getAssertionVerifierService(),
-                factoryHelper.getRequestValidationService()
-        );
+                factoryHelper.getRequestValidationService());
     }
 }
