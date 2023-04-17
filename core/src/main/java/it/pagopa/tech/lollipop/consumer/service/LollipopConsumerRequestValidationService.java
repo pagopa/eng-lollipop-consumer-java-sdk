@@ -12,7 +12,6 @@ public interface LollipopConsumerRequestValidationService {
      * Validates all request headers
      *
      * @param request the Lollipop request
-     * @return true if the request is validated
      * @throws LollipopRequestContentValidationException if some error occurred during validation
      */
     void validateLollipopRequest(LollipopConsumerRequest request) throws LollipopRequestContentValidationException;
