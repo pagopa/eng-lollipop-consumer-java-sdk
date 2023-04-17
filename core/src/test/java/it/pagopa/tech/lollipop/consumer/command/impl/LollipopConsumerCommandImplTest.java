@@ -12,9 +12,8 @@ import it.pagopa.tech.lollipop.consumer.model.CommandResult;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.service.AssertionVerifierService;
 import it.pagopa.tech.lollipop.consumer.service.HttpMessageVerifierService;
-import java.io.UnsupportedEncodingException;
-
 import it.pagopa.tech.lollipop.consumer.service.LollipopConsumerRequestValidationService;
+import java.io.UnsupportedEncodingException;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
 import org.mockito.*;
@@ -36,17 +35,19 @@ class LollipopConsumerCommandImplTest {
                         new LollipopConsumerCommandImpl(
                                 messageVerifierServiceMock,
                                 assertionVerifierServiceMock,
-                                requestValidationServiceMock
-                        ));
+                                requestValidationServiceMock));
     }
 
     @Test
     void failedHttpMessageValidationThrowDigestException()
-            throws LollipopDigestException, UnsupportedEncodingException,
-            LollipopVerifierException, AssertionPeriodException, AssertionThumbprintException, AssertionUserIdException, ErrorRetrievingAssertionException, LollipopRequestContentValidationException {
+            throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException,
+                    AssertionPeriodException, AssertionThumbprintException,
+                    AssertionUserIdException, ErrorRetrievingAssertionException,
+                    LollipopRequestContentValidationException {
 
-        doThrow(new LollipopDigestException(
-                LollipopDigestException.ErrorCode.INCORRECT_DIGEST, "error"))
+        doThrow(
+                        new LollipopDigestException(
+                                LollipopDigestException.ErrorCode.INCORRECT_DIGEST, "error"))
                 .when(messageVerifierServiceMock)
                 .verifyHttpMessage(any(LollipopConsumerRequest.class));
 
@@ -56,7 +57,8 @@ class LollipopConsumerCommandImplTest {
                 HttpMessageVerificationResultCode.DIGEST_VALIDATION_ERROR.name(),
                 commandResult.getResultCode());
 
-        verify(requestValidationServiceMock).validateLollipopRequest(any(LollipopConsumerRequest.class));
+        verify(requestValidationServiceMock)
+                .validateLollipopRequest(any(LollipopConsumerRequest.class));
         verify(messageVerifierServiceMock).verifyHttpMessage(any(LollipopConsumerRequest.class));
         verify(assertionVerifierServiceMock, never())
                 .validateLollipop(any(LollipopConsumerRequest.class));
@@ -76,7 +78,8 @@ class LollipopConsumerCommandImplTest {
                 HttpMessageVerificationResultCode.UNSUPPORTED_ENCODING.name(),
                 commandResult.getResultCode());
 
-        verify(requestValidationServiceMock).validateLollipopRequest(any(LollipopConsumerRequest.class));
+        verify(requestValidationServiceMock)
+                .validateLollipopRequest(any(LollipopConsumerRequest.class));
         verify(messageVerifierServiceMock).verifyHttpMessage(any(LollipopConsumerRequest.class));
         verify(assertionVerifierServiceMock, never())
                 .validateLollipop(any(LollipopConsumerRequest.class));
@@ -84,8 +87,10 @@ class LollipopConsumerCommandImplTest {
 
     @Test
     void failedHttpMessageValidationWithoutThrowingException()
-            throws LollipopDigestException, UnsupportedEncodingException,
-            LollipopVerifierException, AssertionPeriodException, AssertionThumbprintException, AssertionUserIdException, ErrorRetrievingAssertionException, LollipopRequestContentValidationException {
+            throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException,
+                    AssertionPeriodException, AssertionThumbprintException,
+                    AssertionUserIdException, ErrorRetrievingAssertionException,
+                    LollipopRequestContentValidationException {
 
         doReturn(false)
                 .when(messageVerifierServiceMock)
@@ -97,7 +102,8 @@ class LollipopConsumerCommandImplTest {
                 HttpMessageVerificationResultCode.HTTP_MESSAGE_VALIDATION_FAILED.name(),
                 commandResult.getResultCode());
 
-        verify(requestValidationServiceMock).validateLollipopRequest(any(LollipopConsumerRequest.class));
+        verify(requestValidationServiceMock)
+                .validateLollipopRequest(any(LollipopConsumerRequest.class));
         verify(messageVerifierServiceMock).verifyHttpMessage(any(LollipopConsumerRequest.class));
         verify(assertionVerifierServiceMock, never())
                 .validateLollipop(any(LollipopConsumerRequest.class));
@@ -105,8 +111,10 @@ class LollipopConsumerCommandImplTest {
 
     @Test
     void failedAssertionValidationWithoutThrowingException()
-            throws LollipopDigestException, UnsupportedEncodingException,
-            LollipopVerifierException, AssertionPeriodException, AssertionThumbprintException, AssertionUserIdException, ErrorRetrievingAssertionException, LollipopRequestContentValidationException {
+            throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException,
+                    AssertionPeriodException, AssertionThumbprintException,
+                    AssertionUserIdException, ErrorRetrievingAssertionException,
+                    LollipopRequestContentValidationException {
 
         doReturn(true)
                 .when(messageVerifierServiceMock)
@@ -121,15 +129,18 @@ class LollipopConsumerCommandImplTest {
                 AssertionVerificationResultCode.ASSERTION_VERIFICATION_FAILED.name(),
                 commandResult.getResultCode());
 
-        verify(requestValidationServiceMock).validateLollipopRequest(any(LollipopConsumerRequest.class));
+        verify(requestValidationServiceMock)
+                .validateLollipopRequest(any(LollipopConsumerRequest.class));
         verify(messageVerifierServiceMock).verifyHttpMessage(any(LollipopConsumerRequest.class));
         verify(assertionVerifierServiceMock).validateLollipop(any(LollipopConsumerRequest.class));
     }
 
     @Test
     void successLollipopRequestValidation()
-            throws LollipopDigestException, UnsupportedEncodingException,
-            LollipopVerifierException, AssertionPeriodException, AssertionThumbprintException, AssertionUserIdException, ErrorRetrievingAssertionException, LollipopRequestContentValidationException {
+            throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException,
+                    AssertionPeriodException, AssertionThumbprintException,
+                    AssertionUserIdException, ErrorRetrievingAssertionException,
+                    LollipopRequestContentValidationException {
 
         doReturn(true)
                 .when(messageVerifierServiceMock)
@@ -142,31 +153,40 @@ class LollipopConsumerCommandImplTest {
 
         Assertions.assertEquals("SUCCESS", commandResult.getResultCode());
 
-        verify(requestValidationServiceMock).validateLollipopRequest(any(LollipopConsumerRequest.class));
+        verify(requestValidationServiceMock)
+                .validateLollipopRequest(any(LollipopConsumerRequest.class));
         verify(messageVerifierServiceMock).verifyHttpMessage(any(LollipopConsumerRequest.class));
         verify(assertionVerifierServiceMock).validateLollipop(any(LollipopConsumerRequest.class));
     }
 
     @Test
     void failedLollipopRequestValidation()
-            throws LollipopDigestException, UnsupportedEncodingException,
-            LollipopVerifierException, AssertionPeriodException, AssertionThumbprintException, AssertionUserIdException, ErrorRetrievingAssertionException, LollipopRequestContentValidationException {
+            throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException,
+                    AssertionPeriodException, AssertionThumbprintException,
+                    AssertionUserIdException, ErrorRetrievingAssertionException,
+                    LollipopRequestContentValidationException {
 
-
-        doThrow(LollipopRequestContentValidationException.class).when(requestValidationServiceMock).validateLollipopRequest(any(LollipopConsumerRequest.class));
+        doThrow(LollipopRequestContentValidationException.class)
+                .when(requestValidationServiceMock)
+                .validateLollipopRequest(any(LollipopConsumerRequest.class));
         CommandResult commandResult = sut.doExecute(LollipopConsumerRequest.builder().build());
 
         Assertions.assertEquals("REQUEST PARAMS VALIDATION FAILED", commandResult.getResultCode());
 
-        verify(requestValidationServiceMock).validateLollipopRequest(any(LollipopConsumerRequest.class));
-        verify(messageVerifierServiceMock, never()).verifyHttpMessage(any(LollipopConsumerRequest.class));
-        verify(assertionVerifierServiceMock, never()).validateLollipop(any(LollipopConsumerRequest.class));
+        verify(requestValidationServiceMock)
+                .validateLollipopRequest(any(LollipopConsumerRequest.class));
+        verify(messageVerifierServiceMock, never())
+                .verifyHttpMessage(any(LollipopConsumerRequest.class));
+        verify(assertionVerifierServiceMock, never())
+                .validateLollipop(any(LollipopConsumerRequest.class));
     }
 
     @Test
     void failedAssertionValidationThrowErrorRetrievingAssertionException()
-            throws LollipopDigestException, UnsupportedEncodingException,
-            LollipopVerifierException, AssertionPeriodException, AssertionThumbprintException, AssertionUserIdException, ErrorRetrievingAssertionException, LollipopRequestContentValidationException {
+            throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException,
+                    AssertionPeriodException, AssertionThumbprintException,
+                    AssertionUserIdException, ErrorRetrievingAssertionException,
+                    LollipopRequestContentValidationException {
 
         doReturn(true)
                 .when(messageVerifierServiceMock)
@@ -181,15 +201,18 @@ class LollipopConsumerCommandImplTest {
                 AssertionVerificationResultCode.ERROR_RETRIEVING_ASSERTION.name(),
                 commandResult.getResultCode());
 
-        verify(requestValidationServiceMock).validateLollipopRequest(any(LollipopConsumerRequest.class));
+        verify(requestValidationServiceMock)
+                .validateLollipopRequest(any(LollipopConsumerRequest.class));
         verify(messageVerifierServiceMock).verifyHttpMessage(any(LollipopConsumerRequest.class));
         verify(assertionVerifierServiceMock).validateLollipop(any(LollipopConsumerRequest.class));
     }
 
     @Test
     void failedAssertionValidationThrowAssertionPeriodException()
-            throws LollipopDigestException, UnsupportedEncodingException,
-            LollipopVerifierException, AssertionPeriodException, AssertionThumbprintException, AssertionUserIdException, ErrorRetrievingAssertionException, LollipopRequestContentValidationException {
+            throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException,
+                    AssertionPeriodException, AssertionThumbprintException,
+                    AssertionUserIdException, ErrorRetrievingAssertionException,
+                    LollipopRequestContentValidationException {
 
         doReturn(true)
                 .when(messageVerifierServiceMock)
@@ -204,15 +227,18 @@ class LollipopConsumerCommandImplTest {
                 AssertionVerificationResultCode.PERIOD_VALIDATION_ERROR.name(),
                 commandResult.getResultCode());
 
-        verify(requestValidationServiceMock).validateLollipopRequest(any(LollipopConsumerRequest.class));
+        verify(requestValidationServiceMock)
+                .validateLollipopRequest(any(LollipopConsumerRequest.class));
         verify(messageVerifierServiceMock).verifyHttpMessage(any(LollipopConsumerRequest.class));
         verify(assertionVerifierServiceMock).validateLollipop(any(LollipopConsumerRequest.class));
     }
 
     @Test
     void failedAssertionValidationThrowAssertionThumbprintException()
-            throws LollipopDigestException, UnsupportedEncodingException,
-            LollipopVerifierException, AssertionPeriodException, AssertionThumbprintException, AssertionUserIdException, ErrorRetrievingAssertionException, LollipopRequestContentValidationException {
+            throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException,
+                    AssertionPeriodException, AssertionThumbprintException,
+                    AssertionUserIdException, ErrorRetrievingAssertionException,
+                    LollipopRequestContentValidationException {
 
         doReturn(true)
                 .when(messageVerifierServiceMock)
@@ -227,15 +253,18 @@ class LollipopConsumerCommandImplTest {
                 AssertionVerificationResultCode.THUMBPRINT_VALIDATION_ERROR.name(),
                 commandResult.getResultCode());
 
-        verify(requestValidationServiceMock).validateLollipopRequest(any(LollipopConsumerRequest.class));
+        verify(requestValidationServiceMock)
+                .validateLollipopRequest(any(LollipopConsumerRequest.class));
         verify(messageVerifierServiceMock).verifyHttpMessage(any(LollipopConsumerRequest.class));
         verify(assertionVerifierServiceMock).validateLollipop(any(LollipopConsumerRequest.class));
     }
 
     @Test
     void failedAssertionValidationThrowAssertionUserIdException()
-            throws LollipopDigestException, UnsupportedEncodingException,
-            LollipopVerifierException, AssertionPeriodException, AssertionThumbprintException, AssertionUserIdException, ErrorRetrievingAssertionException, LollipopRequestContentValidationException {
+            throws LollipopDigestException, UnsupportedEncodingException, LollipopVerifierException,
+                    AssertionPeriodException, AssertionThumbprintException,
+                    AssertionUserIdException, ErrorRetrievingAssertionException,
+                    LollipopRequestContentValidationException {
 
         doReturn(true)
                 .when(messageVerifierServiceMock)
@@ -250,7 +279,8 @@ class LollipopConsumerCommandImplTest {
                 AssertionVerificationResultCode.USER_ID_VALIDATION_ERROR.name(),
                 commandResult.getResultCode());
 
-        verify(requestValidationServiceMock).validateLollipopRequest(any(LollipopConsumerRequest.class));
+        verify(requestValidationServiceMock)
+                .validateLollipopRequest(any(LollipopConsumerRequest.class));
         verify(messageVerifierServiceMock).verifyHttpMessage(any(LollipopConsumerRequest.class));
         verify(assertionVerifierServiceMock).validateLollipop(any(LollipopConsumerRequest.class));
     }

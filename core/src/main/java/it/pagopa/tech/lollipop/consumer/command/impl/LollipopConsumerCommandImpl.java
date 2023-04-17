@@ -2,7 +2,6 @@
 package it.pagopa.tech.lollipop.consumer.command.impl;
 
 import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommand;
-import it.pagopa.tech.lollipop.consumer.service.LollipopConsumerRequestValidationService;
 import it.pagopa.tech.lollipop.consumer.enumeration.AssertionVerificationResultCode;
 import it.pagopa.tech.lollipop.consumer.enumeration.HttpMessageVerificationResultCode;
 import it.pagopa.tech.lollipop.consumer.exception.*;
@@ -10,6 +9,7 @@ import it.pagopa.tech.lollipop.consumer.model.CommandResult;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.service.AssertionVerifierService;
 import it.pagopa.tech.lollipop.consumer.service.HttpMessageVerifierService;
+import it.pagopa.tech.lollipop.consumer.service.LollipopConsumerRequestValidationService;
 import java.io.UnsupportedEncodingException;
 import javax.inject.Inject;
 
@@ -21,7 +21,8 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
     private final LollipopConsumerRequestValidationService requestValidationService;
 
     public static final String VERIFICATION_SUCCESS_CODE = "SUCCESS";
-    public static final String REQUEST_PARAMS_VALIDATION_FAILED = "REQUEST PARAMS VALIDATION FAILED";
+    public static final String REQUEST_PARAMS_VALIDATION_FAILED =
+            "REQUEST PARAMS VALIDATION FAILED";
 
     @Inject
     public LollipopConsumerCommandImpl(
@@ -46,7 +47,11 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
         try {
             requestValidationService.validateLollipopRequest(request);
         } catch (LollipopRequestContentValidationException e) {
-            String message = String.format("Error validating Lollipop request header or body, validation failed with error code %s" + " and message: %s", e.getErrorCode(), e.getMessage());
+            String message =
+                    String.format(
+                            "Error validating Lollipop request header or body, validation failed"
+                                    + " with error code %s and message: %s",
+                            e.getErrorCode(), e.getMessage());
             return buildCommandResult(REQUEST_PARAMS_VALIDATION_FAILED, message);
         }
 
@@ -70,17 +75,37 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
         try {
             result = assertionVerifierService.validateLollipop(request);
         } catch (ErrorRetrievingAssertionException e) {
-            String message = String.format("Cannot obtain the assertion, validation failed with error code %s" + " and message: %s", e.getErrorCode(), e.getMessage());
-            return buildCommandResult(AssertionVerificationResultCode.ERROR_RETRIEVING_ASSERTION.name(), message);
+            String message =
+                    String.format(
+                            "Cannot obtain the assertion, validation failed with error code %s"
+                                    + " and message: %s",
+                            e.getErrorCode(), e.getMessage());
+            return buildCommandResult(
+                    AssertionVerificationResultCode.ERROR_RETRIEVING_ASSERTION.name(), message);
         } catch (AssertionPeriodException e) {
-            String message = String.format("Assertion validation failed on verifying period with error code %s" + " and message: %s", e.getErrorCode(), e.getMessage());
-            return buildCommandResult(AssertionVerificationResultCode.PERIOD_VALIDATION_ERROR.name(), message);
+            String message =
+                    String.format(
+                            "Assertion validation failed on verifying period with error code %s"
+                                    + " and message: %s",
+                            e.getErrorCode(), e.getMessage());
+            return buildCommandResult(
+                    AssertionVerificationResultCode.PERIOD_VALIDATION_ERROR.name(), message);
         } catch (AssertionThumbprintException e) {
-            String message = String.format("Assertion validation failed on verifying thumbprint  with error code %s" + " and message: %s", e.getErrorCode(), e.getMessage());
-            return buildCommandResult(AssertionVerificationResultCode.THUMBPRINT_VALIDATION_ERROR.name(), message);
+            String message =
+                    String.format(
+                            "Assertion validation failed on verifying thumbprint  with error code"
+                                    + " %s and message: %s",
+                            e.getErrorCode(), e.getMessage());
+            return buildCommandResult(
+                    AssertionVerificationResultCode.THUMBPRINT_VALIDATION_ERROR.name(), message);
         } catch (AssertionUserIdException e) {
-            String message = String.format("Assertion validation failed on verifying user id  with error code %s" + " and message: %s", e.getErrorCode(), e.getMessage());
-            return buildCommandResult(AssertionVerificationResultCode.USER_ID_VALIDATION_ERROR.name(), message);
+            String message =
+                    String.format(
+                            "Assertion validation failed on verifying user id  with error code %s"
+                                    + " and message: %s",
+                            e.getErrorCode(), e.getMessage());
+            return buildCommandResult(
+                    AssertionVerificationResultCode.USER_ID_VALIDATION_ERROR.name(), message);
         }
 
         if (!result) {

@@ -1,12 +1,10 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.exception;
 
 import java.util.Objects;
 
-/**
- * Thrown in case of problems when verifying assertion user id
- */
+/** Thrown in case of problems when verifying assertion user id */
 public class AssertionUserIdException extends Exception {
-
 
     /** Error code of this exception */
     private final ErrorCode errorCode;

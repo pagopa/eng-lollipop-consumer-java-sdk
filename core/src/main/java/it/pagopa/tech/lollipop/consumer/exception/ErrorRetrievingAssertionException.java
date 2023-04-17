@@ -1,10 +1,9 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.exception;
 
 import java.util.Objects;
 
-/**
- * Thrown in case of problems on retrieving the assertion
- */
+/** Thrown in case of problems on retrieving the assertion */
 public class ErrorRetrievingAssertionException extends Exception {
 
     /** Error code of this exception */

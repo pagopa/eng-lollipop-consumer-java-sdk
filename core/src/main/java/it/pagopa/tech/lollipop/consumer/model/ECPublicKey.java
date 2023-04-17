@@ -1,10 +1,9 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.model;
 
 import lombok.Data;
 
-/**
- * EC public key model
- */
+/** EC public key model */
 @Data
 public class ECPublicKey {
 

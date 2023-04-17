@@ -1,10 +1,9 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.exception;
 
 import java.util.Objects;
 
-/**
- * Thrown in case of problems when verifying assertion thumbprint
- */
+/** Thrown in case of problems when verifying assertion thumbprint */
 public class AssertionThumbprintException extends Exception {
 
     /** Error code of this exception */
