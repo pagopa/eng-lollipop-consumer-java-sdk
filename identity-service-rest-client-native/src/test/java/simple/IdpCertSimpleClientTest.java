@@ -6,6 +6,8 @@ import it.pagopa.tech.lollipop.consumer.exception.CertDataTagListNotFoundExcepti
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.IdpCertSimpleClient;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.IdpCertSimpleClientConfig;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.ApiClient;
+import it.pagopa.tech.lollipop.consumer.idp.client.simple.storage.SimpleIdpCertStorageProvider;
+import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorageConfig;
 import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
 import java.time.Instant;
 import java.util.List;
@@ -31,7 +33,12 @@ class IdpCertSimpleClientTest {
     public static void startServer() {
         entityConfig = Mockito.spy(IdpCertSimpleClientConfig.builder().build());
         ApiClient client = new ApiClient(entityConfig);
-        idpCertSimpleClient = new IdpCertSimpleClient(client, entityConfig);
+        SimpleIdpCertStorageProvider storageProvider = new SimpleIdpCertStorageProvider();
+        idpCertSimpleClient =
+                new IdpCertSimpleClient(
+                        client,
+                        entityConfig,
+                        storageProvider.provideStorage(new IdpCertStorageConfig()));
     }
 
     @Test

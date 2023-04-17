@@ -25,16 +25,19 @@ public class IdpCertProviderImpl implements IdpCertProvider {
     /**
      * {@inheritDoc}
      *
-     * <p>Retrieve the Identity Provider Certification Data, first looking in the storage if enabled
-     * ({@link IdpCertStorageConfig}) and then, if not found, through the client {@link
-     * IdpCertClient}. If the storage is enabled ({@link IdpCertStorageConfig}) the IdpCertData will
-     * be stored, after being retrieved by the client.
+     * <p>Retrieve the certification data of the given entityId issued in the same timeframe as the
+     * issue instant of the SAML assertion, first looking in the storage if enabled ({@link
+     * IdpCertStorageConfig}) and then, if not found, through the client {@link IdpCertClient}. If
+     * the storage is enabled ({@link IdpCertStorageConfig}) the IdpCertData will be stored, after
+     * being retrieved by the client.
      *
-     * @param assertionInstant Assertion Issue Instant found in the xml
-     * @param entityId Entity ID of the identity provider found in the assertion
-     * @return List<IdpCertData> a list of idp cert data
-     * @throws CertDataTagListNotFoundException
-     * @throws CertDataNotFoundException
+     * @param entityId Identity Provider ID
+     * @param assertionInstant Assertion Issue Instant
+     * @return the certifications issued before and after the timestamp instant
+     * @throws CertDataTagListNotFoundException if an error occurred retrieving the list of tags or
+     *     filtering the tags with the instant
+     * @throws CertDataNotFoundException if an error occurred retrieving the certification XML or if
+     *     data for the given entityId were not found
      */
     @Override
     public List<IdpCertData> getIdpCertData(String assertionInstant, String entityId)
@@ -51,20 +54,6 @@ public class IdpCertProviderImpl implements IdpCertProvider {
             throw new IllegalArgumentException(errMsg);
         }
 
-        List<IdpCertData> listIdpCertData = idpCertStorage.getIdpCertData(assertionInstant);
-
-        if (listIdpCertData != null && listIdpCertData.size() > 0) {
-            return listIdpCertData;
-        }
-
-        listIdpCertData = idpCertClient.getCertData(entityId, assertionInstant);
-
-        if (listIdpCertData == null || listIdpCertData.size() > 0) {
-            return null;
-        }
-
-        idpCertStorage.saveIdpCertData(assertionInstant, listIdpCertData);
-
-        return listIdpCertData;
+        return idpCertClient.getCertData(assertionInstant, entityId);
     }
 }

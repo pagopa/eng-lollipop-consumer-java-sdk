@@ -1,6 +1,9 @@
 /* (C)2023 */
-package it.pagopa.tech.lollipop.consumer.idp.storage;
+package it.pagopa.tech.lollipop.consumer.idp.client.simple.storage;
 
+import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorage;
+import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorageConfig;
+import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorageProvider;
 import java.util.HashMap;
 
 /** Implementation of {@link IdpCertStorageProvider} interface. It provides an instance of the */

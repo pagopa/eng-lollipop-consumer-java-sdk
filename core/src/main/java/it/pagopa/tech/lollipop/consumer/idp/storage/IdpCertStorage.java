@@ -2,7 +2,6 @@
 package it.pagopa.tech.lollipop.consumer.idp.storage;
 
 import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
-import java.util.List;
 
 /**
  * Interface of the storage used for storing the identity provider certification data retrieved for
@@ -16,7 +15,7 @@ public interface IdpCertStorage {
      * @param tag
      * @return the list of idpCertData found
      */
-    List<IdpCertData> getIdpCertData(String tag);
+    IdpCertData getIdpCertData(String tag);
 
     /**
      * Store the provided idpCertData
@@ -24,5 +23,5 @@ public interface IdpCertStorage {
      * @param tag the idpCertData issue instance
      * @param idpCertData
      */
-    void saveIdpCertData(String tag, List<IdpCertData> idpCertData);
+    void saveIdpCertData(String tag, IdpCertData idpCertData);
 }

@@ -1,8 +1,9 @@
 /* (C)2023 */
-package it.pagopa.tech.lollipop.consumer.idp.storage;
+package it.pagopa.tech.lollipop.consumer.idp.client.simple.storage;
 
+import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorage;
+import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorageConfig;
 import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -20,13 +21,13 @@ import javax.inject.Inject;
  */
 public class SimpleIdpCertStorage implements IdpCertStorage {
 
-    private final Map<String, List<IdpCertData>> idpCertDataMap;
+    private final Map<String, IdpCertData> idpCertDataMap;
     private final Map<String, ScheduledFuture<?>> scheduledEvictionsMap;
     private final IdpCertStorageConfig storageConfig;
 
     @Inject
     public SimpleIdpCertStorage(
-            Map<String, List<IdpCertData>> idpCertDataMap,
+            Map<String, IdpCertData> idpCertDataMap,
             Map<String, ScheduledFuture<?>> scheduledEvictionsMap,
             IdpCertStorageConfig storageConfig) {
         this.idpCertDataMap = idpCertDataMap;
@@ -46,16 +47,16 @@ public class SimpleIdpCertStorage implements IdpCertStorage {
      *     the storage is disabled
      */
     @Override
-    public List<IdpCertData> getIdpCertData(String tag) {
+    public IdpCertData getIdpCertData(String tag) {
         if (!storageConfig.isIdpCertDataStorageEnabled()) {
             return null;
         }
 
-        List<IdpCertData> listIdpCertData = idpCertDataMap.get(tag);
-        if (listIdpCertData != null) {
+        IdpCertData idpCertData = idpCertDataMap.get(tag);
+        if (idpCertData != null) {
             delayEviction(tag);
         }
-        return listIdpCertData;
+        return idpCertData;
     }
 
     /**
@@ -69,7 +70,7 @@ public class SimpleIdpCertStorage implements IdpCertStorage {
      * @param idpCertData
      */
     @Override
-    public void saveIdpCertData(String tag, List<IdpCertData> idpCertData) {
+    public void saveIdpCertData(String tag, IdpCertData idpCertData) {
         if (!storageConfig.isIdpCertDataStorageEnabled()) {
             return;
         }
