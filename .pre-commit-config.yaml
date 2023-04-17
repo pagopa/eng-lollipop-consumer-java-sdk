@@ -1,7 +1,24 @@
 # 1. `pip install pre-commit`
 # 2. `pre-commit install`
 repos:
-  - repo: https://github.com/maltzj/google-style-precommit-hook
-    rev: b7e9e7fcba4a5aea463e72fe9964c14877bd8130
+  - repo: https://github.com/jguttman94/pre-commit-gradle
+    rev: v0.2.1
     hooks:
-      - id: google-style-java
+      - id: gradle-task
+        name: update-verification-metadata-sha256
+        args: [ '-w', '--write-verification-metadata sha256 help']
+      - id: gradle-spotless
+        args: [ '-w']
+      - id: gradle-check
+        args: [ '-w' ]
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+      - id: trailing-whitespace
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-merge-conflict
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.16.1
+    hooks:
+      - id: gitleaks
