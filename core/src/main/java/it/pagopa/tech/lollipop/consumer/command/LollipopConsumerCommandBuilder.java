@@ -1,6 +1,8 @@
 /* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.command;
 
+import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
+
 /** Builder class for creating command instance */
 public interface LollipopConsumerCommandBuilder {
 
@@ -9,5 +11,5 @@ public interface LollipopConsumerCommandBuilder {
      *
      * @return an instance of {@link LollipopConsumerCommand}
      */
-    LollipopConsumerCommand createCommand();
+    LollipopConsumerCommand createCommand(LollipopConsumerRequest lollipopConsumerRequest);
 }

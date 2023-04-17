@@ -29,4 +29,4 @@ gradleEnterprise {
 }
 
 rootProject.name = 'eng-lollipop-consumer-java-sdk'
-include 'core', 'assertion-rest-client-native', 'http-verifier', 'identity-service-rest-client-native', 'redis-storage'
+include 'core', 'assertion-rest-client-native', 'http-verifier', 'identity-service-rest-client-native', 'redis-storage', 'spring-impl'
