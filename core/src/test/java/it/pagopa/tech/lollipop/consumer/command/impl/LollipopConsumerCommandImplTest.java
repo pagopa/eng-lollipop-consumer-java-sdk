@@ -35,7 +35,8 @@ class LollipopConsumerCommandImplTest {
                         new LollipopConsumerCommandImpl(
                                 messageVerifierServiceMock,
                                 assertionVerifierServiceMock,
-                                requestValidationServiceMock));
+                                requestValidationServiceMock,
+                                LollipopConsumerRequest.builder().build()));
     }
 
     @Test
@@ -51,7 +52,7 @@ class LollipopConsumerCommandImplTest {
                 .when(messageVerifierServiceMock)
                 .verifyHttpMessage(any(LollipopConsumerRequest.class));
 
-        CommandResult commandResult = sut.doExecute(LollipopConsumerRequest.builder().build());
+        CommandResult commandResult = sut.doExecute();
 
         Assertions.assertEquals(
                 HttpMessageVerificationResultCode.DIGEST_VALIDATION_ERROR.name(),
@@ -77,7 +78,7 @@ class LollipopConsumerCommandImplTest {
                 .when(messageVerifierServiceMock)
                 .verifyHttpMessage(any(LollipopConsumerRequest.class));
 
-        CommandResult commandResult = sut.doExecute(LollipopConsumerRequest.builder().build());
+        CommandResult commandResult = sut.doExecute();
 
         Assertions.assertEquals(
                 HttpMessageVerificationResultCode.SIGNATURE_VALIDATION_ERROR.name(),
@@ -98,7 +99,7 @@ class LollipopConsumerCommandImplTest {
                 .when(messageVerifierServiceMock)
                 .verifyHttpMessage(any(LollipopConsumerRequest.class));
 
-        CommandResult commandResult = sut.doExecute(LollipopConsumerRequest.builder().build());
+        CommandResult commandResult = sut.doExecute();
 
         Assertions.assertEquals(
                 HttpMessageVerificationResultCode.UNSUPPORTED_ENCODING.name(),
@@ -122,7 +123,7 @@ class LollipopConsumerCommandImplTest {
                 .when(messageVerifierServiceMock)
                 .verifyHttpMessage(any(LollipopConsumerRequest.class));
 
-        CommandResult commandResult = sut.doExecute(LollipopConsumerRequest.builder().build());
+        CommandResult commandResult = sut.doExecute();
 
         Assertions.assertEquals(
                 HttpMessageVerificationResultCode.HTTP_MESSAGE_VALIDATION_FAILED.name(),
@@ -149,7 +150,7 @@ class LollipopConsumerCommandImplTest {
                 .when(assertionVerifierServiceMock)
                 .validateLollipop(any(LollipopConsumerRequest.class));
 
-        CommandResult commandResult = sut.doExecute(LollipopConsumerRequest.builder().build());
+        CommandResult commandResult = sut.doExecute();
 
         Assertions.assertEquals(
                 AssertionVerificationResultCode.ASSERTION_VERIFICATION_FAILED.name(),
@@ -175,7 +176,7 @@ class LollipopConsumerCommandImplTest {
                 .when(assertionVerifierServiceMock)
                 .validateLollipop(any(LollipopConsumerRequest.class));
 
-        CommandResult commandResult = sut.doExecute(LollipopConsumerRequest.builder().build());
+        CommandResult commandResult = sut.doExecute();
 
         Assertions.assertEquals("SUCCESS", commandResult.getResultCode());
 
@@ -195,7 +196,7 @@ class LollipopConsumerCommandImplTest {
         doThrow(LollipopRequestContentValidationException.class)
                 .when(requestValidationServiceMock)
                 .validateLollipopRequest(any(LollipopConsumerRequest.class));
-        CommandResult commandResult = sut.doExecute(LollipopConsumerRequest.builder().build());
+        CommandResult commandResult = sut.doExecute();
 
         Assertions.assertEquals("REQUEST PARAMS VALIDATION FAILED", commandResult.getResultCode());
 
@@ -221,7 +222,7 @@ class LollipopConsumerCommandImplTest {
                 .when(assertionVerifierServiceMock)
                 .validateLollipop(any(LollipopConsumerRequest.class));
 
-        CommandResult commandResult = sut.doExecute(LollipopConsumerRequest.builder().build());
+        CommandResult commandResult = sut.doExecute();
 
         Assertions.assertEquals(
                 AssertionVerificationResultCode.ERROR_RETRIEVING_ASSERTION.name(),
@@ -247,7 +248,7 @@ class LollipopConsumerCommandImplTest {
                 .when(assertionVerifierServiceMock)
                 .validateLollipop(any(LollipopConsumerRequest.class));
 
-        CommandResult commandResult = sut.doExecute(LollipopConsumerRequest.builder().build());
+        CommandResult commandResult = sut.doExecute();
 
         Assertions.assertEquals(
                 AssertionVerificationResultCode.PERIOD_VALIDATION_ERROR.name(),
@@ -273,7 +274,7 @@ class LollipopConsumerCommandImplTest {
                 .when(assertionVerifierServiceMock)
                 .validateLollipop(any(LollipopConsumerRequest.class));
 
-        CommandResult commandResult = sut.doExecute(LollipopConsumerRequest.builder().build());
+        CommandResult commandResult = sut.doExecute();
 
         Assertions.assertEquals(
                 AssertionVerificationResultCode.THUMBPRINT_VALIDATION_ERROR.name(),
@@ -299,7 +300,7 @@ class LollipopConsumerCommandImplTest {
                 .when(assertionVerifierServiceMock)
                 .validateLollipop(any(LollipopConsumerRequest.class));
 
-        CommandResult commandResult = sut.doExecute(LollipopConsumerRequest.builder().build());
+        CommandResult commandResult = sut.doExecute();
 
         Assertions.assertEquals(
                 AssertionVerificationResultCode.USER_ID_VALIDATION_ERROR.name(),

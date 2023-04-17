@@ -20,6 +20,8 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
     private final AssertionVerifierService assertionVerifierService;
     private final LollipopConsumerRequestValidationService requestValidationService;
 
+    private final LollipopConsumerRequest request;
+
     public static final String VERIFICATION_SUCCESS_CODE = "SUCCESS";
     public static final String REQUEST_PARAMS_VALIDATION_FAILED =
             "REQUEST PARAMS VALIDATION FAILED";
@@ -28,21 +30,22 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
     public LollipopConsumerCommandImpl(
             HttpMessageVerifierService messageVerifierService,
             AssertionVerifierService assertionVerifierService,
-            LollipopConsumerRequestValidationService requestValidationService) {
+            LollipopConsumerRequestValidationService requestValidationService,
+            LollipopConsumerRequest lollipopConsumerRequest) {
         this.messageVerifierService = messageVerifierService;
         this.assertionVerifierService = assertionVerifierService;
         this.requestValidationService = requestValidationService;
+        this.request = lollipopConsumerRequest;
     }
 
     /**
      * Command that execute all necessary method for validating a Lollipop request: HTTP message
      * verification and Saml assertion verification
      *
-     * @param request LolliPop request
      * @return {@link CommandResult} object with result code and message of request verification
      */
     @Override
-    public CommandResult doExecute(LollipopConsumerRequest request) {
+    public CommandResult doExecute() {
 
         try {
             requestValidationService.validateLollipopRequest(request);
