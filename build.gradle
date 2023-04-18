@@ -141,13 +141,13 @@ subprojects {
 				}
 			}
 		}
-		subprojects {
-			sonar {
-				properties {
-					property "sonar.sources", "src"
-				}
+
+		sonar {
+			properties {
+				property "sonar.sources", "src"
 			}
 		}
+
 
 		test {
 			finalizedBy jacocoTestReport // report is always generated after tests run
