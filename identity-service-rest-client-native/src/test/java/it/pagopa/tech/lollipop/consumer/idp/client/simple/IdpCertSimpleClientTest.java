@@ -1,10 +1,8 @@
 /* (C)2023 */
-package simple;
+package it.pagopa.tech.lollipop.consumer.idp.client.simple;
 
 import it.pagopa.tech.lollipop.consumer.exception.CertDataNotFoundException;
 import it.pagopa.tech.lollipop.consumer.exception.CertDataTagListNotFoundException;
-import it.pagopa.tech.lollipop.consumer.idp.client.simple.IdpCertSimpleClient;
-import it.pagopa.tech.lollipop.consumer.idp.client.simple.IdpCertSimpleClientConfig;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.ApiClient;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.storage.SimpleIdpCertStorageProvider;
 import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorageConfig;
@@ -74,5 +72,19 @@ class IdpCertSimpleClientTest {
         Assertions.assertThrows(
                 CertDataTagListNotFoundException.class,
                 () -> idpCertSimpleClient.getCertData(CIE_ENTITY_ID, WRONG_INSTANT));
+    }
+
+    @Test
+    void entityIdNull() {
+        Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> idpCertSimpleClient.getCertData(null, WRONG_INSTANT));
+    }
+
+    @Test
+    void instantNull() {
+        Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> idpCertSimpleClient.getCertData(CIE_ENTITY_ID, null));
     }
 }
