@@ -25,7 +25,7 @@ dependencies {
 	//Mockserver for testing api
 	testImplementation 'org.mock-server:mockserver-netty:5.15.0'
 	testImplementation project(':http-verifier')
-	testImplementation testFixtures(project(':assertion-rest-client-native'))
+	testImplementation project(':assertion-rest-client-native')
 	testImplementation project(':identity-service-rest-client-native')
 }
 
