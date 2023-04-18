@@ -144,7 +144,9 @@ subprojects {
 
 		sonar {
 			properties {
-				property "sonar.sources", "src/main"
+				property "sonar.sources", "src/main/java"
+				property "sonar.tests", "src/test/java"
+				property "sonar.java.binaries" "build/classes/java/main"
 			}
 		}
 
@@ -161,6 +163,18 @@ subprojects {
 
 	}
 
+}
+
+project(":test-coverage") {
+	sonarqube {
+		skipProject = true
+	}
+}
+
+project(":redis-storage") {
+	sonarqube {
+		skipProject = true
+	}
 }
 
 graalvmNative {

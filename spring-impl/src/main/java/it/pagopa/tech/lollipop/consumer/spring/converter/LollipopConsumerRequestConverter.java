@@ -9,13 +9,12 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.util.StreamUtils;
 
-/**
- * Class to be used for conversion of the http requests to be validated
- */
+/** Class to be used for conversion of the http requests to be validated */
 public class LollipopConsumerRequestConverter {
 
     /**
      * Utility method to be used to generate a LollipopConsumerRequest
+     *
      * @param httpServletRequest http request to be converted into a lollipop request
      * @return instance of {@link LollipopConsumerRequest} produced from the httpServletRequest
      * @throws IOException exception return if body extraction fails

@@ -5,14 +5,13 @@ import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommand;
 import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommandBuilder;
 import it.pagopa.tech.lollipop.consumer.model.CommandResult;
 import it.pagopa.tech.lollipop.consumer.spring.converter.LollipopConsumerRequestConverter;
+import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
-
-import java.io.IOException;
 
 /**
  * Instance of a Spring Http {@link HandlerInterceptor}, to be used for Lollipop Request validations
@@ -24,7 +23,6 @@ public class HttpVerifierHandlerInterceptor implements HandlerInterceptor {
     private static final Log log = LogFactory.getLog(HttpVerifierHandlerInterceptor.class);
 
     /**
-     *
      * @param request current HTTP request
      * @param response current HTTP response
      * @param handler chosen handler to execute, for type and/or instance evaluation
@@ -33,8 +31,8 @@ public class HttpVerifierHandlerInterceptor implements HandlerInterceptor {
      */
     @Override
     public boolean preHandle(
-            HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
-
+            HttpServletRequest request, HttpServletResponse response, Object handler)
+            throws IOException {
 
         LollipopConsumerCommand lollipopConsumerCommand =
                 consumerCommandBuilder.createCommand(

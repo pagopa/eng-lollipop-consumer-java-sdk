@@ -98,7 +98,7 @@ public class HttpVerifierHandlerInterceptorIntegrationTest {
 
         String signatureInput =
                 "sig123=(\"content-digest\" \"x-pagopa-lollipop-original-method\""
-                        + " \"x-pagopa-lollipop-original-url\");created=1678293988;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\"";
+                    + " \"x-pagopa-lollipop-original-url\");created=1678293988;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\"";
         var signature =
                 "sig123=:lTuoRytp53GuUMOB4Rz1z97Y96gfSeEOm/xVpO39d3HR6lLAy4KYiGq+1hZ7nmRFBt2bASWEpen7ov5O4wU3kQ==:";
 
@@ -119,9 +119,9 @@ public class HttpVerifierHandlerInterceptorIntegrationTest {
                                     .add(
                                             "x-pagopa-lollipop-public-key",
                                             "eyJrdHkiOiJFQyIsIngiOiJGcUZEd"
-                                                    + "XdFZ3U0TVVYRVJQTVZMLTg1cEd2MkQzWW1MNEoxZ2ZNa2RiYzI0IiwieSI6Im"
-                                                    + "hkVjBveG1XRlN4TW9KVURwZGlocjc2clM4VlJCRXFNRmViWXlBZks5LWsiLCJjcnYiO"
-                                                    + "iJQLTI1NiJ9");
+                                                + "XdFZ3U0TVVYRVJQTVZMLTg1cEd2MkQzWW1MNEoxZ2ZNa2RiYzI0IiwieSI6Im"
+                                                + "hkVjBveG1XRlN4TW9KVURwZGlocjc2clM4VlJCRXFNRmViWXlBZks5LWsiLCJjcnYiO"
+                                                + "iJQLTI1NiJ9");
                             request.getHeaders()
                                     .add(
                                             "x-pagopa-lollipop-assertion-ref",
