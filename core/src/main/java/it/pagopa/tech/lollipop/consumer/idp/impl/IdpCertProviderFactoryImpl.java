@@ -4,8 +4,6 @@ package it.pagopa.tech.lollipop.consumer.idp.impl;
 import it.pagopa.tech.lollipop.consumer.idp.IdpCertProvider;
 import it.pagopa.tech.lollipop.consumer.idp.IdpCertProviderFactory;
 import it.pagopa.tech.lollipop.consumer.idp.client.IdpCertClientProvider;
-import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorageConfig;
-import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorageProvider;
 import javax.inject.Inject;
 
 /**
@@ -14,18 +12,11 @@ import javax.inject.Inject;
  */
 public class IdpCertProviderFactoryImpl implements IdpCertProviderFactory {
 
-    private IdpCertClientProvider idpCertClientProvider;
-    private IdpCertStorageProvider idpCertStorageProvider;
-    private final IdpCertStorageConfig storageConfig;
+    private final IdpCertClientProvider idpCertClientProvider;
 
     @Inject
-    public IdpCertProviderFactoryImpl(
-            IdpCertStorageProvider idpCertStorageProvider,
-            IdpCertClientProvider idpCertClientProvider,
-            IdpCertStorageConfig storageConfig) {
+    public IdpCertProviderFactoryImpl(IdpCertClientProvider idpCertClientProvider) {
         this.idpCertClientProvider = idpCertClientProvider;
-        this.idpCertStorageProvider = idpCertStorageProvider;
-        this.storageConfig = storageConfig;
     }
 
     /**
@@ -35,8 +26,6 @@ public class IdpCertProviderFactoryImpl implements IdpCertProviderFactory {
      */
     @Override
     public IdpCertProvider create() {
-        return new IdpCertProviderImpl(
-                idpCertClientProvider.provideClient(),
-                idpCertStorageProvider.provideStorage(storageConfig));
+        return new IdpCertProviderImpl(idpCertClientProvider.provideClient());
     }
 }

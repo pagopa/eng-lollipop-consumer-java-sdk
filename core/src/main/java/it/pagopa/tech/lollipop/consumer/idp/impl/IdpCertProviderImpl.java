@@ -5,7 +5,6 @@ import it.pagopa.tech.lollipop.consumer.exception.CertDataNotFoundException;
 import it.pagopa.tech.lollipop.consumer.exception.CertDataTagListNotFoundException;
 import it.pagopa.tech.lollipop.consumer.idp.IdpCertProvider;
 import it.pagopa.tech.lollipop.consumer.idp.client.IdpCertClient;
-import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorage;
 import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorageConfig;
 import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
 import java.util.List;
@@ -14,12 +13,10 @@ import javax.inject.Inject;
 public class IdpCertProviderImpl implements IdpCertProvider {
 
     private IdpCertClient idpCertClient;
-    private IdpCertStorage idpCertStorage;
 
     @Inject
-    public IdpCertProviderImpl(IdpCertClient idpCertClient, IdpCertStorage idpCertStorage) {
+    public IdpCertProviderImpl(IdpCertClient idpCertClient) {
         this.idpCertClient = idpCertClient;
-        this.idpCertStorage = idpCertStorage;
     }
 
     /**
