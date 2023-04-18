@@ -57,7 +57,7 @@ jobs:
       with:
         sarif_file: ${{ steps.scan.outputs.sarif }}
     - name: Run Sonar Scanner
-      run: ./gradlew sonar
+      run: ./gradlew build sonarqube --info
         -Dsonar.organization=pagopa
         -Dsonar.projectKey=${{ env.PROJECT_KEY }}
         -Dsonar.coverage.jacoco.xmlReportPaths=./test-coverage/reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml
