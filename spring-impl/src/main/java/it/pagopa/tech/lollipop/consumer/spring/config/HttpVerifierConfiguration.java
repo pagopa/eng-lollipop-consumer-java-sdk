@@ -10,13 +10,14 @@ import it.pagopa.tech.lollipop.consumer.idp.IdpCertProviderFactory;
 import it.pagopa.tech.lollipop.consumer.service.LollipopConsumerRequestValidationService;
 import it.pagopa.tech.lollipop.consumer.service.impl.LollipopConsumerRequestValidationServiceImpl;
 import it.pagopa.tech.lollipop.consumer.spring.HttpVerifierHandlerInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class HttpVerifierConfiguration {
 
-    private SpringLollipopConsumerRequestConfig springLollipopConsumerRequestConfig;
+    @Autowired private SpringLollipopConsumerRequestConfig springLollipopConsumerRequestConfig;
 
     @Bean
     public LollipopConsumerFactoryHelper lollipopConsumerFactoryHelper(

@@ -18,19 +18,23 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import lombok.extern.java.Log;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+@Log
 /** Standard implementation of {@link AssertionVerifierService} */
 public class AssertionVerifierServiceImpl implements AssertionVerifierService {
 
@@ -269,6 +273,11 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
             throws AssertionThumbprintException {
         Base64URL thumbprint;
         try {
+            try {
+                publicKey = new String(Base64.getDecoder().decode(publicKey));
+            } catch (Exception e) {
+                log.log(Level.FINE, "Key not in Base64");
+            }
             thumbprint = ThumbprintUtils.compute(inResponseToAlgorithm, JWK.parse(publicKey));
         } catch (JOSEException | ParseException e) {
             String errMsg = String.format("Can not calculate JwkThumbprint: %S", e.getMessage());
