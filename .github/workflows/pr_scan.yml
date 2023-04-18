@@ -7,13 +7,16 @@ env:
   DOCKERFILE: Dockerfile.test-only
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  PROJECT_KEY: 'pagopa_eng-lollipop-consumer-java-sdk'
 
 jobs:
   pr_scan:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      packages: read
+      contents: write
+      pull-requests: write
+
     steps:
     - name: Checkout project sources
       uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
@@ -21,10 +24,24 @@ jobs:
         fetch-depth: 0
     - name: Setup Gradle
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+    - name: Cache SonarCloud packages
+      uses: actions/cache@v1
+      with:
+        path: ~/.sonar-project.properties/cache
+        key: ${{ runner.os }}-sonar-project.properties
+        restore-keys: ${{ runner.os }}-sonar-project.properties
     - name: Make gradlew executable
       run: chmod +x ./gradlew
     - name: Run build with Gradle Wrapper
-      run: ./gradlew build
+      run: ./gradlew build testCodeCoverageReport
+    - name: Add coverage to PR
+      id: jacoco
+      uses: madrapps/jacoco-report@7a334255fbce42f385d7567c25d986a9c62e2971
+      with:
+        paths: ${{ github.workspace }}/test-coverage/build/reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml
+        token: ${{ secrets.GITHUB_TOKEN }}
+        min-coverage-overall: 40
+        min-coverage-changed-files: 60
     - name: Build the Docker image
       run: docker build . --file ${{ env.DOCKERFILE }} --tag localbuild/testimage:latest
     - name: Run the Anchore Grype scan action
@@ -39,3 +56,14 @@ jobs:
       if: always()
       with:
         sarif_file: ${{ steps.scan.outputs.sarif }}
+    - name: Run Sonar Scanner
+      run: ./gradlew build sonarqube --info
+        -Dsonar.organization=pagopa
+        -Dsonar.projectKey=${{ env.PROJECT_KEY }}
+        -Dsonar.coverage.jacoco.xmlReportPaths=test-coverage/reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml
+        -Dsonar.coverage.exclusions="**/config/*","**/*Mock*","**/model/**","**/entity/*","**/*Stub*","**/*Config*"
+        -Dsonar.host.url=https://sonarcloud.io
+        -Dsonar.login=${{ env.SONAR_TOKEN }}
+        -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
+        -Dsonar.pullrequest.branch=${{ github.head_ref }}
+        -Dsonar.pullrequest.base=${{ github.base_ref }}
