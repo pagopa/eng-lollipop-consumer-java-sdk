@@ -21,6 +21,7 @@ class IdpCertSimpleClientTest {
 
     private static final String INSTANT = String.valueOf(Instant.now().getEpochSecond());
     private static final String SPID_ENTITY_ID = "https://posteid.poste.it";
+    private static final String SPID_ENTITY_ID_MULTIPLE_SIGNATURE = "https://loginspid.aruba.it";
     private static final String CIE_ENTITY_ID =
             "https://idserver.servizicie.interno.gov.it/idp/profile/SAML2/POST/SSO";
 
@@ -44,6 +45,16 @@ class IdpCertSimpleClientTest {
         List<IdpCertData> response = idpCertSimpleClient.getCertData(SPID_ENTITY_ID, INSTANT);
 
         Assertions.assertNotNull(response);
+    }
+
+    @Test
+    void certSPIDDataFoundMultipleSignature()
+            throws CertDataTagListNotFoundException, CertDataNotFoundException {
+        List<IdpCertData> response =
+                idpCertSimpleClient.getCertData(SPID_ENTITY_ID_MULTIPLE_SIGNATURE, INSTANT);
+
+        Assertions.assertNotNull(response);
+        Assertions.assertTrue(response.get(0).getCertData().size() > 1);
     }
 
     @Test

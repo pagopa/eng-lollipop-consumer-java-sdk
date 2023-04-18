@@ -168,7 +168,7 @@ public class IdpCertSimpleClient implements IdpCertClient {
             if (entity.getEntityID().equals(entityId)) {
                 newData.setEntityId(entityId);
                 newData.setTag(tag);
-                newData.setCertData(entity.getSignature());
+                newData.setCertData(entity.getSignatureList());
 
                 return newData;
             }
