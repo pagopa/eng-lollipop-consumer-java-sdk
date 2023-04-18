@@ -9,6 +9,8 @@ import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.api.DefaultAp
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.model.CertData;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.model.EntitiesDescriptor;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.model.EntityDescriptor;
+import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorage;
+import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorageConfig;
 import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,16 +22,22 @@ public class IdpCertSimpleClient implements IdpCertClient {
     private final DefaultApi defaultApi;
 
     private final IdpCertSimpleClientConfig entityConfig;
+    private IdpCertStorage storage;
 
     @Inject
-    public IdpCertSimpleClient(ApiClient client, IdpCertSimpleClientConfig entityConfig) {
+    public IdpCertSimpleClient(
+            ApiClient client, IdpCertSimpleClientConfig entityConfig, IdpCertStorage storage) {
         this.defaultApi = new DefaultApi(client);
         this.entityConfig = entityConfig;
+        this.storage = storage;
     }
 
     /**
      * Retrieve the certification data of the given entityId issued in the same timeframe as the
-     * issue instant of the SAML assertion
+     * issue instant of the SAML assertion, first looking in the storage if enabled ({@link
+     * IdpCertStorageConfig}) and then, if not found, through the client {@link IdpCertClient}. If
+     * the storage is enabled ({@link IdpCertStorageConfig}) the IdpCertData will be stored, after
+     * being retrieved by the client.
      *
      * @param entityId Identity Provider ID
      * @param instant Assertion Issue Instant
@@ -61,7 +69,14 @@ public class IdpCertSimpleClient implements IdpCertClient {
 
             for (String tag : tagList) {
                 try {
-                    IdpCertData certData = getCIECertData(tag, entityId);
+                    String storageTag = codifyStorageTag(tag, entityId);
+                    IdpCertData certData = storage.getIdpCertData(storageTag);
+
+                    if (certData == null) {
+                        certData = getCIECertData(tag, entityId);
+                    } else {
+                        storage.saveIdpCertData(storageTag, certData);
+                    }
 
                     listCertData.add(certData);
                 } catch (ApiException | EntityIdNotFoundException e) {
@@ -85,8 +100,14 @@ public class IdpCertSimpleClient implements IdpCertClient {
 
             for (String tag : tagList) {
                 try {
-                    IdpCertData certData = getSPIDCertData(tag, entityId);
+                    String storageTag = codifyStorageTag(tag, entityId);
+                    IdpCertData certData = storage.getIdpCertData(codifyStorageTag(tag, entityId));
 
+                    if (certData == null) {
+                        certData = getSPIDCertData(tag, entityId);
+                    } else {
+                        storage.saveIdpCertData(storageTag, certData);
+                    }
                     listCertData.add(certData);
                 } catch (ApiException | EntityIdNotFoundException e) {
                     throw new CertDataNotFoundException(
@@ -147,7 +168,7 @@ public class IdpCertSimpleClient implements IdpCertClient {
             if (entity.getEntityID().equals(entityId)) {
                 newData.setEntityId(entityId);
                 newData.setTag(tag);
-                newData.setCertData(entity.getSignature());
+                newData.setCertData(entity.getSignatureList());
 
                 return newData;
             }
@@ -210,5 +231,9 @@ public class IdpCertSimpleClient implements IdpCertClient {
         }
 
         return newTagList;
+    }
+
+    private String codifyStorageTag(String tag, String entityId) {
+        return tag + entityId;
     }
 }

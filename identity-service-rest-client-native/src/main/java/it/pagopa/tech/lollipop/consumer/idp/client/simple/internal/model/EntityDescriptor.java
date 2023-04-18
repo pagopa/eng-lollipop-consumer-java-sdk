@@ -3,10 +3,8 @@ package it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.Getter;
 
 /** EntityDescriptor */
@@ -21,7 +19,7 @@ public class EntityDescriptor {
     @JsonProperty("entityID")
     private String entityID;
 
-    private String signature;
+    private List<String> signatureList;
 
     /**
      * Methods that obtains the signature used for verify the user's assertion from a series of
@@ -32,24 +30,52 @@ public class EntityDescriptor {
     @SuppressWarnings("unchecked")
     @JsonProperty("IDPSSODescriptor")
     private void unpackNestedSignature(Map<String, Object> signature) {
-        Map<String, Object> keyDescriptor = new HashMap<>();
+        List<Map<String, Object>> keyDescriptorsList = new ArrayList<>();
         if (signature.get(KEY_DESCRIPTOR) instanceof List) {
-            List<Map<String, Object>> listDescriptors =
-                    (List<Map<String, Object>>) signature.get(KEY_DESCRIPTOR);
-            Optional<Map<String, Object>> optionalFirst =
-                    listDescriptors.stream()
-                            .filter(el -> el.get("use").equals("signing"))
-                            .findFirst();
 
-            if (optionalFirst.isPresent()) {
-                keyDescriptor = optionalFirst.get();
-            }
+            keyDescriptorsList =
+                    ((List<Map<String, Object>>) signature.get(KEY_DESCRIPTOR))
+                            .stream()
+                                    .filter(el -> el.get("use").equals("signing"))
+                                    .collect(Collectors.toList());
         } else {
-            keyDescriptor = (Map<String, Object>) signature.get(KEY_DESCRIPTOR);
+            Map<String, Object> keyDescriptorFound =
+                    (Map<String, Object>) signature.get(KEY_DESCRIPTOR);
+
+            if (keyDescriptorFound.get("use").equals("signing")) {
+                keyDescriptorsList.add(keyDescriptorFound);
+            }
         }
 
-        Map<String, Object> keyInfo = (Map<String, Object>) keyDescriptor.get(KEY_INFO);
-        Map<String, Object> x509Data = (Map<String, Object>) keyInfo.get(X_509_DATA);
-        this.signature = (String) x509Data.get(X_509_CERTIFICATE);
+        List<Map<String, Object>> keyInfosList = new ArrayList<>();
+        for (Map<String, Object> keyDescriptor : keyDescriptorsList) {
+            if (keyDescriptor.get(KEY_INFO) instanceof List) {
+                keyInfosList = (List<Map<String, Object>>) keyDescriptor.get(KEY_INFO);
+            } else {
+                Map<String, Object> keyInfo = (Map<String, Object>) keyDescriptor.get(KEY_INFO);
+
+                keyInfosList.add(keyInfo);
+            }
+        }
+
+        List<Map<String, Object>> listX509Data = new ArrayList<>();
+        for (Map<String, Object> keyInfo : keyInfosList) {
+            if (keyInfo.get(X_509_DATA) instanceof List) {
+                listX509Data = (List<Map<String, Object>>) keyInfo.get(X_509_DATA);
+            } else {
+                listX509Data.add((Map<String, Object>) keyInfo.get(X_509_DATA));
+            }
+        }
+
+        List<String> signatureList = new ArrayList<>();
+        for (Map<String, Object> x509Data : listX509Data) {
+            if (x509Data.get(X_509_CERTIFICATE) instanceof List) {
+                signatureList = (List<String>) x509Data.get(X_509_CERTIFICATE);
+            } else {
+                signatureList.add((String) x509Data.get(X_509_CERTIFICATE));
+            }
+        }
+
+        this.signatureList = signatureList;
     }
 }
