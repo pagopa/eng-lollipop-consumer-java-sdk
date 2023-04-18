@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
+/**
+ * Spring instance of the {@link LollipopConsumerRequestConfig}
+ */
 @ConfigurationProperties(prefix = "lollipop.core.config")
 @ConfigurationPropertiesScan
 @NoArgsConstructor

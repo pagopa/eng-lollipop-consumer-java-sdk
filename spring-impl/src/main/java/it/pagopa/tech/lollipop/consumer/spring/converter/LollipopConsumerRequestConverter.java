@@ -9,18 +9,31 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.util.StreamUtils;
 
+/**
+ * Class to be used for conversion of the http requests to be validated
+ */
 public class LollipopConsumerRequestConverter {
 
+    /**
+     * Utility method to be used to generate a LollipopConsumerRequest
+     * @param httpServletRequest http request to be converted into a lollipop request
+     * @return instance of {@link LollipopConsumerRequest} produced from the httpServletRequest
+     * @throws IOException exception return if body extraction fails
+     */
     public static LollipopConsumerRequest convert(HttpServletRequest httpServletRequest)
             throws IOException {
 
-        byte[] requestBody;
+        byte[] requestBody = null;
 
-        InputStream requestInputStream = httpServletRequest.getInputStream();
-        requestBody = StreamUtils.copyToByteArray(requestInputStream);
+        String method = httpServletRequest.getMethod();
+
+        if (method != null && (!method.equals("GET") && !method.equals("DELETE"))) {
+            InputStream requestInputStream = httpServletRequest.getInputStream();
+            requestBody = StreamUtils.copyToByteArray(requestInputStream);
+        }
 
         return LollipopConsumerRequest.builder()
-                .requestBody(new String(requestBody))
+                .requestBody(requestBody != null ? new String(requestBody) : null)
                 .headerParams(
                         Collections.list(httpServletRequest.getHeaderNames()).stream()
                                 .collect(Collectors.toMap(h -> h, httpServletRequest::getHeader)))

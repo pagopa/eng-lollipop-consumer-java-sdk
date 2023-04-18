@@ -12,16 +12,29 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import java.io.IOException;
+
+/**
+ * Instance of a Spring Http {@link HandlerInterceptor}, to be used for Lollipop Request validations
+ */
 @AllArgsConstructor
 public class HttpVerifierHandlerInterceptor implements HandlerInterceptor {
 
     private final LollipopConsumerCommandBuilder consumerCommandBuilder;
     private static final Log log = LogFactory.getLog(HttpVerifierHandlerInterceptor.class);
 
+    /**
+     *
+     * @param request current HTTP request
+     * @param response current HTTP response
+     * @param handler chosen handler to execute, for type and/or instance evaluation
+     * @return boolean to determine if the handle completes successfully
+     * @throws IOException throws exception if the conversion of a http request fails
+     */
     @Override
     public boolean preHandle(
-            HttpServletRequest request, HttpServletResponse response, Object handler)
-            throws Exception {
+            HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
+
 
         LollipopConsumerCommand lollipopConsumerCommand =
                 consumerCommandBuilder.createCommand(

@@ -14,6 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Instance of Spring configuration of the core elements, the implementations of the related services
+ * are delegated to external configurations
+ */
 @Configuration
 public class HttpVerifierConfiguration {
 
