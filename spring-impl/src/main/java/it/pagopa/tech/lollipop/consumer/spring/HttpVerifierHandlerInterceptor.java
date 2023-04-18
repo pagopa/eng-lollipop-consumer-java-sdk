@@ -30,7 +30,7 @@ public class HttpVerifierHandlerInterceptor implements HandlerInterceptor {
         try {
             CommandResult commandResult = lollipopConsumerCommand.doExecute();
 
-            if (commandResult.getResultCode().equals("KO")) {
+            if (!commandResult.getResultCode().equals("SUCCESS")) {
                 response.sendError(401, commandResult.getResultMessage());
             } else {
                 return true;
