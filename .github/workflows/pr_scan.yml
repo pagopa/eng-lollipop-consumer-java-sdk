@@ -63,6 +63,7 @@ jobs:
         -Dsonar.coverage.jacoco.xmlReportPaths=test-coverage/build/reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml
         -Dsonar.coverage.exclusions="**/config/*","**/*Mock*","**/model/**","**/entity/*","**/*Stub*","**/*Config*"
         -Dsonar.host.url=https://sonarcloud.io
+        -Dsonar.java.libraries="**/*.jar"
         -Dsonar.login=${{ env.SONAR_TOKEN }}
         -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
         -Dsonar.pullrequest.branch=${{ github.head_ref }}
