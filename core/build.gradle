@@ -45,9 +45,6 @@ dependencies {
 	implementation 'javax.inject:javax.inject:1'
 	implementation 'com.nimbusds:nimbus-jose-jwt:9.31'
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
-	implementation 'org.opensaml:opensaml-core:4.0.1'
-	implementation 'org.opensaml:opensaml-saml-api:4.0.1'
-	implementation 'org.opensaml:opensaml-saml-impl:4.0.1'
 	implementation 'org.apache.wss4j:wss4j-ws-security-common:2.4.1'
 
 	// Use JUnit Jupiter for testing.

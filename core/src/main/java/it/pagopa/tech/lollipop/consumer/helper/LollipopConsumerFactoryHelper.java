@@ -116,4 +116,8 @@ public class LollipopConsumerFactoryHelper {
     public LollipopConsumerRequestValidationService getRequestValidationService() {
         return lollipopConsumerRequestValidationService;
     }
+
+    public void setAssertionVerifierService(AssertionVerifierService assertionVerifierService) {
+        this.assertionVerifierService = assertionVerifierService;
+    }
 }

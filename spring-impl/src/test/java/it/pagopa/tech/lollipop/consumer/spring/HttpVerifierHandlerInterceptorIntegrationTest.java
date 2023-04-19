@@ -3,6 +3,11 @@ package it.pagopa.tech.lollipop.consumer.spring;
 
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 
+import it.pagopa.tech.lollipop.consumer.assertion.AssertionService;
+import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
+import it.pagopa.tech.lollipop.consumer.helper.LollipopConsumerFactoryHelper;
+import it.pagopa.tech.lollipop.consumer.idp.IdpCertProvider;
+import it.pagopa.tech.lollipop.consumer.service.impl.MockAssertionVerifierService;
 import it.pagopa.tech.lollipop.consumer.spring.config.HttpVerifierConfiguration;
 import it.pagopa.tech.lollipop.consumer.spring.config.SpringLollipopConsumerRequestConfig;
 import org.junit.jupiter.api.AfterAll;
@@ -32,6 +37,7 @@ public class HttpVerifierHandlerInterceptorIntegrationTest {
 
     @LocalServerPort private int port;
     @Autowired private TestRestTemplate restTemplate;
+    @Autowired private LollipopConsumerFactoryHelper factoryHelper;
 
     @BeforeAll
     public static void startServer() {
@@ -45,6 +51,7 @@ public class HttpVerifierHandlerInterceptorIntegrationTest {
     @Test
     void testWithValidRequestReturnsSuccess() {
         AssertionSimpleClientTestUtils.createExpectationAssertionFound();
+        factoryHelper.setAssertionVerifierService(new MockAssertionVerifierService(factoryHelper.getIdpCertProviderFactory().create(), factoryHelper.getAssertionServiceFactory().create(), LollipopConsumerRequestConfig.builder().build()));
 
         String signatureInput =
                 "sig123=(\"content-digest\" \"x-pagopa-lollipop-original-method\""

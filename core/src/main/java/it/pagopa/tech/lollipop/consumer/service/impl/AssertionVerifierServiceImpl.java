@@ -14,35 +14,35 @@ import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
 import it.pagopa.tech.lollipop.consumer.service.AssertionVerifierService;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SAMLKeyInfo;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import it.pagopa.tech.lollipop.consumer.utils.LollipopSamlAssertionWrapper;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import lombok.extern.java.Log;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.*;
 
 /** Standard implementation of {@link AssertionVerifierService} */
 @Log
@@ -76,11 +76,10 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
                     ErrorRetrievingIdpCertDataException, ErrorValidatingAssertionSignature {
         Map<String, String> headerParams = request.getHeaderParams();
 
-        SamlAssertion assertion =
+        Document assertionDoc =
                 getAssertion(
                         headerParams.get(lollipopRequestConfig.getAuthJWTHeader()),
                         headerParams.get(lollipopRequestConfig.getAssertionRefHeader()));
-        Document assertionDoc = buildDocumentFromAssertion(assertion);
 
         boolean isAssertionPeriodValid = validateAssertionPeriod(assertionDoc);
         if (!isAssertionPeriodValid) {
@@ -108,10 +107,11 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         return validateSignature(assertionDoc, idpCertDataList);
     }
 
-    private SamlAssertion getAssertion(String jwt, String assertionRef)
+    private Document getAssertion(String jwt, String assertionRef)
             throws ErrorRetrievingAssertionException {
+        SamlAssertion assertion;
         try {
-            return assertionService.getAssertion(jwt, assertionRef);
+            assertion = assertionService.getAssertion(jwt, assertionRef);
         } catch (OidcAssertionNotSupported e) {
             throw new ErrorRetrievingAssertionException(
                     ErrorRetrievingAssertionException.ErrorCode.OIDC_TYPE_NOT_SUPPORTED,
@@ -123,6 +123,7 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
                     e.getMessage(),
                     e);
         }
+        return buildDocumentFromAssertion(assertion);
     }
 
     protected boolean validateAssertionPeriod(Document assertionDoc)
@@ -197,7 +198,7 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         return inResponseTo.equals(calculatedThumbprint) && inResponseTo.equals(assertionRefHeader);
     }
 
-    private List<IdpCertData> getIdpCertData(Document assertionDoc)
+    protected List<IdpCertData> getIdpCertData(Document assertionDoc)
             throws ErrorRetrievingIdpCertDataException {
         NodeList listElements =
                 assertionDoc.getElementsByTagNameNS(
@@ -218,7 +219,13 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
                     "Missing entity id field in the retrieved saml assertion");
         }
         try {
-            return idpCertProvider.getIdpCertData(instant, entityId);
+            instant = Long.toString(
+                    new SimpleDateFormat(lollipopRequestConfig.getAssertionNotBeforeDateFormat())
+                            .parse(instant).getTime());
+        } catch (ParseException e) {
+        }
+        try {
+            return idpCertProvider.getIdpCertData(instant, entityId.trim());
         } catch (CertDataNotFoundException e) {
             throw new ErrorRetrievingIdpCertDataException(
                     ErrorRetrievingIdpCertDataException.ErrorCode.IDP_CERT_DATA_NOT_FOUND,
@@ -229,10 +236,10 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
 
     protected boolean validateSignature(Document assertionDoc, List<IdpCertData> idpCertDataList)
             throws ErrorValidatingAssertionSignature {
-        SamlAssertionWrapper wrapper;
+        LollipopSamlAssertionWrapper wrapper;
         try {
             wrapper =
-                    new SamlAssertionWrapper(
+                    new LollipopSamlAssertionWrapper(
                             (Element)
                                     assertionDoc
                                             .getElementsByTagNameNS(
@@ -242,9 +249,8 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
                                             .item(0));
         } catch (WSSecurityException e) {
             throw new ErrorValidatingAssertionSignature(
-                    ErrorValidatingAssertionSignature.ErrorCode
-                            .ERROR_RETRIEVING_ASSERTION_SIGNATURE,
-                    "Failed to retrieve signature from assertion",
+                    ErrorValidatingAssertionSignature.ErrorCode.ERROR_PARSING_ASSERTION,
+                    "Failed to build SAML object from assertion",
                     e);
         }
 
@@ -252,19 +258,20 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
     }
 
     private boolean validateSignature(
-            List<IdpCertData> idpCertDataList, SamlAssertionWrapper wrapper) {
+            List<IdpCertData> idpCertDataList, LollipopSamlAssertionWrapper wrapper)
+            throws ErrorValidatingAssertionSignature {
         for (IdpCertData idpCertData : idpCertDataList) {
             for (String certData : idpCertData.getCertData()) {
                 try {
                     X509Certificate x509Certificate = getX509Certificate(certData);
-                    wrapper.verifySignature(
+                    wrapper.verifySignatureLollipop(
                             new SAMLKeyInfo(new X509Certificate[] {x509Certificate}));
                 } catch (CertificateException | WSSecurityException e) {
                     // CertificateException: Failed to generate X509 certificate from IDP metadata
                     // or
                     // WSSecurityException: Failed to validate assertion signature
-                    // TODO: se l'assertion non ha signature la validazione va in successo,
-                    // corretto?
+                    // this exceptions are ignored because if the signature validation fail for one
+                    // certificate it may pass with one of the other certificates
                     continue;
                 }
                 return true;
@@ -409,4 +416,3 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         return publicKey;
     }
 }
-

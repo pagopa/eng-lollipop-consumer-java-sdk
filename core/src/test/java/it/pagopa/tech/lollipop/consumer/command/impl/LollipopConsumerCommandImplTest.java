@@ -337,7 +337,7 @@ class LollipopConsumerCommandImplTest {
                 .when(assertionVerifierServiceMock)
                 .validateLollipop(any(LollipopConsumerRequest.class));
 
-        CommandResult commandResult = sut.doExecute(LollipopConsumerRequest.builder().build());
+        CommandResult commandResult = sut.doExecute();
 
         Assertions.assertEquals(
                 AssertionVerificationResultCode.SIGNATURE_VALIDATION_ERROR.name(),
@@ -364,7 +364,7 @@ class LollipopConsumerCommandImplTest {
                 .when(assertionVerifierServiceMock)
                 .validateLollipop(any(LollipopConsumerRequest.class));
 
-        CommandResult commandResult = sut.doExecute(LollipopConsumerRequest.builder().build());
+        CommandResult commandResult = sut.doExecute();
 
         Assertions.assertEquals(
                 AssertionVerificationResultCode.IDP_CERT_DATA_RETRIEVING_ERROR.name(),
