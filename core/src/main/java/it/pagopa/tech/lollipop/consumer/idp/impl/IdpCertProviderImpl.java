@@ -48,7 +48,6 @@ public class IdpCertProviderImpl implements IdpCertProvider {
             throw new IllegalArgumentException(errMsg);
         }
 
-
         return idpCertClient.getCertData(entityId, assertionInstant);
     }
 }
