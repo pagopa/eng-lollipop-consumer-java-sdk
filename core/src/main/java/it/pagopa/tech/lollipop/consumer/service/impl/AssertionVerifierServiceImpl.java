@@ -219,9 +219,12 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
                     "Missing entity id field in the retrieved saml assertion");
         }
         try {
-            instant = Long.toString(
-                    new SimpleDateFormat(lollipopRequestConfig.getAssertionNotBeforeDateFormat())
-                            .parse(instant).getTime());
+            instant =
+                    Long.toString(
+                            new SimpleDateFormat(
+                                            lollipopRequestConfig.getAssertionNotBeforeDateFormat())
+                                    .parse(instant)
+                                    .getTime());
         } catch (ParseException e) {
         }
         try {

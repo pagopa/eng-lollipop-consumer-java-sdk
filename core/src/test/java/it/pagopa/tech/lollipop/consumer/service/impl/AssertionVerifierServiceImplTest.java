@@ -12,7 +12,6 @@ import it.pagopa.tech.lollipop.consumer.idp.IdpCertProvider;
 import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
-
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.Collections;
@@ -188,7 +187,8 @@ class AssertionVerifierServiceImplTest {
         LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
 
         SamlAssertion assertion = new SamlAssertion();
-        assertion.setAssertionData(new String(Base64.decode(ASSERTION_XML_TIM.getBytes(StandardCharsets.UTF_8))));
+        assertion.setAssertionData(
+                new String(Base64.decode(ASSERTION_XML_TIM.getBytes(StandardCharsets.UTF_8))));
 
         doReturn(365 * 20).when(lollipopRequestConfigMock).getAssertionExpireInDays();
 
@@ -649,7 +649,8 @@ class AssertionVerifierServiceImplTest {
         LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
 
         SamlAssertion assertion = new SamlAssertion();
-        assertion.setAssertionData(new String(Base64.decode(ASSERTION_XML_TIM.getBytes(StandardCharsets.UTF_8))));
+        assertion.setAssertionData(
+                new String(Base64.decode(ASSERTION_XML_TIM.getBytes(StandardCharsets.UTF_8))));
 
         IdpCertData idpCertData = new IdpCertData();
         idpCertData.setCertData(Collections.singletonList(CERTIFICATE_TIM_LATEST));
