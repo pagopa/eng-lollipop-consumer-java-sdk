@@ -43,7 +43,7 @@ public class ErrorValidatingAssertionSignature extends Exception {
 
     /** Error codes to classify Lollipop Request Exceptions */
     public enum ErrorCode {
-        ERROR_GENERATING_X509_CERTIFICATE,
-        ERROR_RETRIEVING_ASSERTION_SIGNATURE
+        ERROR_PARSING_ASSERTION,
+        MISSING_ASSERTION_SIGNATURE
     }
 }

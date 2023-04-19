@@ -122,6 +122,10 @@ public class LollipopConsumerFactoryHelper {
         return lollipopConsumerRequestValidationService;
     }
 
+    public void setAssertionVerifierService(AssertionVerifierService assertionVerifierService) {
+        this.assertionVerifierService = assertionVerifierService;
+    }
+
     public LollipopLoggerService getLollipopLoggerService() {
         return new LollipopLogbackLoggerService();
     }
