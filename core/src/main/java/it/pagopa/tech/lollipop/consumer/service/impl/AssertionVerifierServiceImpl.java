@@ -273,11 +273,7 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
             throws AssertionThumbprintException {
         Base64URL thumbprint;
         try {
-            try {
-                publicKey = new String(Base64.getDecoder().decode(publicKey));
-            } catch (Exception e) {
-                log.log(Level.FINE, "Key not in Base64");
-            }
+            publicKey = getPublicKey(publicKey);
             thumbprint = ThumbprintUtils.compute(inResponseToAlgorithm, JWK.parse(publicKey));
         } catch (JOSEException | ParseException e) {
             String errMsg = String.format("Can not calculate JwkThumbprint: %S", e.getMessage());
@@ -296,5 +292,14 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
                             + calculatedThumbprint);
         }
         return calculatedThumbprint;
+    }
+
+    private String getPublicKey(String publicKey) {
+        try {
+            publicKey = new String(Base64.getDecoder().decode(publicKey));
+        } catch (Exception e) {
+            log.log(Level.FINE, "Key not in Base64");
+        }
+        return publicKey;
     }
 }

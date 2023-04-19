@@ -12,6 +12,8 @@ import org.springframework.util.StreamUtils;
 /** Class to be used for conversion of the http requests to be validated */
 public class LollipopConsumerRequestConverter {
 
+    private LollipopConsumerRequestConverter() {}
+
     /**
      * Utility method to be used to generate a LollipopConsumerRequest
      *
