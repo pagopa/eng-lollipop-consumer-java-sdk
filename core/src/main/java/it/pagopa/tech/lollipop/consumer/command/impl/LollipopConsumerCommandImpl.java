@@ -96,7 +96,7 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
         } catch (AssertionThumbprintException e) {
             String message =
                     String.format(
-                            "Assertion validation failed on verifying thumbprint  with error code"
+                            "Assertion validation failed on verifying thumbprint with error code"
                                     + " %s and message: %s",
                             e.getErrorCode(), e.getMessage());
             return buildCommandResult(
@@ -104,15 +104,27 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
         } catch (AssertionUserIdException e) {
             String message =
                     String.format(
-                            "Assertion validation failed on verifying user id  with error code %s"
+                            "Assertion validation failed on verifying user id with error code %s"
                                     + " and message: %s",
                             e.getErrorCode(), e.getMessage());
             return buildCommandResult(
                     AssertionVerificationResultCode.USER_ID_VALIDATION_ERROR.name(), message);
         } catch (ErrorValidatingAssertionSignature e) {
-            throw new RuntimeException(e); // TODO
+            String message =
+                    String.format(
+                            "Assertion validation failed on verifying signature with error code %s"
+                                    + " and message: %s",
+                            e.getErrorCode(), e.getMessage());
+            return buildCommandResult(
+                    AssertionVerificationResultCode.SIGNATURE_VALIDATION_ERROR.name(), message);
         } catch (ErrorRetrievingIdpCertDataException e) {
-            throw new RuntimeException(e); // TODO
+            String message =
+                    String.format(
+                            "Assertion validation failed on retrieving identity provider's"
+                                    + " certification data with error code %s and message: %s",
+                            e.getErrorCode(), e.getMessage());
+            return buildCommandResult(
+                    AssertionVerificationResultCode.IDP_CERT_DATA_RETRIEVING_ERROR.name(), message);
         }
 
         if (!result) {
