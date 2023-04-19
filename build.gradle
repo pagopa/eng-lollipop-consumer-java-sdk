@@ -163,6 +163,7 @@ subprojects {
 			finalizedBy jacocoTestReport // report is always generated after tests run
 			jacoco {
 				excludes = ["**/config/*","**/*Mock*","**/model/**","**/entity/*","**/*Stub*","**/*Config*"]
+
 			}
 		}
 		jacocoTestReport {
@@ -174,12 +175,18 @@ subprojects {
 }
 
 project(":test-coverage") {
+	sonar {
+		skipProject = true
+	}
 	sonarqube {
 		skipProject = true
 	}
 }
 
 project(":redis-storage") {
+	sonar {
+		skipProject = true
+	}
 	sonarqube {
 		skipProject = true
 	}
