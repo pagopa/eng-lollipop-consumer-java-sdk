@@ -1,11 +1,15 @@
 /* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.config;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Builder
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class LollipopConsumerRequestConfig {
 
     @Builder.Default private boolean strictDigestVerify = false;

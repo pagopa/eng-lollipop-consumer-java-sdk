@@ -12,6 +12,7 @@ import it.pagopa.tech.lollipop.consumer.model.ECPublicKey;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.model.RSAPublicKey;
 import it.pagopa.tech.lollipop.consumer.service.LollipopConsumerRequestValidationService;
+import java.util.Base64;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -30,7 +31,6 @@ public class LollipopConsumerRequestValidationServiceImpl
         Map<String, String> headerParams = request.getHeaderParams();
 
         validatePublicKey(headerParams.get(this.config.getPublicKeyHeader()));
-
         validateAssertionRefHeader(headerParams.get(this.config.getAssertionRefHeader()));
         validateAssertionTypeHeader(headerParams.get(this.config.getAssertionTypeHeader()));
         validateUserIdHeader(headerParams.get(this.config.getUserIdHeader()));
@@ -47,6 +47,12 @@ public class LollipopConsumerRequestValidationServiceImpl
             throw new LollipopRequestContentValidationException(
                     LollipopRequestContentValidationException.ErrorCode.MISSING_PUBLIC_KEY,
                     "Missing Public Key Header");
+        }
+
+        try {
+            publicKey = new String(Base64.getDecoder().decode(publicKey.getBytes()));
+        } catch (Exception e) {
+            //
         }
 
         if (isNotValidPublicKey(publicKey, ECPublicKey.class)

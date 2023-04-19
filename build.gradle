@@ -77,6 +77,15 @@ allprojects {
 }
 
 
+dependencies {
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.1'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.1'
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformats-text:2.14.1'
+	implementation 'com.fasterxml.jackson.module:jackson-modules-java8:2.14.1'
+	implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names:2.14.1'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.14.1'
+}
+
 // Settings for allowing reproducible build
 tasks.withType(AbstractArchiveTask).configureEach {
 	preserveFileTimestamps = false
@@ -144,7 +153,8 @@ subprojects {
 
 		sonar {
 			properties {
-				property "sonar.sources", "src/main"
+				property "sonar.sources", "src/main/java"
+				property "sonar.tests", "src/test/java"
 			}
 		}
 
@@ -153,6 +163,7 @@ subprojects {
 			finalizedBy jacocoTestReport // report is always generated after tests run
 			jacoco {
 				excludes = ["**/config/*","**/*Mock*","**/model/**","**/entity/*","**/*Stub*","**/*Config*"]
+
 			}
 		}
 		jacocoTestReport {
@@ -161,6 +172,24 @@ subprojects {
 
 	}
 
+}
+
+project(":test-coverage") {
+	sonar {
+		skipProject = true
+	}
+	sonarqube {
+		skipProject = true
+	}
+}
+
+project(":redis-storage") {
+	sonar {
+		skipProject = true
+	}
+	sonarqube {
+		skipProject = true
+	}
 }
 
 graalvmNative {
