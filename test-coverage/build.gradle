@@ -18,6 +18,7 @@ dependencies {
 	jacocoAggregation project(':http-verifier')
 	jacocoAggregation project(':identity-service-rest-client-native')
 	jacocoAggregation project(':assertion-rest-client-native')
+	jacocoAggregation project(':spring-impl')
 }
 
 reporting {
@@ -37,7 +38,8 @@ testCodeCoverageReport {
 			[project(':http-verifier'),
 			project(':identity-service-rest-client-native'),
 			project(':assertion-rest-client-native'),
-			project(':core')
+			project(':core'),
+			project(':spring-impl')
 			].collect {
 				it.fileTree(dir: "${it.buildDir}/classes", exclude: [
 						"**/config/*","**/*Mock*","**/model/**","**/entity/*","**/*Stub*","**/*Config*"
