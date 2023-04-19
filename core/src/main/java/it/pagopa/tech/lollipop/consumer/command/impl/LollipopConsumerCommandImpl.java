@@ -127,6 +127,10 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
                             e.getErrorCode(), e.getMessage());
             return buildCommandResult(
                     AssertionVerificationResultCode.USER_ID_VALIDATION_ERROR.name(), message);
+        } catch (ErrorValidatingAssertionSignature e) {
+            throw new RuntimeException(e); // TODO
+        } catch (ErrorRetrievingIdpCertDataException e) {
+            throw new RuntimeException(e); // TODO
         }
 
         if (!result) {

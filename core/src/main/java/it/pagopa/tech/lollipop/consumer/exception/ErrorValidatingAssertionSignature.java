@@ -1,3 +1,4 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.exception;
 
 import java.util.Objects;
@@ -44,6 +45,5 @@ public class ErrorValidatingAssertionSignature extends Exception {
     public enum ErrorCode {
         ERROR_GENERATING_X509_CERTIFICATE,
         ERROR_RETRIEVING_ASSERTION_SIGNATURE
-
     }
 }

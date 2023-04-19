@@ -25,5 +25,6 @@ public interface AssertionVerifierService {
      */
     boolean validateLollipop(LollipopConsumerRequest request)
             throws ErrorRetrievingAssertionException, AssertionPeriodException,
-            AssertionThumbprintException, AssertionUserIdException, ErrorRetrievingIdpCertDataException, ErrorValidatingAssertionSignature;
+                    AssertionThumbprintException, AssertionUserIdException,
+                    ErrorRetrievingIdpCertDataException, ErrorValidatingAssertionSignature;
 }
