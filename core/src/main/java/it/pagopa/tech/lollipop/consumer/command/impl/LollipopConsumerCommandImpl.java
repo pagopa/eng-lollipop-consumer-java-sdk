@@ -19,7 +19,6 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
     private final HttpMessageVerifierService messageVerifierService;
     private final AssertionVerifierService assertionVerifierService;
     private final LollipopConsumerRequestValidationService requestValidationService;
-
     private final LollipopConsumerRequest request;
 
     public static final String VERIFICATION_SUCCESS_CODE = "SUCCESS";
@@ -46,6 +45,7 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
      */
     @Override
     public CommandResult doExecute() {
+
 
         try {
             requestValidationService.validateLollipopRequest(request);

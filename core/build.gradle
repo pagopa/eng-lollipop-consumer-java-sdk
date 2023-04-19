@@ -44,6 +44,7 @@ dependencies {
 	implementation 'com.typesafe:config:1.4.2'
 	implementation 'javax.inject:javax.inject:1'
 	implementation 'com.nimbusds:nimbus-jose-jwt:9.31'
+	implementation 'ch.qos.logback:logback-classic:1.4.6'
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
 	// Use JUnit Jupiter for testing.
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'

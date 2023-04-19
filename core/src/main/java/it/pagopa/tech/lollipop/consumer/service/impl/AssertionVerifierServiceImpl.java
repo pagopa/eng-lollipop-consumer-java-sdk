@@ -28,13 +28,14 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-@Log
+@Slf4j
 /** Standard implementation of {@link AssertionVerifierService} */
 public class AssertionVerifierServiceImpl implements AssertionVerifierService {
 
@@ -298,7 +299,7 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         try {
             publicKey = new String(Base64.getDecoder().decode(publicKey));
         } catch (Exception e) {
-            log.log(Level.FINE, "Key not in Base64");
+            log.debug("Key not in Base64");
         }
         return publicKey;
     }
