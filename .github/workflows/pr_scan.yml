@@ -2,6 +2,8 @@ name: Check Build and Anchore on PR
 
 on:
   pull_request:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 env:
   DOCKERFILE: Dockerfile.test-only
@@ -56,7 +58,8 @@ jobs:
       if: always()
       with:
         sarif_file: ${{ steps.scan.outputs.sarif }}
-    - name: Run Sonar Scanner
+    - name: Run Sonar Scanner on Pull Request
+      if: ${{ github.event_name == 'pull_request' }}
       run: ./gradlew sonar --info
         -Dsonar.organization=pagopa
         -Dsonar.projectKey=${{ env.PROJECT_KEY }}
@@ -68,3 +71,14 @@ jobs:
         -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
         -Dsonar.pullrequest.branch=${{ github.head_ref }}
         -Dsonar.pullrequest.base=${{ github.base_ref }}
+    - name: Run Sonar Scanner
+      if: ${{ github.event_name != 'pull_request' }}
+      run: ./gradlew sonar --info
+        -Dsonar.organization=pagopa
+        -Dsonar.projectKey=${{ env.PROJECT_KEY }}
+        -Dsonar.coverage.jacoco.xmlReportPaths=**/test-coverage/build/reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml
+        -Dsonar.coverage.exclusions="**/config/*","**/*Mock*","**/model/**","**/entity/*","**/*Stub*","**/*Config*"
+        -Dsonar.host.url=https://sonarcloud.io
+        -Dsonar.java.libraries="**/*.jar"
+        -Dsonar.login=${{ env.SONAR_TOKEN }}
+        -Dsonar.branch.name=${{ github.head_ref }}
