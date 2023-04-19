@@ -72,7 +72,8 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
     @Override
     public boolean validateLollipop(LollipopConsumerRequest request)
             throws ErrorRetrievingAssertionException, AssertionPeriodException,
-            AssertionThumbprintException, AssertionUserIdException, ErrorRetrievingIdpCertDataException, ErrorValidatingAssertionSignature {
+                    AssertionThumbprintException, AssertionUserIdException,
+                    ErrorRetrievingIdpCertDataException, ErrorValidatingAssertionSignature {
         Map<String, String> headerParams = request.getHeaderParams();
 
         SamlAssertion assertion =
@@ -124,7 +125,8 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         }
     }
 
-    protected boolean validateAssertionPeriod(Document assertionDoc) throws AssertionPeriodException {
+    protected boolean validateAssertionPeriod(Document assertionDoc)
+            throws AssertionPeriodException {
         NodeList listElements =
                 assertionDoc.getElementsByTagNameNS(
                         lollipopRequestConfig.getSamlNamespaceAssertion(),
@@ -195,50 +197,74 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         return inResponseTo.equals(calculatedThumbprint) && inResponseTo.equals(assertionRefHeader);
     }
 
-    private List<IdpCertData> getIdpCertData(Document assertionDoc) throws ErrorRetrievingIdpCertDataException {
+    private List<IdpCertData> getIdpCertData(Document assertionDoc)
+            throws ErrorRetrievingIdpCertDataException {
         NodeList listElements =
                 assertionDoc.getElementsByTagNameNS(
                         lollipopRequestConfig.getSamlNamespaceAssertion(),
                         lollipopRequestConfig.getAssertionInstantTag());
         if (isElementNotFound(listElements, ISSUE_INSTANT)) {
-            throw new ErrorRetrievingIdpCertDataException(ErrorRetrievingIdpCertDataException.ErrorCode.INSTANT_FIELD_NOT_FOUND, "Missing instant field in the retrieved saml assertion");
+            throw new ErrorRetrievingIdpCertDataException(
+                    ErrorRetrievingIdpCertDataException.ErrorCode.INSTANT_FIELD_NOT_FOUND,
+                    "Missing instant field in the retrieved saml assertion");
         }
         String instant =
                 listElements.item(0).getAttributes().getNamedItem(ISSUE_INSTANT).getNodeValue();
 
         String entityId = getEntityId(listElements.item(0).getChildNodes());
         if (entityId == null) {
-            throw new ErrorRetrievingIdpCertDataException(ErrorRetrievingIdpCertDataException.ErrorCode.ENTITY_ID_FIELD_NOT_FOUND, "Missing entity id field in the retrieved saml assertion");
+            throw new ErrorRetrievingIdpCertDataException(
+                    ErrorRetrievingIdpCertDataException.ErrorCode.ENTITY_ID_FIELD_NOT_FOUND,
+                    "Missing entity id field in the retrieved saml assertion");
         }
         try {
             return idpCertProvider.getIdpCertData(instant, entityId);
         } catch (CertDataNotFoundException e) {
-            throw new ErrorRetrievingIdpCertDataException(ErrorRetrievingIdpCertDataException.ErrorCode.IDP_CERT_DATA_NOT_FOUND, "Some error occurred in retrieving certification data from IDP", e);
+            throw new ErrorRetrievingIdpCertDataException(
+                    ErrorRetrievingIdpCertDataException.ErrorCode.IDP_CERT_DATA_NOT_FOUND,
+                    "Some error occurred in retrieving certification data from IDP",
+                    e);
         }
     }
 
-    protected boolean validateSignature(Document assertionDoc, List<IdpCertData> idpCertDataList) throws ErrorValidatingAssertionSignature {
+    protected boolean validateSignature(Document assertionDoc, List<IdpCertData> idpCertDataList)
+            throws ErrorValidatingAssertionSignature {
         SamlAssertionWrapper wrapper;
         try {
-            wrapper = new SamlAssertionWrapper((Element) assertionDoc.getElementsByTagNameNS(lollipopRequestConfig.getSamlNamespaceAssertion(), lollipopRequestConfig.getAssertionInstantTag()).item(0));
+            wrapper =
+                    new SamlAssertionWrapper(
+                            (Element)
+                                    assertionDoc
+                                            .getElementsByTagNameNS(
+                                                    lollipopRequestConfig
+                                                            .getSamlNamespaceAssertion(),
+                                                    lollipopRequestConfig.getAssertionInstantTag())
+                                            .item(0));
         } catch (WSSecurityException e) {
-            throw new ErrorValidatingAssertionSignature(ErrorValidatingAssertionSignature.ErrorCode.ERROR_RETRIEVING_ASSERTION_SIGNATURE, "Failed to retrieve signature from assertion", e);
+            throw new ErrorValidatingAssertionSignature(
+                    ErrorValidatingAssertionSignature.ErrorCode
+                            .ERROR_RETRIEVING_ASSERTION_SIGNATURE,
+                    "Failed to retrieve signature from assertion",
+                    e);
         }
 
         return validateSignature(idpCertDataList, wrapper);
     }
 
-    private boolean validateSignature(List<IdpCertData> idpCertDataList, SamlAssertionWrapper wrapper) {
+    private boolean validateSignature(
+            List<IdpCertData> idpCertDataList, SamlAssertionWrapper wrapper) {
         for (IdpCertData idpCertData : idpCertDataList) {
             for (String certData : idpCertData.getCertData()) {
                 try {
                     X509Certificate x509Certificate = getX509Certificate(certData);
-                    wrapper.verifySignature(new SAMLKeyInfo(new X509Certificate[] {x509Certificate}));
+                    wrapper.verifySignature(
+                            new SAMLKeyInfo(new X509Certificate[] {x509Certificate}));
                 } catch (CertificateException | WSSecurityException e) {
                     // CertificateException: Failed to generate X509 certificate from IDP metadata
                     // or
                     // WSSecurityException: Failed to validate assertion signature
-                    // TODO: se l'assertion non ha signature la validazione va in successo, corretto?
+                    // TODO: se l'assertion non ha signature la validazione va in successo,
+                    // corretto?
                     continue;
                 }
                 return true;
@@ -249,7 +275,8 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
 
     private X509Certificate getX509Certificate(String idpCertificate) throws CertificateException {
         CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-        InputStream fileStream = new ByteArrayInputStream(Base64.getMimeDecoder().decode(idpCertificate));
+        InputStream fileStream =
+                new ByteArrayInputStream(Base64.getMimeDecoder().decode(idpCertificate));
         return (X509Certificate) certificateFactory.generateCertificate(fileStream);
     }
 
@@ -278,7 +305,8 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
                 || listElements.item(0) == null
                 || !listElements.item(0).hasAttributes()
                 || listElements.item(0).getAttributes().getNamedItem(elementName) == null
-                || listElements.item(0).getAttributes().getNamedItem(elementName).getNodeValue() == null;
+                || listElements.item(0).getAttributes().getNamedItem(elementName).getNodeValue()
+                        == null;
     }
 
     private String getUserIdFromAssertion(Document assertionDoc) throws AssertionUserIdException {

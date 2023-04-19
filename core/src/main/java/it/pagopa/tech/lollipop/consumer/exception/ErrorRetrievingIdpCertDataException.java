@@ -1,3 +1,4 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.exception;
 
 import java.util.Objects;
@@ -26,7 +27,8 @@ public class ErrorRetrievingIdpCertDataException extends Exception {
      * @param message Detail message
      * @param cause Exception causing the constructed one
      */
-    public ErrorRetrievingIdpCertDataException(ErrorCode errorCode, String message, Throwable cause) {
+    public ErrorRetrievingIdpCertDataException(
+            ErrorCode errorCode, String message, Throwable cause) {
         super(message, cause);
         this.errorCode = Objects.requireNonNull(errorCode);
     }
