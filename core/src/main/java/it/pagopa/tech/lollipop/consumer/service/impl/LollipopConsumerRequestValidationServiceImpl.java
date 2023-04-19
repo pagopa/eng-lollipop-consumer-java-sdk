@@ -14,8 +14,11 @@ import it.pagopa.tech.lollipop.consumer.model.RSAPublicKey;
 import it.pagopa.tech.lollipop.consumer.service.LollipopConsumerRequestValidationService;
 import java.util.Base64;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
+import lombok.extern.java.Log;
 
+@Log
 public class LollipopConsumerRequestValidationServiceImpl
         implements LollipopConsumerRequestValidationService {
 
@@ -52,7 +55,7 @@ public class LollipopConsumerRequestValidationServiceImpl
         try {
             publicKey = new String(Base64.getDecoder().decode(publicKey.getBytes()));
         } catch (Exception e) {
-            //
+            log.log(Level.FINE, "Key not in Base64");
         }
 
         if (isNotValidPublicKey(publicKey, ECPublicKey.class)

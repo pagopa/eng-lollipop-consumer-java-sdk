@@ -10,7 +10,6 @@ import it.pagopa.tech.lollipop.consumer.idp.IdpCertProviderFactory;
 import it.pagopa.tech.lollipop.consumer.service.LollipopConsumerRequestValidationService;
 import it.pagopa.tech.lollipop.consumer.service.impl.LollipopConsumerRequestValidationServiceImpl;
 import it.pagopa.tech.lollipop.consumer.spring.HttpVerifierHandlerInterceptor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,22 +20,22 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class HttpVerifierConfiguration {
 
-    @Autowired private SpringLollipopConsumerRequestConfig springLollipopConsumerRequestConfig;
-
     @Bean
     public LollipopConsumerFactoryHelper lollipopConsumerFactoryHelper(
             HttpMessageVerifierFactory httpMessageVerifierFactory,
             IdpCertProviderFactory idpCertProviderFactory,
-            AssertionServiceFactory assertionServiceFactory) {
+            AssertionServiceFactory assertionServiceFactory,
+            LollipopConsumerRequestValidationService lollipopConsumerRequestValidationService) {
         return new LollipopConsumerFactoryHelper(
                 httpMessageVerifierFactory,
                 idpCertProviderFactory,
                 assertionServiceFactory,
-                getLollipopConsumerRequestValidationService());
+                lollipopConsumerRequestValidationService);
     }
 
     @Bean
-    public LollipopConsumerRequestValidationService getLollipopConsumerRequestValidationService() {
+    public LollipopConsumerRequestValidationService getLollipopConsumerRequestValidationService(
+            SpringLollipopConsumerRequestConfig springLollipopConsumerRequestConfig) {
         return new LollipopConsumerRequestValidationServiceImpl(
                 springLollipopConsumerRequestConfig);
     }

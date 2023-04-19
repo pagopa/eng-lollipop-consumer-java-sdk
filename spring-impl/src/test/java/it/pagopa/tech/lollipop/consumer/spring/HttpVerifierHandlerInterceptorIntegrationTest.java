@@ -43,7 +43,7 @@ public class HttpVerifierHandlerInterceptorIntegrationTest {
     @Autowired private HttpVerifierHandlerInterceptor interceptor;
 
     @Test
-    public void testWithValidRequestReturnsSuccess() {
+    void testWithValidRequestReturnsSuccess() {
         AssertionSimpleClientTestUtils.createExpectationAssertionFound();
 
         String signatureInput =
@@ -93,7 +93,8 @@ public class HttpVerifierHandlerInterceptorIntegrationTest {
         Assertions.assertEquals(200, response.getStatusCodeValue());
     }
 
-    public void testWithinvalidPayloadRequestReturnsUnauthorized() {
+    @Test
+    void testWithinvalidPayloadRequestReturnsUnauthorized() {
         AssertionSimpleClientTestUtils.createExpectationAssertionFound();
 
         String signatureInput =
