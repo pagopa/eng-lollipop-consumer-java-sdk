@@ -33,11 +33,13 @@ public class LollipopConsumerFactoryHelper {
             HttpMessageVerifierFactory httpMessageVerifierFactory,
             IdpCertProviderFactory idpCertProviderFactory,
             AssertionServiceFactory assertionServiceFactory,
-            LollipopConsumerRequestValidationService lollipopConsumerRequestValidationService) {
+            LollipopConsumerRequestValidationService lollipopConsumerRequestValidationService,
+            LollipopConsumerRequestConfig lollipopConsumerRequestConfig) {
         this.httpMessageVerifierFactory = httpMessageVerifierFactory;
         this.idpCertProviderFactory = idpCertProviderFactory;
         this.assertionServiceFactory = assertionServiceFactory;
         this.lollipopConsumerRequestValidationService = lollipopConsumerRequestValidationService;
+        this.lollipopConsumerRequestConfig = lollipopConsumerRequestConfig;
     }
 
     /**

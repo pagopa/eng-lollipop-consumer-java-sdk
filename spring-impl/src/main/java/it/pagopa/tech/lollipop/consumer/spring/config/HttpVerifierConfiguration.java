@@ -25,12 +25,14 @@ public class HttpVerifierConfiguration {
             HttpMessageVerifierFactory httpMessageVerifierFactory,
             IdpCertProviderFactory idpCertProviderFactory,
             AssertionServiceFactory assertionServiceFactory,
-            LollipopConsumerRequestValidationService lollipopConsumerRequestValidationService) {
+            LollipopConsumerRequestValidationService lollipopConsumerRequestValidationService,
+            SpringLollipopConsumerRequestConfig springLollipopConsumerRequestConfig) {
         return new LollipopConsumerFactoryHelper(
                 httpMessageVerifierFactory,
                 idpCertProviderFactory,
                 assertionServiceFactory,
-                lollipopConsumerRequestValidationService);
+                lollipopConsumerRequestValidationService,
+                springLollipopConsumerRequestConfig);
     }
 
     @Bean
