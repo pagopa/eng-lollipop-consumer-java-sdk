@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<included>
+
+    <appender name="LOLLIPOP_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="LOLLIPOP_ASYNC_STDOUT"
+              class="ch.qos.logback.classic.AsyncAppender">
+        <neverBlock>true</neverBlock>
+        <queueSize>20000</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <appender-ref ref="LOLLIPOP_STDOUT"/>
+    </appender>
+
+    <logger name="it.pagopa.tech.lollipop.consumer.logger.impl.LollipopLogbackLoggerService">
+        <appender-ref ref="LOLLIPOP_ASYNC_STDOUT" />
+    </logger>
+
+</included>

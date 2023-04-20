@@ -10,10 +10,22 @@ import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
 import it.pagopa.tech.lollipop.consumer.enumeration.AssertionRefAlgorithms;
 import it.pagopa.tech.lollipop.consumer.exception.*;
 import it.pagopa.tech.lollipop.consumer.idp.IdpCertProvider;
+import it.pagopa.tech.lollipop.consumer.logger.LollipopLoggerService;
 import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
 import it.pagopa.tech.lollipop.consumer.service.AssertionVerifierService;
+import lombok.extern.slf4j.Slf4j;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import javax.inject.Inject;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.text.ParseException;
@@ -22,22 +34,12 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import javax.inject.Inject;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import lombok.extern.java.Log;
-import lombok.extern.slf4j.Slf4j;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 @Slf4j
 /** Standard implementation of {@link AssertionVerifierService} */
 public class AssertionVerifierServiceImpl implements AssertionVerifierService {
+
+    private final LollipopLoggerService lollipopLoggerService;
 
     private final IdpCertProvider idpCertProvider;
     private final AssertionService assertionService;
@@ -47,9 +49,11 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
 
     @Inject
     public AssertionVerifierServiceImpl(
+            LollipopLoggerService lollipopLoggerService,
             IdpCertProvider idpCertProvider,
             AssertionService assertionService,
             LollipopConsumerRequestConfig lollipopRequestConfig) {
+        this.lollipopLoggerService = lollipopLoggerService;
         this.idpCertProvider = idpCertProvider;
         this.assertionService = assertionService;
         this.lollipopRequestConfig = lollipopRequestConfig;
@@ -293,6 +297,16 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
                             + calculatedThumbprint);
         }
         return calculatedThumbprint;
+    }
+
+    private void assertionCheckLogging(String message, Object... args) {
+        if (lollipopRequestConfig.isEnableConsumerLogging() && lollipopRequestConfig.isEnableAssertionLogging()) {
+
+        }
+    }
+
+    private void signatureCheckLogging() {
+
     }
 
     private String getPublicKey(String publicKey) {

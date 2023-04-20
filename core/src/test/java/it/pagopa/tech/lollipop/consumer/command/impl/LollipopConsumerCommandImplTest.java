@@ -5,9 +5,11 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommand;
+import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
 import it.pagopa.tech.lollipop.consumer.enumeration.AssertionVerificationResultCode;
 import it.pagopa.tech.lollipop.consumer.enumeration.HttpMessageVerificationResultCode;
 import it.pagopa.tech.lollipop.consumer.exception.*;
+import it.pagopa.tech.lollipop.consumer.logger.impl.LollipopLogbackLoggerService;
 import it.pagopa.tech.lollipop.consumer.model.CommandResult;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.service.AssertionVerifierService;
@@ -33,9 +35,11 @@ class LollipopConsumerCommandImplTest {
         sut =
                 Mockito.spy(
                         new LollipopConsumerCommandImpl(
+                                LollipopConsumerRequestConfig.builder().build(),
                                 messageVerifierServiceMock,
                                 assertionVerifierServiceMock,
                                 requestValidationServiceMock,
+                                new LollipopLogbackLoggerService(),
                                 LollipopConsumerRequest.builder().build()));
     }
 
