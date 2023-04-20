@@ -12,7 +12,7 @@ import java.util.Date;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "it.pagopa.tech")
 public class SampleApplication {
 
     public static void main(String[] args) {
