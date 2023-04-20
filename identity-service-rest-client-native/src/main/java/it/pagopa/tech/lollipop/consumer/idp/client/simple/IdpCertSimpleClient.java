@@ -64,7 +64,8 @@ public class IdpCertSimpleClient implements IdpCertClient {
         return listCertData;
     }
 
-    private void getCieCerts(String entityId, String instant, List<IdpCertData> listCertData) throws CertDataNotFoundException {
+    private void getCieCerts(String entityId, String instant, List<IdpCertData> listCertData)
+            throws CertDataNotFoundException {
         List<String> tagList;
         try {
             tagList = getCIETagList(instant);
@@ -89,16 +90,14 @@ public class IdpCertSimpleClient implements IdpCertClient {
                 listCertData.add(certData);
             } catch (ApiException | EntityIdNotFoundException e) {
                 throw new CertDataNotFoundException(
-                        "Error retrieving certificate data for tag "
-                                + tag
-                                + ": "
-                                + e.getMessage(),
+                        "Error retrieving certificate data for tag " + tag + ": " + e.getMessage(),
                         e);
             }
         }
     }
 
-    private void getSpidCerts(String entityId, String instant, List<IdpCertData> listCertData) throws CertDataNotFoundException {
+    private void getSpidCerts(String entityId, String instant, List<IdpCertData> listCertData)
+            throws CertDataNotFoundException {
         List<String> tagList;
         try {
             tagList = getSPIDTagList(instant);
@@ -122,10 +121,7 @@ public class IdpCertSimpleClient implements IdpCertClient {
                 listCertData.add(certData);
             } catch (ApiException | EntityIdNotFoundException e) {
                 throw new CertDataNotFoundException(
-                        "Error retrieving certificate data for tag "
-                                + tag
-                                + ": "
-                                + e.getMessage(),
+                        "Error retrieving certificate data for tag " + tag + ": " + e.getMessage(),
                         e);
             }
         }
