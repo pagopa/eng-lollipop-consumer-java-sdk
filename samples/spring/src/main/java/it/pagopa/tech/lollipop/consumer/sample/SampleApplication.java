@@ -1,10 +1,13 @@
 package it.pagopa.tech.lollipop.consumer.sample;
 
+import it.pagopa.tech.lollipop.consumer.spring.config.HttpVerifierConfiguration;
+import it.pagopa.tech.lollipop.consumer.spring.config.SpringLollipopConsumerRequestConfig;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Header;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
