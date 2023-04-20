@@ -3,6 +3,7 @@ package it.pagopa.tech.lollipop.consumer.idp.client.simple;
 
 import it.pagopa.tech.lollipop.consumer.exception.*;
 import it.pagopa.tech.lollipop.consumer.idp.client.IdpCertClient;
+import it.pagopa.tech.lollipop.consumer.idp.client.simple.exception.TagListSearchOutOfBoundException;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.ApiClient;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.ApiException;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.api.DefaultApi;
@@ -42,14 +43,12 @@ public class IdpCertSimpleClient implements IdpCertClient {
      * @param entityId Identity Provider ID
      * @param instant Assertion Issue Instant
      * @return the certifications issued before and after the timestamp instant
-     * @throws CertDataTagListNotFoundException if an error occurred retrieving the list of tags or
-     *     filtering the tags with the instant
      * @throws CertDataNotFoundException if an error occurred retrieving the certification XML or if
      *     data for the given entityId were not found
      */
     @Override
     public List<IdpCertData> getCertData(String entityId, String instant)
-            throws CertDataNotFoundException, CertDataTagListNotFoundException {
+            throws CertDataNotFoundException {
         List<IdpCertData> listCertData = new ArrayList<>();
         List<String> tagList;
 
@@ -63,7 +62,7 @@ public class IdpCertSimpleClient implements IdpCertClient {
             } catch (ApiException
                     | TagListSearchOutOfBoundException
                     | InvalidInstantFormatException e) {
-                throw new CertDataTagListNotFoundException(
+                throw new CertDataNotFoundException(
                         "Error retrieving certificate's tag list: " + e.getMessage(), e);
             }
 
@@ -94,7 +93,7 @@ public class IdpCertSimpleClient implements IdpCertClient {
             } catch (ApiException
                     | TagListSearchOutOfBoundException
                     | InvalidInstantFormatException e) {
-                throw new CertDataTagListNotFoundException(
+                throw new CertDataNotFoundException(
                         "Error retrieving certificate's tag list: " + e.getMessage(), e);
             }
 

@@ -2,7 +2,6 @@
 package it.pagopa.tech.lollipop.consumer.idp.client.simple;
 
 import it.pagopa.tech.lollipop.consumer.exception.CertDataNotFoundException;
-import it.pagopa.tech.lollipop.consumer.exception.CertDataTagListNotFoundException;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.ApiClient;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.storage.SimpleIdpCertStorageProvider;
 import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorageConfig;
@@ -41,15 +40,14 @@ class IdpCertSimpleClientTest {
     }
 
     @Test
-    void certSPIDDataFound() throws CertDataTagListNotFoundException, CertDataNotFoundException {
+    void certSPIDDataFound() throws CertDataNotFoundException {
         List<IdpCertData> response = idpCertSimpleClient.getCertData(SPID_ENTITY_ID, INSTANT);
 
         Assertions.assertNotNull(response);
     }
 
     @Test
-    void certSPIDDataFoundMultipleSignature()
-            throws CertDataTagListNotFoundException, CertDataNotFoundException {
+    void certSPIDDataFoundMultipleSignature() throws CertDataNotFoundException {
         List<IdpCertData> response =
                 idpCertSimpleClient.getCertData(SPID_ENTITY_ID_MULTIPLE_SIGNATURE, INSTANT);
 
@@ -58,7 +56,7 @@ class IdpCertSimpleClientTest {
     }
 
     @Test
-    void certCIEDataFound() throws CertDataTagListNotFoundException, CertDataNotFoundException {
+    void certCIEDataFound() throws CertDataNotFoundException {
         List<IdpCertData> response = idpCertSimpleClient.getCertData(CIE_ENTITY_ID, INSTANT);
 
         Assertions.assertNotNull(response);
@@ -74,14 +72,14 @@ class IdpCertSimpleClientTest {
     @Test
     void getSPIDCertDataWrongInstant() {
         Assertions.assertThrows(
-                CertDataTagListNotFoundException.class,
+                CertDataNotFoundException.class,
                 () -> idpCertSimpleClient.getCertData(SPID_ENTITY_ID, WRONG_INSTANT));
     }
 
     @Test
     void getCIECertDataWrongInstant() {
         Assertions.assertThrows(
-                CertDataTagListNotFoundException.class,
+                CertDataNotFoundException.class,
                 () -> idpCertSimpleClient.getCertData(CIE_ENTITY_ID, WRONG_INSTANT));
     }
 

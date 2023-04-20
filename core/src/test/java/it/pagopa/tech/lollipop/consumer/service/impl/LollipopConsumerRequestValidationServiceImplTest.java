@@ -9,11 +9,18 @@ import it.pagopa.tech.lollipop.consumer.enumeration.AssertionType;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopRequestContentValidationException;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.service.LollipopConsumerRequestValidationService;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Random;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class LollipopConsumerRequestValidationServiceImplTest {
+
+    private LollipopConsumerRequestConfig config;
+    private LollipopConsumerRequestValidationService sut;
+
+    private final Random random = new Random();
 
     public static final String VALID_EC_PUBLIC_KEY =
             "{  \"kty\": \"EC\",  \"x\": \"FqFDuwEgu4MUXERPMVL-85pGv2D3YmL4J1gfMkdbc24\",  \"y\":"
@@ -30,10 +37,6 @@ class LollipopConsumerRequestValidationServiceImplTest {
                 + " \"x-pagopa-lollipop-original-url\");created=1678293988;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\"";
     public static final String VALID_SIGNATURE =
             "sig1=:lTuoRytp53GuUMOB4Rz1z97Y96gfSeEOm/xVpO39d3HR6lLAy4KYiGq+1hZ7nmRFBt2bASWEpen7ov5O4wU3kQ==:";
-    public static final String RANDOM_STRING = "";
-    private LollipopConsumerRequestConfig config;
-
-    private LollipopConsumerRequestValidationService sut;
 
     @BeforeEach
     void setUp() {
@@ -60,7 +63,7 @@ class LollipopConsumerRequestValidationServiceImplTest {
     @Test
     void validatePublicKeyFailureHeaderInvalidFormat() {
         HashMap<String, String> headers = new HashMap<>();
-        headers.put(config.getPublicKeyHeader(), RANDOM_STRING);
+        headers.put(config.getPublicKeyHeader(), generateRandomString());
         LollipopConsumerRequest request =
                 LollipopConsumerRequest.builder().headerParams(headers).build();
 
@@ -95,7 +98,7 @@ class LollipopConsumerRequestValidationServiceImplTest {
     void validateAssertionRefFailureInvalidFormat() {
         HashMap<String, String> headers = new HashMap<>();
         headers.put(config.getPublicKeyHeader(), VALID_EC_PUBLIC_KEY);
-        headers.put(config.getAssertionRefHeader(), RANDOM_STRING);
+        headers.put(config.getAssertionRefHeader(), generateRandomString());
         LollipopConsumerRequest request =
                 LollipopConsumerRequest.builder().headerParams(headers).build();
 
@@ -132,7 +135,7 @@ class LollipopConsumerRequestValidationServiceImplTest {
         HashMap<String, String> headers = new HashMap<>();
         headers.put(config.getPublicKeyHeader(), VALID_EC_PUBLIC_KEY);
         headers.put(config.getAssertionRefHeader(), VALID_ASSERTION_REF);
-        headers.put(config.getAssertionTypeHeader(), RANDOM_STRING);
+        headers.put(config.getAssertionTypeHeader(), generateRandomString());
         LollipopConsumerRequest request =
                 LollipopConsumerRequest.builder().headerParams(headers).build();
 
@@ -171,7 +174,7 @@ class LollipopConsumerRequestValidationServiceImplTest {
         headers.put(config.getPublicKeyHeader(), VALID_EC_PUBLIC_KEY);
         headers.put(config.getAssertionRefHeader(), VALID_ASSERTION_REF);
         headers.put(config.getAssertionTypeHeader(), AssertionType.SAML.name());
-        headers.put(config.getUserIdHeader(), RANDOM_STRING);
+        headers.put(config.getUserIdHeader(), generateRandomString());
         LollipopConsumerRequest request =
                 LollipopConsumerRequest.builder().headerParams(headers).build();
 
@@ -212,7 +215,7 @@ class LollipopConsumerRequestValidationServiceImplTest {
         headers.put(config.getAssertionRefHeader(), VALID_ASSERTION_REF);
         headers.put(config.getAssertionTypeHeader(), AssertionType.SAML.name());
         headers.put(config.getUserIdHeader(), VALID_FISCAL_CODE);
-        headers.put(config.getAuthJWTHeader(), RANDOM_STRING);
+        headers.put(config.getAuthJWTHeader(), "");
         LollipopConsumerRequest request =
                 LollipopConsumerRequest.builder().headerParams(headers).build();
 
@@ -322,7 +325,7 @@ class LollipopConsumerRequestValidationServiceImplTest {
         headers.put(config.getUserIdHeader(), VALID_FISCAL_CODE);
         headers.put(config.getAuthJWTHeader(), VALID_JWT);
         headers.put(config.getOriginalMethodHeader(), config.getExpectedFirstLcOriginalMethod());
-        headers.put(config.getOriginalURLHeader(), RANDOM_STRING);
+        headers.put(config.getOriginalURLHeader(), generateRandomString());
         LollipopConsumerRequest request =
                 LollipopConsumerRequest.builder().headerParams(headers).build();
 
@@ -392,7 +395,7 @@ class LollipopConsumerRequestValidationServiceImplTest {
         headers.put(config.getAuthJWTHeader(), VALID_JWT);
         headers.put(config.getOriginalMethodHeader(), config.getExpectedFirstLcOriginalMethod());
         headers.put(config.getOriginalURLHeader(), config.getExpectedFirstLcOriginalUrl());
-        headers.put(config.getSignatureInputHeader(), RANDOM_STRING);
+        headers.put(config.getSignatureInputHeader(), generateRandomString());
         LollipopConsumerRequest request =
                 LollipopConsumerRequest.builder().headerParams(headers).build();
 
@@ -441,7 +444,7 @@ class LollipopConsumerRequestValidationServiceImplTest {
         headers.put(config.getOriginalMethodHeader(), config.getExpectedFirstLcOriginalMethod());
         headers.put(config.getOriginalURLHeader(), config.getExpectedFirstLcOriginalUrl());
         headers.put(config.getSignatureInputHeader(), VALID_SIGNATURE_INPUT);
-        headers.put(config.getSignatureHeader(), RANDOM_STRING);
+        headers.put(config.getSignatureHeader(), generateRandomString());
         LollipopConsumerRequest request =
                 LollipopConsumerRequest.builder().headerParams(headers).build();
 
@@ -489,5 +492,11 @@ class LollipopConsumerRequestValidationServiceImplTest {
                 LollipopConsumerRequest.builder().headerParams(headers).build();
 
         assertDoesNotThrow(() -> sut.validateLollipopRequest(request));
+    }
+
+    private String generateRandomString() {
+        byte[] array = new byte[7];
+        random.nextBytes(array);
+        return new String(array, StandardCharsets.UTF_8);
     }
 }

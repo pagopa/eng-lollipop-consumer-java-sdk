@@ -35,6 +35,7 @@ public class LollipopConsumerRequestConfig {
     // assertion validation parameters
     @Builder.Default private int assertionExpireInDays = 30;
     @Builder.Default private String assertionNotBeforeDateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    @Builder.Default private String assertionInstantDateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
     @Builder.Default
     private String samlNamespaceAssertion = "urn:oasis:names:tc:SAML:2.0:assertion";
@@ -42,4 +43,6 @@ public class LollipopConsumerRequestConfig {
     @Builder.Default private String assertionNotBeforeTag = "Conditions";
     @Builder.Default private String assertionFiscalCodeTag = "Attribute";
     @Builder.Default private String assertionInResponseToTag = "SubjectConfirmationData";
+    @Builder.Default private String assertionEntityIdTag = "Issuer";
+    @Builder.Default private String assertionInstantTag = "Assertion";
 }

@@ -1,24 +1,27 @@
 /* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.service.impl;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static it.pagopa.tech.lollipop.consumer.TestUtils.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import it.pagopa.tech.lollipop.consumer.assertion.AssertionService;
 import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
 import it.pagopa.tech.lollipop.consumer.exception.*;
 import it.pagopa.tech.lollipop.consumer.idp.IdpCertProvider;
+import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
-import it.pagopa.tech.lollipop.consumer.service.AssertionVerifierService;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Collections;
 import java.util.HashMap;
+import lombok.SneakyThrows;
+import org.apache.geronimo.mail.util.Base64;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.w3c.dom.Document;
 
 class AssertionVerifierServiceImplTest {
 
@@ -26,263 +29,25 @@ class AssertionVerifierServiceImplTest {
     private AssertionService assertionServiceMock;
     private static LollipopConsumerRequestConfig lollipopRequestConfigMock;
 
-    private AssertionVerifierService sut;
-
-    private static final String VALID_FISCAL_CODE = "AAAAAA89S20I111X";
-    private static final String VALID_JWK =
-            "{  \"kty\": \"EC\",  \"crv\": \"P-256\",  \"x\":"
-                    + " \"SVqB4JcUD6lsfvqMr-OKUNUphdNn64Eay60978ZlL74\",  \"y\":"
-                    + " \"lf0u0pMj4lGAzZix5u4Cm5CMQIgMNpkwy163wtKYVKI\"}";
-    private static final String VALID_SHA_256_ASSERTION_REF =
-            "sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg";
-    private static final String VALID_SHA_384_ASSERTION_REF =
-            "sha384-lqxC_2kqMdwiBWoD-Us63Fha6e3bE1Y3yUz8G6IJTldohJCIBVDfvS8acB3GJBhw";
-    private static final String VALID_SHA_512_ASSERTION_REF =
-            "sha512-nX5CfUc5R-FoYKYZwvQMuc4Tt-heb7vHi_O-AMUSqHNVCw9kNaN2SVuN-DXtGXyUhrcVcQdCyY6FVzl_vyWXNA";
-
-    private static final String EMPTY_ASSERTION_XML =
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root></root>";
-    private static final String ASSERTION_XML_WITH_INVALID_PERIOD_DATE_FORMAT =
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?><saml2p:Response"
-                + " xmlns:saml2p=\"urn:oasis:names:tc:SAML:2.0:protocol\""
-                + " Destination=\"https://app-backend.io.italia.it/assertionConsumerService\""
-                + " ID=\"_de2ce675-f1e5-46fc-96ed-019803471175\""
-                + " InResponseTo=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\""
-                + " IssueInstant=\"2023-02-28T16:27:26.400Z\" Version=\"2.0\"><saml2:Assertion"
-                + " xmlns:saml2=\"urn:oasis:names:tc:SAML:2.0:assertion\""
-                + " ID=\"_6b9580aa-08b1-4f19-8fb6-8b670d070bad\""
-                + " IssueInstant=\"2023-02-28T16:27:25.400Z\" Version=\"2.0\"><saml2:Conditions"
-                + " NotBefore=\"2023-02-28\""
-                + " NotOnOrAfter=\"2023-02-28T16:28:25.400Z\"><saml2:AudienceRestriction><saml2:Audience>https://app-backend.io.italia.it</saml2:Audience></saml2:AudienceRestriction></saml2:Conditions></saml2:Assertion></saml2p:Response>";
-    private static final String ASSERTION_XML_WITH_EXPIRED_PERIOD =
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?><saml2p:Response"
-                + " xmlns:saml2p=\"urn:oasis:names:tc:SAML:2.0:protocol\""
-                + " Destination=\"https://app-backend.io.italia.it/assertionConsumerService\""
-                + " ID=\"_de2ce675-f1e5-46fc-96ed-019803471175\""
-                + " InResponseTo=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\""
-                + " IssueInstant=\"2023-02-28T16:27:26.400Z\" Version=\"2.0\"><saml2:Assertion"
-                + " xmlns:saml2=\"urn:oasis:names:tc:SAML:2.0:assertion\""
-                + " ID=\"_6b9580aa-08b1-4f19-8fb6-8b670d070bad\""
-                + " IssueInstant=\"2023-02-28T16:27:25.400Z\" Version=\"2.0\"><saml2:Conditions"
-                + " NotBefore=\"2000-02-28T16:27:25.400Z\""
-                + " NotOnOrAfter=\"2023-02-28T16:28:25.400Z\"><saml2:AudienceRestriction><saml2:Audience>https://app-backend.io.italia.it</saml2:Audience></saml2:AudienceRestriction></saml2:Conditions></saml2:Assertion></saml2p:Response>";
-    private static String ASSERTION_XML_WITHOUT_ATTRIBUTE_TAG;
-    private static String ASSERTION_XML_WITHOUT_FISCAL_CODE;
-    private static String ASSERTION_XML_WITHOUT_SUBJECTCONFIRMATIONDATA_TAG;
-    private static String ASSERTION_XML_WITH_INVALID_INRESPONSETO_ALGORITHM;
-    private static String ASSERTION_XML_WITH_VALID_INRESPONSETO_SHA256_ALGORITHM;
-    private static String ASSERTION_XML_WITH_VALID_INRESPONSETO_SHA384_ALGORITHM;
-    private static String ASSERTION_XML_WITH_VALID_INRESPONSETO_SHA512_ALGORITHM;
-
-    @BeforeAll
-    static void prepareInput() {
-        lollipopRequestConfigMock = spy(LollipopConsumerRequestConfig.builder().build());
-
-        String todayTimestamp =
-                new SimpleDateFormat(lollipopRequestConfigMock.getAssertionNotBeforeDateFormat())
-                        .format(new Date());
-        ASSERTION_XML_WITHOUT_ATTRIBUTE_TAG =
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?><saml2p:Response"
-                    + " xmlns:saml2p=\"urn:oasis:names:tc:SAML:2.0:protocol\""
-                    + " Destination=\"https://app-backend.io.italia.it/assertionConsumerService\""
-                    + " ID=\"_de2ce675-f1e5-46fc-96ed-019803471175\""
-                    + " InResponseTo=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\""
-                    + " IssueInstant=\"2023-02-28T16:27:26.400Z\" Version=\"2.0\"><saml2:Assertion"
-                    + " xmlns:saml2=\"urn:oasis:names:tc:SAML:2.0:assertion\""
-                    + " ID=\"_6b9580aa-08b1-4f19-8fb6-8b670d070bad\""
-                    + " IssueInstant=\"2023-02-28T16:27:25.400Z\" Version=\"2.0\"><saml2:Conditions"
-                    + " NotBefore=\""
-                        + todayTimestamp
-                        + "\" NotOnOrAfter=\"2023-02-28T16:28:25.400Z\"><saml2:AudienceRestriction><saml2:Audience>https://app-backend.io.italia.it</saml2:Audience></saml2:AudienceRestriction></saml2:Conditions></saml2:Assertion></saml2p:Response>";
-        ASSERTION_XML_WITHOUT_FISCAL_CODE =
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?><saml2p:Response"
-                    + " xmlns:saml2p=\"urn:oasis:names:tc:SAML:2.0:protocol\""
-                    + " Destination=\"https://app-backend.io.italia.it/assertionConsumerService\""
-                    + " ID=\"_de2ce675-f1e5-46fc-96ed-019803471175\""
-                    + " InResponseTo=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\""
-                    + " IssueInstant=\"2023-02-28T16:27:26.400Z\" Version=\"2.0\">  "
-                    + " <saml2:Assertion xmlns:saml2=\"urn:oasis:names:tc:SAML:2.0:assertion\""
-                    + " ID=\"_6b9580aa-08b1-4f19-8fb6-8b670d070bad\""
-                    + " IssueInstant=\"2023-02-28T16:27:25.400Z\" Version=\"2.0\">     "
-                    + " <saml2:Conditions NotBefore=\""
-                        + todayTimestamp
-                        + "\" NotOnOrAfter=\"2023-02-28T16:28:25.400Z\">        "
-                        + " <saml2:AudienceRestriction>           "
-                        + " <saml2:Audience>https://app-backend.io.italia.it</saml2:Audience>      "
-                        + "   </saml2:AudienceRestriction>      </saml2:Conditions>\t       "
-                        + " <saml2:AttributeStatement>         <saml2:Attribute>        "
-                        + " </saml2:Attribute>      </saml2:AttributeStatement>  "
-                        + " </saml2:Assertion></saml2p:Response>";
-        ASSERTION_XML_WITHOUT_SUBJECTCONFIRMATIONDATA_TAG =
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?><saml2p:Response"
-                    + " xmlns:saml2p=\"urn:oasis:names:tc:SAML:2.0:protocol\""
-                    + " Destination=\"https://app-backend.io.italia.it/assertionConsumerService\""
-                    + " ID=\"_de2ce675-f1e5-46fc-96ed-019803471175\""
-                    + " InResponseTo=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\""
-                    + " IssueInstant=\"2023-02-28T16:27:26.400Z\" Version=\"2.0\">  "
-                    + " <saml2:Assertion xmlns:saml2=\"urn:oasis:names:tc:SAML:2.0:assertion\""
-                    + " ID=\"_6b9580aa-08b1-4f19-8fb6-8b670d070bad\""
-                    + " IssueInstant=\"2023-02-28T16:27:25.400Z\" Version=\"2.0\">     "
-                    + " <saml2:Conditions NotBefore=\""
-                        + todayTimestamp
-                        + "\" NotOnOrAfter=\"2023-02-28T16:28:25.400Z\">        "
-                        + " <saml2:AudienceRestriction>           "
-                        + " <saml2:Audience>https://app-backend.io.italia.it</saml2:Audience>      "
-                        + "   </saml2:AudienceRestriction>      </saml2:Conditions>\t "
-                        + " <saml2:AttributeStatement>         <saml2:Attribute"
-                        + " FriendlyName=\"Codice fiscale\" Name=\"fiscalNumber\">           "
-                        + " <saml2:AttributeValue xmlns:xs=\"http://www.w3.org/2001/XMLSchema\""
-                        + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
-                        + " xsi:type=\"xs:string\">TINIT-AAAAAA89S20I111X</saml2:AttributeValue>   "
-                        + "      </saml2:Attribute>      </saml2:AttributeStatement>  "
-                        + " </saml2:Assertion></saml2p:Response>";
-        ASSERTION_XML_WITH_INVALID_INRESPONSETO_ALGORITHM =
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?><saml2p:Response"
-                    + " xmlns:saml2p=\"urn:oasis:names:tc:SAML:2.0:protocol\""
-                    + " Destination=\"https://app-backend.io.italia.it/assertionConsumerService\""
-                    + " ID=\"_de2ce675-f1e5-46fc-96ed-019803471175\""
-                    + " InResponseTo=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\""
-                    + " IssueInstant=\"2023-02-28T16:27:26.400Z\" Version=\"2.0\">  "
-                    + " <saml2:Assertion xmlns:saml2=\"urn:oasis:names:tc:SAML:2.0:assertion\""
-                    + " ID=\"_6b9580aa-08b1-4f19-8fb6-8b670d070bad\""
-                    + " IssueInstant=\"2023-02-28T16:27:25.400Z\" Version=\"2.0\">\t"
-                    + "\t<saml2:Subject>\t\t\t<saml2:NameID"
-                    + " Format=\"urn:oasis:names:tc:SAML:2.0:nameid-format:transient\""
-                    + " NameQualifier=\"https://posteid.poste.it\">SPID-d4de186b-e103-4b39-8209-0bccc7b1acdd</saml2:NameID>"
-                    + "\t\t\t<saml2:SubjectConfirmation"
-                    + " Method=\"urn:oasis:names:tc:SAML:2.0:cm:bearer\">\t\t\t"
-                    + "\t<saml2:SubjectConfirmationData"
-                    + " InResponseTo=\"INVALIDsha-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\""
-                    + " NotOnOrAfter=\"2023-02-28T16:28:25.400Z\""
-                    + " Recipient=\"https://app-backend.io.italia.it/assertionConsumerService\" />"
-                    + "\t\t\t</saml2:SubjectConfirmation>\t\t</saml2:Subject>\t\t<saml2:Conditions"
-                    + " NotBefore=\""
-                        + todayTimestamp
-                        + "\" NotOnOrAfter=\"2023-02-28T16:28:25.400Z\">\t\t"
-                        + "\t<saml2:AudienceRestriction>\t\t\t"
-                        + "\t<saml2:Audience>https://app-backend.io.italia.it</saml2:Audience>\t\t"
-                        + "\t</saml2:AudienceRestriction>\t\t</saml2:Conditions>\t"
-                        + "\t<saml2:AttributeStatement>\t\t\t<saml2:Attribute FriendlyName=\"Codice"
-                        + " fiscale\" Name=\"fiscalNumber\">\t\t\t\t<saml2:AttributeValue"
-                        + " xmlns:xs=\"http://www.w3.org/2001/XMLSchema\""
-                        + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
-                        + " xsi:type=\"xs:string\">TINIT-AAAAAA89S20I111X</saml2:AttributeValue>\t"
-                        + "\t\t</saml2:Attribute>\t\t</saml2:AttributeStatement>"
-                        + "\t</saml2:Assertion></saml2p:Response>";
-        ASSERTION_XML_WITH_VALID_INRESPONSETO_SHA256_ALGORITHM =
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?><saml2p:Response"
-                    + " xmlns:saml2p=\"urn:oasis:names:tc:SAML:2.0:protocol\""
-                    + " Destination=\"https://app-backend.io.italia.it/assertionConsumerService\""
-                    + " ID=\"_de2ce675-f1e5-46fc-96ed-019803471175\""
-                    + " InResponseTo=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\""
-                    + " IssueInstant=\"2023-02-28T16:27:26.400Z\" Version=\"2.0\">  "
-                    + " <saml2:Assertion xmlns:saml2=\"urn:oasis:names:tc:SAML:2.0:assertion\""
-                    + " ID=\"_6b9580aa-08b1-4f19-8fb6-8b670d070bad\""
-                    + " IssueInstant=\"2023-02-28T16:27:25.400Z\" Version=\"2.0\">\t"
-                    + "\t<saml2:Subject>\t\t\t<saml2:NameID"
-                    + " Format=\"urn:oasis:names:tc:SAML:2.0:nameid-format:transient\""
-                    + " NameQualifier=\"https://posteid.poste.it\">SPID-d4de186b-e103-4b39-8209-0bccc7b1acdd</saml2:NameID>"
-                    + "\t\t\t<saml2:SubjectConfirmation"
-                    + " Method=\"urn:oasis:names:tc:SAML:2.0:cm:bearer\">\t\t\t"
-                    + "\t<saml2:SubjectConfirmationData"
-                    + " InResponseTo=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\""
-                    + " NotOnOrAfter=\"2023-02-28T16:28:25.400Z\""
-                    + " Recipient=\"https://app-backend.io.italia.it/assertionConsumerService\" />"
-                    + "\t\t\t</saml2:SubjectConfirmation>\t\t</saml2:Subject>\t\t<saml2:Conditions"
-                    + " NotBefore=\""
-                        + todayTimestamp
-                        + "\" NotOnOrAfter=\"2023-02-28T16:28:25.400Z\">\t\t"
-                        + "\t<saml2:AudienceRestriction>\t\t\t"
-                        + "\t<saml2:Audience>https://app-backend.io.italia.it</saml2:Audience>\t\t"
-                        + "\t</saml2:AudienceRestriction>\t\t</saml2:Conditions>\t"
-                        + "\t<saml2:AttributeStatement>\t\t\t<saml2:Attribute FriendlyName=\"Codice"
-                        + " fiscale\" Name=\"fiscalNumber\">\t\t\t\t<saml2:AttributeValue"
-                        + " xmlns:xs=\"http://www.w3.org/2001/XMLSchema\""
-                        + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
-                        + " xsi:type=\"xs:string\">TINIT-AAAAAA89S20I111X</saml2:AttributeValue>\t"
-                        + "\t\t</saml2:Attribute>\t\t</saml2:AttributeStatement>"
-                        + "\t</saml2:Assertion></saml2p:Response>";
-        ASSERTION_XML_WITH_VALID_INRESPONSETO_SHA384_ALGORITHM =
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?><saml2p:Response"
-                    + " xmlns:saml2p=\"urn:oasis:names:tc:SAML:2.0:protocol\""
-                    + " Destination=\"https://app-backend.io.italia.it/assertionConsumerService\""
-                    + " ID=\"_de2ce675-f1e5-46fc-96ed-019803471175\""
-                    + " InResponseTo=\"sha384-lqxC_2kqMdwiBWoD-Us63Fha6e3bE1Y3yUz8G6IJTldohJCIBVDfvS8acB3GJBhw\""
-                    + " IssueInstant=\"2023-02-28T16:27:26.400Z\" Version=\"2.0\">  "
-                    + " <saml2:Assertion xmlns:saml2=\"urn:oasis:names:tc:SAML:2.0:assertion\""
-                    + " ID=\"_6b9580aa-08b1-4f19-8fb6-8b670d070bad\""
-                    + " IssueInstant=\"2023-02-28T16:27:25.400Z\" Version=\"2.0\">\t"
-                    + "\t<saml2:Subject>\t\t\t<saml2:NameID"
-                    + " Format=\"urn:oasis:names:tc:SAML:2.0:nameid-format:transient\""
-                    + " NameQualifier=\"https://posteid.poste.it\">SPID-d4de186b-e103-4b39-8209-0bccc7b1acdd</saml2:NameID>"
-                    + "\t\t\t<saml2:SubjectConfirmation"
-                    + " Method=\"urn:oasis:names:tc:SAML:2.0:cm:bearer\">\t\t\t"
-                    + "\t<saml2:SubjectConfirmationData"
-                    + " InResponseTo=\"sha384-lqxC_2kqMdwiBWoD-Us63Fha6e3bE1Y3yUz8G6IJTldohJCIBVDfvS8acB3GJBhw\""
-                    + " NotOnOrAfter=\"2023-02-28T16:28:25.400Z\""
-                    + " Recipient=\"https://app-backend.io.italia.it/assertionConsumerService\" />"
-                    + "\t\t\t</saml2:SubjectConfirmation>\t\t</saml2:Subject>\t\t<saml2:Conditions"
-                    + " NotBefore=\""
-                        + todayTimestamp
-                        + "\" NotOnOrAfter=\"2023-02-28T16:28:25.400Z\">\t\t"
-                        + "\t<saml2:AudienceRestriction>\t\t\t"
-                        + "\t<saml2:Audience>https://app-backend.io.italia.it</saml2:Audience>\t\t"
-                        + "\t</saml2:AudienceRestriction>\t\t</saml2:Conditions>\t"
-                        + "\t<saml2:AttributeStatement>\t\t\t<saml2:Attribute FriendlyName=\"Codice"
-                        + " fiscale\" Name=\"fiscalNumber\">\t\t\t\t<saml2:AttributeValue"
-                        + " xmlns:xs=\"http://www.w3.org/2001/XMLSchema\""
-                        + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
-                        + " xsi:type=\"xs:string\">TINIT-AAAAAA89S20I111X</saml2:AttributeValue>\t"
-                        + "\t\t</saml2:Attribute>\t\t</saml2:AttributeStatement>"
-                        + "\t</saml2:Assertion></saml2p:Response>";
-        ASSERTION_XML_WITH_VALID_INRESPONSETO_SHA512_ALGORITHM =
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?><saml2p:Response"
-                    + " xmlns:saml2p=\"urn:oasis:names:tc:SAML:2.0:protocol\""
-                    + " Destination=\"https://app-backend.io.italia.it/assertionConsumerService\""
-                    + " ID=\"_de2ce675-f1e5-46fc-96ed-019803471175\""
-                    + " InResponseTo=\"sha512-nX5CfUc5R-FoYKYZwvQMuc4Tt-heb7vHi_O-AMUSqHNVCw9kNaN2SVuN-DXtGXyUhrcVcQdCyY6FVzl_vyWXNA\""
-                    + " IssueInstant=\"2023-02-28T16:27:26.400Z\" Version=\"2.0\">  "
-                    + " <saml2:Assertion xmlns:saml2=\"urn:oasis:names:tc:SAML:2.0:assertion\""
-                    + " ID=\"_6b9580aa-08b1-4f19-8fb6-8b670d070bad\""
-                    + " IssueInstant=\"2023-02-28T16:27:25.400Z\" Version=\"2.0\">\t"
-                    + "\t<saml2:Subject>\t\t\t<saml2:NameID"
-                    + " Format=\"urn:oasis:names:tc:SAML:2.0:nameid-format:transient\""
-                    + " NameQualifier=\"https://posteid.poste.it\">SPID-d4de186b-e103-4b39-8209-0bccc7b1acdd</saml2:NameID>"
-                    + "\t\t\t<saml2:SubjectConfirmation"
-                    + " Method=\"urn:oasis:names:tc:SAML:2.0:cm:bearer\">\t\t\t"
-                    + "\t<saml2:SubjectConfirmationData"
-                    + " InResponseTo=\"sha512-nX5CfUc5R-FoYKYZwvQMuc4Tt-heb7vHi_O-AMUSqHNVCw9kNaN2SVuN-DXtGXyUhrcVcQdCyY6FVzl_vyWXNA\""
-                    + " NotOnOrAfter=\"2023-02-28T16:28:25.400Z\""
-                    + " Recipient=\"https://app-backend.io.italia.it/assertionConsumerService\" />"
-                    + "\t\t\t</saml2:SubjectConfirmation>\t\t</saml2:Subject>\t\t<saml2:Conditions"
-                    + " NotBefore=\""
-                        + todayTimestamp
-                        + "\" NotOnOrAfter=\"2023-02-28T16:28:25.400Z\">\t\t"
-                        + "\t<saml2:AudienceRestriction>\t\t\t"
-                        + "\t<saml2:Audience>https://app-backend.io.italia.it</saml2:Audience>\t\t"
-                        + "\t</saml2:AudienceRestriction>\t\t</saml2:Conditions>\t"
-                        + "\t<saml2:AttributeStatement>\t\t\t<saml2:Attribute FriendlyName=\"Codice"
-                        + " fiscale\" Name=\"fiscalNumber\">\t\t\t\t<saml2:AttributeValue"
-                        + " xmlns:xs=\"http://www.w3.org/2001/XMLSchema\""
-                        + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
-                        + " xsi:type=\"xs:string\">TINIT-AAAAAA89S20I111X</saml2:AttributeValue>\t"
-                        + "\t\t</saml2:Attribute>\t\t</saml2:AttributeStatement>"
-                        + "\t</saml2:Assertion></saml2p:Response>";
-    }
+    private AssertionVerifierServiceImpl sut;
 
     @BeforeEach
     void setUp() {
         idpCertProviderMock = mock(IdpCertProvider.class);
         assertionServiceMock = mock(AssertionService.class);
+        lollipopRequestConfigMock = spy(LollipopConsumerRequestConfig.builder().build());
 
         sut =
-                new AssertionVerifierServiceImpl(
-                        idpCertProviderMock, assertionServiceMock, lollipopRequestConfigMock);
+                spy(
+                        new AssertionVerifierServiceImpl(
+                                idpCertProviderMock,
+                                assertionServiceMock,
+                                lollipopRequestConfigMock));
     }
 
+    @SneakyThrows
     @Test
-    void validateLollipopGetAssertionFailureWithOidcAssertionException()
-            throws OidcAssertionNotSupported, LollipopAssertionNotFoundException {
+    void validateLollipopGetAssertionFailureWithOidcAssertionException() {
         LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
 
         doThrow(OidcAssertionNotSupported.class)
@@ -300,9 +65,9 @@ class AssertionVerifierServiceImplTest {
                 e.getErrorCode());
     }
 
+    @SneakyThrows
     @Test
-    void validateLollipopGetAssertionFailureWithAssertionNotFoundException()
-            throws OidcAssertionNotSupported, LollipopAssertionNotFoundException {
+    void validateLollipopGetAssertionFailureWithAssertionNotFoundException() {
         LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
 
         doThrow(LollipopAssertionNotFoundException.class)
@@ -320,9 +85,9 @@ class AssertionVerifierServiceImplTest {
                 e.getErrorCode());
     }
 
+    @SneakyThrows
     @Test
-    void validateLollipopBuildAssertionDocFailure()
-            throws OidcAssertionNotSupported, LollipopAssertionNotFoundException {
+    void validateLollipopGetAssertionFailureForBuildAssertionDocError() {
         LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
 
         SamlAssertion assertion = new SamlAssertion();
@@ -340,9 +105,33 @@ class AssertionVerifierServiceImplTest {
                 e.getErrorCode());
     }
 
+    @SneakyThrows
     @Test
-    void validateLollipopValidatePeriodFailureWithFieldNotFoundInAssertionDoc()
-            throws OidcAssertionNotSupported, LollipopAssertionNotFoundException {
+    void validateLollipopGetAssertionSuccess() {
+        LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
+
+        SamlAssertion assertion = new SamlAssertion();
+        assertion.setAssertionData(EMPTY_ASSERTION_XML);
+
+        doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateInResponseTo(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(Collections.emptyList()).when(sut).getIdpCertData(any(Document.class));
+        doReturn(true).when(sut).validateSignature(any(Document.class), anyList());
+
+        boolean result = sut.validateLollipop(request);
+
+        assertTrue(result);
+    }
+
+    @SneakyThrows
+    @Test
+    void validateLollipopValidatePeriodFailureWithFieldNotFoundInAssertionDoc() {
         LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
 
         SamlAssertion assertion = new SamlAssertion();
@@ -357,9 +146,9 @@ class AssertionVerifierServiceImplTest {
                 AssertionPeriodException.ErrorCode.INVALID_ASSERTION_PERIOD, e.getErrorCode());
     }
 
+    @SneakyThrows
     @Test
-    void validateLollipopValidatePeriodFailureWithInvalidDateFormat()
-            throws OidcAssertionNotSupported, LollipopAssertionNotFoundException {
+    void validateLollipopValidatePeriodFailureWithInvalidDateFormat() {
         LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
 
         SamlAssertion assertion = new SamlAssertion();
@@ -375,9 +164,9 @@ class AssertionVerifierServiceImplTest {
                 e.getErrorCode());
     }
 
+    @SneakyThrows
     @Test
-    void validateLollipopValidatePeriodFailureWithExpiredAssertion()
-            throws OidcAssertionNotSupported, LollipopAssertionNotFoundException {
+    void validateLollipopValidatePeriodFailureWithExpiredAssertion() {
         LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
 
         SamlAssertion assertion = new SamlAssertion();
@@ -392,15 +181,42 @@ class AssertionVerifierServiceImplTest {
                 AssertionPeriodException.ErrorCode.INVALID_ASSERTION_PERIOD, e.getErrorCode());
     }
 
+    @SneakyThrows
     @Test
-    void validateLollipopValidateUserIdFailureWithoutAttributeTagInAssertionDoc()
-            throws OidcAssertionNotSupported, LollipopAssertionNotFoundException {
+    void validateLollipopValidatePeriodSuccess() {
+        LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
+
+        SamlAssertion assertion = new SamlAssertion();
+        assertion.setAssertionData(
+                new String(Base64.decode(ASSERTION_XML_TIM.getBytes(StandardCharsets.UTF_8))));
+
+        doReturn(365 * 20).when(lollipopRequestConfigMock).getAssertionExpireInDays();
+
+        doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true)
+                .when(sut)
+                .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateInResponseTo(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(Collections.emptyList()).when(sut).getIdpCertData(any(Document.class));
+        doReturn(true).when(sut).validateSignature(any(Document.class), anyList());
+
+        boolean result = sut.validateLollipop(request);
+
+        assertTrue(result);
+    }
+
+    @SneakyThrows
+    @Test
+    void validateLollipopValidateUserIdFailureWithoutAttributeTagInAssertionDoc() {
         LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
 
         SamlAssertion assertion = new SamlAssertion();
         assertion.setAssertionData(ASSERTION_XML_WITHOUT_ATTRIBUTE_TAG);
 
         doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
 
         AssertionUserIdException e =
                 assertThrows(AssertionUserIdException.class, () -> sut.validateLollipop(request));
@@ -409,15 +225,16 @@ class AssertionVerifierServiceImplTest {
                 AssertionUserIdException.ErrorCode.FISCAL_CODE_FIELD_NOT_FOUND, e.getErrorCode());
     }
 
+    @SneakyThrows
     @Test
-    void validateLollipopValidateUserIdFailureWithoutFiscalCodeInAssertionDoc()
-            throws OidcAssertionNotSupported, LollipopAssertionNotFoundException {
+    void validateLollipopValidateUserIdFailureWithoutFiscalCodeInAssertionDoc() {
         LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
 
         SamlAssertion assertion = new SamlAssertion();
         assertion.setAssertionData(ASSERTION_XML_WITHOUT_FISCAL_CODE);
 
         doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
 
         AssertionUserIdException e =
                 assertThrows(AssertionUserIdException.class, () -> sut.validateLollipop(request));
@@ -426,15 +243,16 @@ class AssertionVerifierServiceImplTest {
                 AssertionUserIdException.ErrorCode.FISCAL_CODE_FIELD_NOT_FOUND, e.getErrorCode());
     }
 
+    @SneakyThrows
     @Test
-    void validateLollipopValidateUserIdFailureWithInvalidUserIdHeader()
-            throws OidcAssertionNotSupported, LollipopAssertionNotFoundException {
+    void validateLollipopValidateUserIdFailureWithInvalidUserIdHeader() {
         LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
 
         SamlAssertion assertion = new SamlAssertion();
         assertion.setAssertionData(ASSERTION_XML_WITHOUT_SUBJECTCONFIRMATIONDATA_TAG);
 
         doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
 
         AssertionUserIdException e =
                 assertThrows(AssertionUserIdException.class, () -> sut.validateLollipop(request));
@@ -443,15 +261,41 @@ class AssertionVerifierServiceImplTest {
                 AssertionUserIdException.ErrorCode.INVALID_USER_ID, e.getErrorCode());
     }
 
+    @SneakyThrows
     @Test
-    void validateLollipopValidateThumbprintFailureWithoutSubjectConfirmationDataTagInAssertionDoc()
-            throws OidcAssertionNotSupported, LollipopAssertionNotFoundException {
+    void validateLollipopValidateUserIdSuccess() {
         LollipopConsumerRequest request = getLollipopConsumerRequest("", "", VALID_FISCAL_CODE);
 
         SamlAssertion assertion = new SamlAssertion();
         assertion.setAssertionData(ASSERTION_XML_WITHOUT_SUBJECTCONFIRMATIONDATA_TAG);
 
         doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateInResponseTo(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(Collections.emptyList()).when(sut).getIdpCertData(any(Document.class));
+        doReturn(true).when(sut).validateSignature(any(Document.class), anyList());
+
+        boolean result = sut.validateLollipop(request);
+
+        assertTrue(result);
+    }
+
+    @SneakyThrows
+    @Test
+    void
+            validateLollipopValidateThumbprintFailureWithoutSubjectConfirmationDataTagInAssertionDoc() {
+        LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
+
+        SamlAssertion assertion = new SamlAssertion();
+        assertion.setAssertionData(ASSERTION_XML_WITHOUT_SUBJECTCONFIRMATIONDATA_TAG);
+
+        doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
 
         AssertionThumbprintException e =
                 assertThrows(
@@ -462,15 +306,19 @@ class AssertionVerifierServiceImplTest {
                 e.getErrorCode());
     }
 
+    @SneakyThrows
     @Test
-    void validateLollipopValidateThumbprintFailureWithInvalidInResponseToAlgorithm()
-            throws OidcAssertionNotSupported, LollipopAssertionNotFoundException {
-        LollipopConsumerRequest request = getLollipopConsumerRequest("", "", VALID_FISCAL_CODE);
+    void validateLollipopValidateThumbprintFailureWithInvalidInResponseToAlgorithm() {
+        LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
 
         SamlAssertion assertion = new SamlAssertion();
         assertion.setAssertionData(ASSERTION_XML_WITH_INVALID_INRESPONSETO_ALGORITHM);
 
         doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
 
         AssertionThumbprintException e =
                 assertThrows(
@@ -481,15 +329,19 @@ class AssertionVerifierServiceImplTest {
                 e.getErrorCode());
     }
 
+    @SneakyThrows
     @Test
-    void validateLollipopValidateThumbprintFailureWithErrorCalculatingThumbprint()
-            throws OidcAssertionNotSupported, LollipopAssertionNotFoundException {
-        LollipopConsumerRequest request = getLollipopConsumerRequest("", "", VALID_FISCAL_CODE);
+    void validateLollipopValidateThumbprintFailureWithErrorCalculatingThumbprint() {
+        LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
 
         SamlAssertion assertion = new SamlAssertion();
         assertion.setAssertionData(ASSERTION_XML_WITH_VALID_INRESPONSETO_SHA256_ALGORITHM);
 
         doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
 
         AssertionThumbprintException e =
                 assertThrows(
@@ -501,16 +353,20 @@ class AssertionVerifierServiceImplTest {
         Assertions.assertTrue(e.getCause() instanceof ParseException);
     }
 
+    @SneakyThrows
     @Test
-    void validateLollipopValidateThumbprintFailureWithDifferentAssertionRefAndCalculatedThumbprint()
-            throws OidcAssertionNotSupported, LollipopAssertionNotFoundException {
-        LollipopConsumerRequest request =
-                getLollipopConsumerRequest("", VALID_JWK, VALID_FISCAL_CODE);
+    void
+            validateLollipopValidateThumbprintFailureWithDifferentAssertionRefAndCalculatedThumbprint() {
+        LollipopConsumerRequest request = getLollipopConsumerRequest("", VALID_JWK, "");
 
         SamlAssertion assertion = new SamlAssertion();
         assertion.setAssertionData(ASSERTION_XML_WITH_VALID_INRESPONSETO_SHA256_ALGORITHM);
 
         doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
 
         AssertionThumbprintException e =
                 assertThrows(
@@ -520,61 +376,323 @@ class AssertionVerifierServiceImplTest {
                 AssertionThumbprintException.ErrorCode.INVALID_IN_RESPONSE_TO, e.getErrorCode());
     }
 
+    @SneakyThrows
     @Test
-    void validateLollipopSuccessWithSHA256Algorithm()
-            throws LollipopAssertionNotFoundException, AssertionPeriodException,
-                    AssertionThumbprintException, AssertionUserIdException,
-                    ErrorRetrievingAssertionException, OidcAssertionNotSupported {
+    void validateLollipopValidateThumbprintSHA256Success() {
         LollipopConsumerRequest request =
-                getLollipopConsumerRequest(
-                        VALID_SHA_256_ASSERTION_REF, VALID_JWK, VALID_FISCAL_CODE);
+                getLollipopConsumerRequest(VALID_SHA_256_ASSERTION_REF, VALID_JWK, "");
 
         SamlAssertion assertion = new SamlAssertion();
         assertion.setAssertionData(ASSERTION_XML_WITH_VALID_INRESPONSETO_SHA256_ALGORITHM);
 
         doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(Collections.emptyList()).when(sut).getIdpCertData(any(Document.class));
+        doReturn(true).when(sut).validateSignature(any(Document.class), anyList());
 
         boolean result = sut.validateLollipop(request);
 
-        Assertions.assertTrue(result);
+        assertTrue(result);
     }
 
+    @SneakyThrows
     @Test
-    void validateLollipopSuccessWithSHA384Algorithm()
-            throws LollipopAssertionNotFoundException, AssertionPeriodException,
-                    AssertionThumbprintException, AssertionUserIdException,
-                    ErrorRetrievingAssertionException, OidcAssertionNotSupported {
+    void validateLollipopValidateThumbprintSHA384Success() {
         LollipopConsumerRequest request =
-                getLollipopConsumerRequest(
-                        VALID_SHA_384_ASSERTION_REF, VALID_JWK, VALID_FISCAL_CODE);
+                getLollipopConsumerRequest(VALID_SHA_384_ASSERTION_REF, VALID_JWK, "");
 
         SamlAssertion assertion = new SamlAssertion();
         assertion.setAssertionData(ASSERTION_XML_WITH_VALID_INRESPONSETO_SHA384_ALGORITHM);
 
         doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(Collections.emptyList()).when(sut).getIdpCertData(any(Document.class));
+        doReturn(true).when(sut).validateSignature(any(Document.class), anyList());
 
         boolean result = sut.validateLollipop(request);
 
-        Assertions.assertTrue(result);
+        assertTrue(result);
     }
 
+    @SneakyThrows
     @Test
-    void validateLollipopSuccessWithSHA512Algorithm()
-            throws LollipopAssertionNotFoundException, AssertionPeriodException,
-                    AssertionThumbprintException, AssertionUserIdException,
-                    ErrorRetrievingAssertionException, OidcAssertionNotSupported {
+    void validateLollipopValidateThumbprintSHA512Success() {
         LollipopConsumerRequest request =
-                getLollipopConsumerRequest(
-                        VALID_SHA_512_ASSERTION_REF, VALID_JWK, VALID_FISCAL_CODE);
+                getLollipopConsumerRequest(VALID_SHA_512_ASSERTION_REF, VALID_JWK, "");
 
         SamlAssertion assertion = new SamlAssertion();
         assertion.setAssertionData(ASSERTION_XML_WITH_VALID_INRESPONSETO_SHA512_ALGORITHM);
 
         doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(Collections.emptyList()).when(sut).getIdpCertData(any(Document.class));
+        doReturn(true).when(sut).validateSignature(any(Document.class), anyList());
 
         boolean result = sut.validateLollipop(request);
 
-        Assertions.assertTrue(result);
+        assertTrue(result);
+    }
+
+    @SneakyThrows
+    @Test
+    void validateLollipopGetIdpCertDataFailureForMissingInstantField() {
+        LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
+
+        SamlAssertion assertion = new SamlAssertion();
+        assertion.setAssertionData(ASSERTION_XML_WITHOUT_INSTANT_FIELD);
+
+        doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateInResponseTo(any(LollipopConsumerRequest.class), any(Document.class));
+
+        ErrorRetrievingIdpCertDataException e =
+                assertThrows(
+                        ErrorRetrievingIdpCertDataException.class,
+                        () -> sut.validateLollipop(request));
+
+        Assertions.assertEquals(
+                ErrorRetrievingIdpCertDataException.ErrorCode.INSTANT_FIELD_NOT_FOUND,
+                e.getErrorCode());
+    }
+
+    @SneakyThrows
+    @Test
+    void validateLollipopGetIdpCertDataFailureForMissingEntityIdField() {
+        LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
+
+        SamlAssertion assertion = new SamlAssertion();
+        assertion.setAssertionData(ASSERTION_XML_WITHOUT_ENTITY_ID_FIELD);
+
+        doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateInResponseTo(any(LollipopConsumerRequest.class), any(Document.class));
+
+        ErrorRetrievingIdpCertDataException e =
+                assertThrows(
+                        ErrorRetrievingIdpCertDataException.class,
+                        () -> sut.validateLollipop(request));
+
+        Assertions.assertEquals(
+                ErrorRetrievingIdpCertDataException.ErrorCode.ENTITY_ID_FIELD_NOT_FOUND,
+                e.getErrorCode());
+    }
+
+    @SneakyThrows
+    @Test
+    void validateLollipopGetIdpCertDataFailureForIdpCertDataNotFoundException() {
+        LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
+
+        SamlAssertion assertion = new SamlAssertion();
+        assertion.setAssertionData(ASSERTION_XML_WITH_VALID_ENTITY_ID_FIELD);
+
+        doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateInResponseTo(any(LollipopConsumerRequest.class), any(Document.class));
+        doThrow(CertDataNotFoundException.class)
+                .when(idpCertProviderMock)
+                .getIdpCertData(anyString(), anyString());
+
+        ErrorRetrievingIdpCertDataException e =
+                assertThrows(
+                        ErrorRetrievingIdpCertDataException.class,
+                        () -> sut.validateLollipop(request));
+
+        Assertions.assertEquals(
+                ErrorRetrievingIdpCertDataException.ErrorCode.IDP_CERT_DATA_NOT_FOUND,
+                e.getErrorCode());
+    }
+
+    @SneakyThrows
+    @Test
+    void validateLollipopGetIdpCertDataSuccessWithWarningForInvalidInstantDateFormat() {
+        LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
+
+        SamlAssertion assertion = new SamlAssertion();
+        assertion.setAssertionData(ASSERTION_XML_WITH_INVALID_INSTANT_FORMAT);
+
+        doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateInResponseTo(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(true).when(sut).validateSignature(any(Document.class), anyList());
+
+        boolean result = sut.validateLollipop(request);
+
+        assertTrue(result);
+    }
+
+    @SneakyThrows
+    @Test
+    void validateLollipopGetIdpCertDataSuccess() {
+        LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
+
+        SamlAssertion assertion = new SamlAssertion();
+        assertion.setAssertionData(ASSERTION_XML_WITH_VALID_ENTITY_ID_FIELD);
+
+        doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateInResponseTo(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(true).when(sut).validateSignature(any(Document.class), anyList());
+
+        boolean result = sut.validateLollipop(request);
+
+        assertTrue(result);
+    }
+
+    @SneakyThrows
+    @Test
+    void validateLollipopValidateSignatureFailureForErrorUnmarshalAssertion() {
+        LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
+
+        SamlAssertion assertion = new SamlAssertion();
+        assertion.setAssertionData(EMPTY_ASSERTION_XML);
+
+        IdpCertData idpCertData = new IdpCertData();
+        idpCertData.setCertData(Collections.singletonList(CERTIFICATE_TIM_LATEST));
+
+        doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateInResponseTo(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(Collections.singletonList(idpCertData))
+                .when(sut)
+                .getIdpCertData(any(Document.class));
+
+        ErrorValidatingAssertionSignature e =
+                assertThrows(
+                        ErrorValidatingAssertionSignature.class,
+                        () -> sut.validateLollipop(request));
+
+        Assertions.assertEquals(
+                ErrorValidatingAssertionSignature.ErrorCode.ERROR_PARSING_ASSERTION,
+                e.getErrorCode());
+    }
+
+    @SneakyThrows
+    @Test
+    void validateLollipopValidateSignatureFailureForMissingSignature() {
+        LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
+
+        SamlAssertion assertion = new SamlAssertion();
+        assertion.setAssertionData(ASSERTION_XML_WITH_VALID_INRESPONSETO_SHA256_ALGORITHM);
+
+        IdpCertData idpCertData = new IdpCertData();
+        idpCertData.setCertData(Collections.singletonList(CERTIFICATE_TIM_LATEST));
+
+        doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateInResponseTo(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(Collections.singletonList(idpCertData))
+                .when(sut)
+                .getIdpCertData(any(Document.class));
+
+        ErrorValidatingAssertionSignature e =
+                assertThrows(
+                        ErrorValidatingAssertionSignature.class,
+                        () -> sut.validateLollipop(request));
+
+        Assertions.assertEquals(
+                ErrorValidatingAssertionSignature.ErrorCode.MISSING_ASSERTION_SIGNATURE,
+                e.getErrorCode());
+    }
+
+    @SneakyThrows
+    @Test
+    void validateLollipopValidateSignatureFailureForSignatureNotValid() {
+        LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
+
+        SamlAssertion assertion = new SamlAssertion();
+        assertion.setAssertionData(ASSERTION_XML_WITH_INVALID_SIGNATURE);
+
+        IdpCertData idpCertData = new IdpCertData();
+        idpCertData.setCertData(Collections.singletonList(CERTIFICATE_TIM_LATEST));
+
+        doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateInResponseTo(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(Collections.singletonList(idpCertData))
+                .when(sut)
+                .getIdpCertData(any(Document.class));
+
+        boolean result = sut.validateLollipop(request);
+
+        assertFalse(result);
+    }
+
+    @SneakyThrows
+    @Test
+    void validateLollipopSuccess() {
+        LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
+
+        SamlAssertion assertion = new SamlAssertion();
+        assertion.setAssertionData(
+                new String(Base64.decode(ASSERTION_XML_TIM.getBytes(StandardCharsets.UTF_8))));
+
+        IdpCertData idpCertData = new IdpCertData();
+        idpCertData.setCertData(Collections.singletonList(CERTIFICATE_TIM_LATEST));
+
+        doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateInResponseTo(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(Collections.singletonList(idpCertData))
+                .when(sut)
+                .getIdpCertData(any(Document.class));
+
+        boolean result = sut.validateLollipop(request);
+
+        assertTrue(result);
     }
 
     private LollipopConsumerRequest getLollipopConsumerRequest(

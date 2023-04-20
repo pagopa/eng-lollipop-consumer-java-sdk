@@ -14,10 +14,17 @@ import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
 import it.pagopa.tech.lollipop.consumer.service.AssertionVerifierService;
+import it.pagopa.tech.lollipop.consumer.utils.LollipopSamlAssertionWrapper;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
@@ -28,14 +35,17 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import lombok.extern.java.Log;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-@Log
 /** Standard implementation of {@link AssertionVerifierService} */
+@Log
 public class AssertionVerifierServiceImpl implements AssertionVerifierService {
 
     private final IdpCertProvider idpCertProvider;
@@ -43,6 +53,8 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
     private final LollipopConsumerRequestConfig lollipopRequestConfig;
 
     private static final String IN_RESPONSE_TO = "InResponseTo";
+    private static final String ISSUE_INSTANT = "IssueInstant";
+    private static final String NOT_BEFORE = "NotBefore";
 
     @Inject
     public AssertionVerifierServiceImpl(
@@ -60,14 +72,14 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
     @Override
     public boolean validateLollipop(LollipopConsumerRequest request)
             throws ErrorRetrievingAssertionException, AssertionPeriodException,
-                    AssertionThumbprintException, AssertionUserIdException {
+                    AssertionThumbprintException, AssertionUserIdException,
+                    ErrorRetrievingIdpCertDataException, ErrorValidatingAssertionSignature {
         Map<String, String> headerParams = request.getHeaderParams();
 
-        SamlAssertion assertion =
+        Document assertionDoc =
                 getAssertion(
                         headerParams.get(lollipopRequestConfig.getAuthJWTHeader()),
                         headerParams.get(lollipopRequestConfig.getAssertionRefHeader()));
-        Document assertionDoc = buildDocumentFromAssertion(assertion);
 
         boolean isAssertionPeriodValid = validateAssertionPeriod(assertionDoc);
         if (!isAssertionPeriodValid) {
@@ -91,13 +103,15 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
                             + " assertion");
         }
 
-        return true;
+        List<IdpCertData> idpCertDataList = getIdpCertData(assertionDoc);
+        return validateSignature(assertionDoc, idpCertDataList);
     }
 
-    private SamlAssertion getAssertion(String jwt, String assertionRef)
+    private Document getAssertion(String jwt, String assertionRef)
             throws ErrorRetrievingAssertionException {
+        SamlAssertion assertion;
         try {
-            return assertionService.getAssertion(jwt, assertionRef);
+            assertion = assertionService.getAssertion(jwt, assertionRef);
         } catch (OidcAssertionNotSupported e) {
             throw new ErrorRetrievingAssertionException(
                     ErrorRetrievingAssertionException.ErrorCode.OIDC_TYPE_NOT_SUPPORTED,
@@ -109,18 +123,20 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
                     e.getMessage(),
                     e);
         }
+        return buildDocumentFromAssertion(assertion);
     }
 
-    private boolean validateAssertionPeriod(Document assertionDoc) throws AssertionPeriodException {
+    protected boolean validateAssertionPeriod(Document assertionDoc)
+            throws AssertionPeriodException {
         NodeList listElements =
                 assertionDoc.getElementsByTagNameNS(
                         lollipopRequestConfig.getSamlNamespaceAssertion(),
                         lollipopRequestConfig.getAssertionNotBeforeTag());
-        if (listElements == null || listElements.getLength() <= 0) {
+        if (isElementNotFound(listElements, NOT_BEFORE)) {
             return false;
         }
         String notBefore =
-                listElements.item(0).getAttributes().getNamedItem("NotBefore").getNodeValue();
+                listElements.item(0).getAttributes().getNamedItem(NOT_BEFORE).getNodeValue();
 
         long notBeforeMilliseconds;
         try {
@@ -142,7 +158,7 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         return 0 <= dateNowLessNotBefore && (dateNowLessNotBefore <= expiresAfterMilliseconds);
     }
 
-    private boolean validateUserId(LollipopConsumerRequest request, Document assertionDoc)
+    protected boolean validateUserId(LollipopConsumerRequest request, Document assertionDoc)
             throws AssertionUserIdException {
         String userIdHeader =
                 request.getHeaderParams().get(lollipopRequestConfig.getUserIdHeader());
@@ -157,13 +173,13 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         return userIdFromAssertion.equals(userIdHeader);
     }
 
-    private boolean validateInResponseTo(LollipopConsumerRequest request, Document assertionDoc)
+    protected boolean validateInResponseTo(LollipopConsumerRequest request, Document assertionDoc)
             throws AssertionThumbprintException {
         NodeList listElements =
                 assertionDoc.getElementsByTagNameNS(
                         lollipopRequestConfig.getSamlNamespaceAssertion(),
                         lollipopRequestConfig.getAssertionInResponseToTag());
-        if (isInResponseToFieldFound(listElements)) {
+        if (isElementNotFound(listElements, IN_RESPONSE_TO)) {
             throw new AssertionThumbprintException(
                     AssertionThumbprintException.ErrorCode.IN_RESPONSE_TO_FIELD_NOT_FOUND,
                     "Missing request id in the retrieved saml assertion");
@@ -182,12 +198,88 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         return inResponseTo.equals(calculatedThumbprint) && inResponseTo.equals(assertionRefHeader);
     }
 
-    private IdpCertData getIdpCertData(SamlAssertion assertion) {
-        return null;
+    protected List<IdpCertData> getIdpCertData(Document assertionDoc)
+            throws ErrorRetrievingIdpCertDataException {
+        NodeList listElements =
+                assertionDoc.getElementsByTagNameNS(
+                        lollipopRequestConfig.getSamlNamespaceAssertion(),
+                        lollipopRequestConfig.getAssertionInstantTag());
+        if (isElementNotFound(listElements, ISSUE_INSTANT)) {
+            throw new ErrorRetrievingIdpCertDataException(
+                    ErrorRetrievingIdpCertDataException.ErrorCode.INSTANT_FIELD_NOT_FOUND,
+                    "Missing instant field in the retrieved saml assertion");
+        }
+        String instant =
+                listElements.item(0).getAttributes().getNamedItem(ISSUE_INSTANT).getNodeValue();
+
+        String entityId = getEntityId(listElements.item(0).getChildNodes());
+        if (entityId == null) {
+            throw new ErrorRetrievingIdpCertDataException(
+                    ErrorRetrievingIdpCertDataException.ErrorCode.ENTITY_ID_FIELD_NOT_FOUND,
+                    "Missing entity id field in the retrieved saml assertion");
+        }
+        instant = parseInstantToMillis(instant);
+        try {
+            return idpCertProvider.getIdpCertData(instant, entityId.trim());
+        } catch (CertDataNotFoundException e) {
+            throw new ErrorRetrievingIdpCertDataException(
+                    ErrorRetrievingIdpCertDataException.ErrorCode.IDP_CERT_DATA_NOT_FOUND,
+                    "Some error occurred in retrieving certification data from IDP",
+                    e);
+        }
     }
 
-    private boolean validateSignature(SamlAssertion assertion, IdpCertData idpCertData) {
+    protected boolean validateSignature(Document assertionDoc, List<IdpCertData> idpCertDataList)
+            throws ErrorValidatingAssertionSignature {
+        LollipopSamlAssertionWrapper wrapper;
+        try {
+            wrapper =
+                    new LollipopSamlAssertionWrapper(
+                            (Element)
+                                    assertionDoc
+                                            .getElementsByTagNameNS(
+                                                    lollipopRequestConfig
+                                                            .getSamlNamespaceAssertion(),
+                                                    lollipopRequestConfig.getAssertionInstantTag())
+                                            .item(0));
+        } catch (WSSecurityException e) {
+            throw new ErrorValidatingAssertionSignature(
+                    ErrorValidatingAssertionSignature.ErrorCode.ERROR_PARSING_ASSERTION,
+                    "Failed to build SAML object from assertion",
+                    e);
+        }
+
+        return validateSignature(idpCertDataList, wrapper);
+    }
+
+    private boolean validateSignature(
+            List<IdpCertData> idpCertDataList, LollipopSamlAssertionWrapper wrapper)
+            throws ErrorValidatingAssertionSignature {
+        for (IdpCertData idpCertData : idpCertDataList) {
+            for (String certData : idpCertData.getCertData()) {
+                try {
+                    X509Certificate x509Certificate = getX509Certificate(certData);
+                    wrapper.verifySignatureLollipop(
+                            new SAMLKeyInfo(new X509Certificate[] {x509Certificate}));
+                } catch (CertificateException | WSSecurityException e) {
+                    // CertificateException: Failed to generate X509 certificate from IDP metadata
+                    // or
+                    // WSSecurityException: Failed to validate assertion signature
+                    // this exceptions are ignored because if the signature validation fail for one
+                    // certificate it may pass with one of the other certificates
+                    continue;
+                }
+                return true;
+            }
+        }
         return false;
+    }
+
+    private X509Certificate getX509Certificate(String idpCertificate) throws CertificateException {
+        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+        InputStream fileStream =
+                new ByteArrayInputStream(Base64.getMimeDecoder().decode(idpCertificate));
+        return (X509Certificate) certificateFactory.generateCertificate(fileStream);
     }
 
     private static Document buildDocumentFromAssertion(SamlAssertion assertion)
@@ -209,13 +301,13 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         }
     }
 
-    private boolean isInResponseToFieldFound(NodeList listElements) {
+    private boolean isElementNotFound(NodeList listElements, String elementName) {
         return listElements == null
                 || listElements.getLength() <= 0
                 || listElements.item(0) == null
-                || listElements.item(0).getAttributes() == null
-                || listElements.item(0).getAttributes().getNamedItem(IN_RESPONSE_TO) == null
-                || listElements.item(0).getAttributes().getNamedItem(IN_RESPONSE_TO).getNodeValue()
+                || !listElements.item(0).hasAttributes()
+                || listElements.item(0).getAttributes().getNamedItem(elementName) == null
+                || listElements.item(0).getAttributes().getNamedItem(elementName).getNodeValue()
                         == null;
     }
 
@@ -294,6 +386,22 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         return calculatedThumbprint;
     }
 
+    private String getEntityId(NodeList listElements) {
+        if (listElements == null) {
+            return null;
+        }
+        for (int i = 0; i < listElements.getLength(); i++) {
+            Node item = listElements.item(i);
+            if (item != null
+                    && item.getLocalName() != null
+                    && item.getLocalName().equals(lollipopRequestConfig.getAssertionEntityIdTag())
+                    && item.getTextContent() != null) {
+                return item.getTextContent();
+            }
+        }
+        return null;
+    }
+
     private String getPublicKey(String publicKey) {
         try {
             publicKey = new String(Base64.getDecoder().decode(publicKey));
@@ -301,5 +409,20 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
             log.log(Level.FINE, "Key not in Base64");
         }
         return publicKey;
+    }
+
+    private String parseInstantToMillis(String instant) {
+        String instantDateFormat = lollipopRequestConfig.getAssertionInstantDateFormat();
+        try {
+            instant =
+                    Long.toString(new SimpleDateFormat(instantDateFormat).parse(instant).getTime());
+        } catch (ParseException e) {
+            String msg =
+                    String.format(
+                            "Retrieved instant %s does not match expected format %s",
+                            instant, instantDateFormat);
+            log.log(Level.WARNING, msg);
+        }
+        return instant;
     }
 }

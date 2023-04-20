@@ -13,8 +13,14 @@ public enum AssertionVerificationResultCode {
     /** Saml assertion validation failed on user id validation */
     USER_ID_VALIDATION_ERROR,
 
-    /** Saml assertion validation failed on thumbpriint validation */
+    /** Saml assertion validation failed on thumbprint validation */
     THUMBPRINT_VALIDATION_ERROR,
+
+    /** Saml assertion validation failed on signature validation */
+    SIGNATURE_VALIDATION_ERROR,
+
+    /** Saml assertion validation failed on retrieving identity provider's certification data */
+    IDP_CERT_DATA_RETRIEVING_ERROR,
 
     /** Saml assertion validation failed without throwing an exception */
     ASSERTION_VERIFICATION_FAILED,

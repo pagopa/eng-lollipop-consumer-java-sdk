@@ -2,7 +2,6 @@
 package it.pagopa.tech.lollipop.consumer.idp.impl;
 
 import it.pagopa.tech.lollipop.consumer.exception.CertDataNotFoundException;
-import it.pagopa.tech.lollipop.consumer.exception.CertDataTagListNotFoundException;
 import it.pagopa.tech.lollipop.consumer.idp.IdpCertProvider;
 import it.pagopa.tech.lollipop.consumer.idp.client.IdpCertClient;
 import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorageConfig;
@@ -12,7 +11,7 @@ import javax.inject.Inject;
 
 public class IdpCertProviderImpl implements IdpCertProvider {
 
-    private IdpCertClient idpCertClient;
+    private final IdpCertClient idpCertClient;
 
     @Inject
     public IdpCertProviderImpl(IdpCertClient idpCertClient) {
@@ -31,14 +30,12 @@ public class IdpCertProviderImpl implements IdpCertProvider {
      * @param entityId Identity Provider ID
      * @param assertionInstant Assertion Issue Instant
      * @return the certifications issued before and after the timestamp instant
-     * @throws CertDataTagListNotFoundException if an error occurred retrieving the list of tags or
-     *     filtering the tags with the instant
      * @throws CertDataNotFoundException if an error occurred retrieving the certification XML or if
      *     data for the given entityId were not found
      */
     @Override
     public List<IdpCertData> getIdpCertData(String assertionInstant, String entityId)
-            throws CertDataTagListNotFoundException, CertDataNotFoundException {
+            throws CertDataNotFoundException {
         if (assertionInstant == null
                 || assertionInstant.isBlank()
                 || entityId == null
@@ -51,6 +48,6 @@ public class IdpCertProviderImpl implements IdpCertProvider {
             throw new IllegalArgumentException(errMsg);
         }
 
-        return idpCertClient.getCertData(assertionInstant, entityId);
+        return idpCertClient.getCertData(entityId, assertionInstant);
     }
 }

@@ -45,6 +45,8 @@ dependencies {
 	implementation 'javax.inject:javax.inject:1'
 	implementation 'com.nimbusds:nimbus-jose-jwt:9.31'
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
+	implementation 'org.apache.wss4j:wss4j-ws-security-common:2.4.1'
+
 	// Use JUnit Jupiter for testing.
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
 	testImplementation 'org.mockito:mockito-core:5.2.0'
