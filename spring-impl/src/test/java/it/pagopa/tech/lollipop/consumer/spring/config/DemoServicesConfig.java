@@ -13,11 +13,18 @@ import it.pagopa.tech.lollipop.consumer.idp.IdpCertProviderFactory;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.IdpCertSimpleClientConfig;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.IdpCertSimpleClientProvider;
 import it.pagopa.tech.lollipop.consumer.idp.impl.IdpCertProviderFactoryImpl;
+import it.pagopa.tech.lollipop.consumer.logger.LollipopLoggerServiceFactory;
+import it.pagopa.tech.lollipop.consumer.logger.impl.LollipopLogbackLoggerServiceFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class DemoServicesConfig {
+
+    @Bean
+    public LollipopLoggerServiceFactory lollipopLoggerServiceFactory() {
+        return new LollipopLogbackLoggerServiceFactory();
+    }
 
     @Bean
     public SpringLollipopConsumerRequestConfig verifierConfiguration() {

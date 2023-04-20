@@ -1,3 +1,4 @@
+/* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.logger.impl;
 
 import it.pagopa.tech.lollipop.consumer.logger.LollipopLoggerService;
@@ -8,5 +9,4 @@ public class LollipopLogbackLoggerServiceFactory implements LollipopLoggerServic
     public LollipopLoggerService create() {
         return new LollipopLogbackLoggerService();
     }
-
 }

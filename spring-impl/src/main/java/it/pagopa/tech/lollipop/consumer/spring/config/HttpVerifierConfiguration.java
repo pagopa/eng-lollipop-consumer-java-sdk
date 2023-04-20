@@ -7,6 +7,7 @@ import it.pagopa.tech.lollipop.consumer.command.impl.LollipopConsumerCommandBuil
 import it.pagopa.tech.lollipop.consumer.helper.LollipopConsumerFactoryHelper;
 import it.pagopa.tech.lollipop.consumer.http_verifier.HttpMessageVerifierFactory;
 import it.pagopa.tech.lollipop.consumer.idp.IdpCertProviderFactory;
+import it.pagopa.tech.lollipop.consumer.logger.LollipopLoggerServiceFactory;
 import it.pagopa.tech.lollipop.consumer.service.LollipopConsumerRequestValidationService;
 import it.pagopa.tech.lollipop.consumer.service.impl.LollipopConsumerRequestValidationServiceImpl;
 import it.pagopa.tech.lollipop.consumer.spring.HttpVerifierHandlerInterceptor;
@@ -22,12 +23,14 @@ public class HttpVerifierConfiguration {
 
     @Bean
     public LollipopConsumerFactoryHelper lollipopConsumerFactoryHelper(
+            LollipopLoggerServiceFactory lollipopLoggerServiceFactory,
             HttpMessageVerifierFactory httpMessageVerifierFactory,
             IdpCertProviderFactory idpCertProviderFactory,
             AssertionServiceFactory assertionServiceFactory,
             LollipopConsumerRequestValidationService lollipopConsumerRequestValidationService,
             SpringLollipopConsumerRequestConfig springLollipopConsumerRequestConfig) {
         return new LollipopConsumerFactoryHelper(
+                lollipopLoggerServiceFactory,
                 httpMessageVerifierFactory,
                 idpCertProviderFactory,
                 assertionServiceFactory,

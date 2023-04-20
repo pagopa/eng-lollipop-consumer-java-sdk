@@ -9,6 +9,7 @@ import it.pagopa.tech.lollipop.consumer.assertion.AssertionService;
 import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
 import it.pagopa.tech.lollipop.consumer.exception.*;
 import it.pagopa.tech.lollipop.consumer.idp.IdpCertProvider;
+import it.pagopa.tech.lollipop.consumer.logger.impl.LollipopLogbackLoggerService;
 import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
@@ -40,6 +41,7 @@ class AssertionVerifierServiceImplTest {
         sut =
                 spy(
                         new AssertionVerifierServiceImpl(
+                                new LollipopLogbackLoggerService(),
                                 idpCertProviderMock,
                                 assertionServiceMock,
                                 lollipopRequestConfigMock));

@@ -12,7 +12,6 @@ import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.service.AssertionVerifierService;
 import it.pagopa.tech.lollipop.consumer.service.HttpMessageVerifierService;
 import it.pagopa.tech.lollipop.consumer.service.LollipopConsumerRequestValidationService;
-
 import java.io.UnsupportedEncodingException;
 import javax.inject.Inject;
 
@@ -38,7 +37,7 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
             AssertionVerifierService assertionVerifierService,
             LollipopConsumerRequestValidationService requestValidationService,
             LollipopLoggerService lollipopLoggerService,
-        LollipopConsumerRequest lollipopConsumerRequest) {
+            LollipopConsumerRequest lollipopConsumerRequest) {
         this.lollipopConsumerRequestConfig = lollipopConsumerRequestConfig;
         this.messageVerifierService = messageVerifierService;
         this.assertionVerifierService = assertionVerifierService;
@@ -60,27 +59,22 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
 
         try {
             requestValidationService.validateLollipopRequest(request);
-        } catch (LollipopRequestContentValidationException e) {
-            String message =
-                    String.format(
-                            "Error validating Lollipop request header or body, validation failed"
-                                    + CODE_AND_MESSAGE,
-                            e.getErrorCode(),
-                            e.getMessage());
-            return buildCommandResult(REQUEST_PARAMS_VALIDATION_FAILED, message);
-        }
 
             CommandResult messageVerificationResult = getHttpMessageVerificationResult(request);
             if (!messageVerificationResult
                     .getResultCode()
-                    .equals(HttpMessageVerificationResultCode.HTTP_MESSAGE_VALIDATION_SUCCESS.name())) {
+                    .equals(
+                            HttpMessageVerificationResultCode.HTTP_MESSAGE_VALIDATION_SUCCESS
+                                    .name())) {
                 logRequestAndResponse(request, messageVerificationResult);
                 return messageVerificationResult;
             }
             CommandResult assertionVerificationResult = getAssertionVerificationResult(request);
             if (!assertionVerificationResult
                     .getResultCode()
-                    .equals(AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name())) {
+                    .equals(
+                            AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS
+                                    .name())) {
                 logRequestAndResponse(request, assertionVerificationResult);
                 return assertionVerificationResult;
             }
@@ -96,7 +90,9 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
             return commandResult;
         }
 
-        commandResult = buildCommandResult(VERIFICATION_SUCCESS_CODE, "Verification completed successfully");
+        commandResult =
+                buildCommandResult(
+                        VERIFICATION_SUCCESS_CODE, "Verification completed successfully");
         logRequestAndResponse(request, commandResult);
         return commandResult;
     }
@@ -223,12 +219,13 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
         return new CommandResult(resultCode, message);
     }
 
-    private void logRequestAndResponse(LollipopConsumerRequest lollipopConsumerRequest, CommandResult commandResult) {
+    private void logRequestAndResponse(
+            LollipopConsumerRequest lollipopConsumerRequest, CommandResult commandResult) {
         if (lollipopConsumerRequestConfig.isEnableConsumerLogging()) {
-            lollipopLoggerService.log("Lollipop validation for request: {} completed with the result: {}",
-                    lollipopConsumerRequest, commandResult);
+            lollipopLoggerService.log(
+                    "Lollipop validation for request: {} completed with the result: {}",
+                    lollipopConsumerRequest,
+                    commandResult);
         }
-
     }
-
 }

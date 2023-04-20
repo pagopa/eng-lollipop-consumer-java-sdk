@@ -12,5 +12,4 @@ public class SamlAssertion {
 
     private String assertionRef;
     private String assertionData;
-
 }
