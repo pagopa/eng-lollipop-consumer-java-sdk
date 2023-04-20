@@ -3,6 +3,7 @@ package it.pagopa.tech.lollipop.consumer.idp.client.simple;
 
 import it.pagopa.tech.lollipop.consumer.exception.*;
 import it.pagopa.tech.lollipop.consumer.idp.client.IdpCertClient;
+import it.pagopa.tech.lollipop.consumer.idp.client.simple.exception.TagListSearchOutOfBoundException;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.ApiClient;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.ApiException;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.api.DefaultApi;

@@ -11,7 +11,7 @@ import javax.inject.Inject;
 
 public class IdpCertProviderImpl implements IdpCertProvider {
 
-    private IdpCertClient idpCertClient;
+    private final IdpCertClient idpCertClient;
 
     @Inject
     public IdpCertProviderImpl(IdpCertClient idpCertClient) {
