@@ -218,15 +218,7 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
                     ErrorRetrievingIdpCertDataException.ErrorCode.ENTITY_ID_FIELD_NOT_FOUND,
                     "Missing entity id field in the retrieved saml assertion");
         }
-        try {
-            instant =
-                    Long.toString(
-                            new SimpleDateFormat(
-                                            lollipopRequestConfig.getAssertionNotBeforeDateFormat())
-                                    .parse(instant)
-                                    .getTime());
-        } catch (ParseException e) {
-        }
+        instant = parseInstantToMillis(instant);
         try {
             return idpCertProvider.getIdpCertData(instant, entityId.trim());
         } catch (CertDataNotFoundException e) {
@@ -417,5 +409,20 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
             log.log(Level.FINE, "Key not in Base64");
         }
         return publicKey;
+    }
+
+    private String parseInstantToMillis(String instant) {
+        String instantDateFormat = lollipopRequestConfig.getAssertionInstantDateFormat();
+        try {
+            instant =
+                    Long.toString(new SimpleDateFormat(instantDateFormat).parse(instant).getTime());
+        } catch (ParseException e) {
+            String msg =
+                    String.format(
+                            "Retrieved instant %s does not match expected format %s",
+                            instant, instantDateFormat);
+            log.log(Level.WARNING, msg);
+        }
+        return instant;
     }
 }

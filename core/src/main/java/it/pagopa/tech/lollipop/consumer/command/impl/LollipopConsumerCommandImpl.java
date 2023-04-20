@@ -22,6 +22,7 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
 
     private final LollipopConsumerRequest request;
 
+    private static final String CODE_AND_MESSAGE = " with error code: %s and message: %s";
     public static final String VERIFICATION_SUCCESS_CODE = "SUCCESS";
     public static final String REQUEST_PARAMS_VALIDATION_FAILED =
             "REQUEST PARAMS VALIDATION FAILED";
@@ -53,8 +54,9 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
             String message =
                     String.format(
                             "Error validating Lollipop request header or body, validation failed"
-                                    + " with error code %s and message: %s",
-                            e.getErrorCode(), e.getMessage());
+                                    + CODE_AND_MESSAGE,
+                            e.getErrorCode(),
+                            e.getMessage());
             return buildCommandResult(REQUEST_PARAMS_VALIDATION_FAILED, message);
         }
 
@@ -80,49 +82,52 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
         } catch (ErrorRetrievingAssertionException e) {
             String message =
                     String.format(
-                            "Cannot obtain the assertion, validation failed with error code %s"
-                                    + " and message: %s",
-                            e.getErrorCode(), e.getMessage());
+                            "Cannot obtain the assertion, validation failed" + CODE_AND_MESSAGE,
+                            e.getErrorCode(),
+                            e.getMessage());
             return buildCommandResult(
                     AssertionVerificationResultCode.ERROR_RETRIEVING_ASSERTION.name(), message);
         } catch (AssertionPeriodException e) {
             String message =
                     String.format(
-                            "Assertion validation failed on verifying period with error code %s"
-                                    + " and message: %s",
-                            e.getErrorCode(), e.getMessage());
+                            "Assertion validation failed on verifying period" + CODE_AND_MESSAGE,
+                            e.getErrorCode(),
+                            e.getMessage());
             return buildCommandResult(
                     AssertionVerificationResultCode.PERIOD_VALIDATION_ERROR.name(), message);
         } catch (AssertionThumbprintException e) {
             String message =
                     String.format(
-                            "Assertion validation failed on verifying thumbprint with error code"
-                                    + " %s and message: %s",
-                            e.getErrorCode(), e.getMessage());
+                            "Assertion validation failed on verifying thumbprint"
+                                    + CODE_AND_MESSAGE,
+                            e.getErrorCode(),
+                            e.getMessage());
             return buildCommandResult(
                     AssertionVerificationResultCode.THUMBPRINT_VALIDATION_ERROR.name(), message);
         } catch (AssertionUserIdException e) {
             String message =
                     String.format(
-                            "Assertion validation failed on verifying user id with error code %s"
-                                    + " and message: %s",
-                            e.getErrorCode(), e.getMessage());
+                            "Assertion validation failed on verifying user id" + CODE_AND_MESSAGE,
+                            e.getErrorCode(),
+                            e.getMessage());
             return buildCommandResult(
                     AssertionVerificationResultCode.USER_ID_VALIDATION_ERROR.name(), message);
         } catch (ErrorValidatingAssertionSignature e) {
             String message =
                     String.format(
-                            "Assertion validation failed on verifying signature with error code %s"
-                                    + " and message: %s",
-                            e.getErrorCode(), e.getMessage());
+                            "Assertion validation failed on verifying signature" + CODE_AND_MESSAGE,
+                            e.getErrorCode(),
+                            e.getMessage());
             return buildCommandResult(
                     AssertionVerificationResultCode.SIGNATURE_VALIDATION_ERROR.name(), message);
         } catch (ErrorRetrievingIdpCertDataException e) {
             String message =
                     String.format(
                             "Assertion validation failed on retrieving identity provider's"
-                                    + " certification data with error code %s and message: %s",
-                            e.getErrorCode(), e.getMessage());
+                                    + " certification data"
+                                    + CODE_AND_MESSAGE,
+                            e.getErrorCode(),
+                            e.getMessage());
             return buildCommandResult(
                     AssertionVerificationResultCode.IDP_CERT_DATA_RETRIEVING_ERROR.name(), message);
         }
@@ -145,16 +150,17 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
         } catch (LollipopDigestException e) {
             String message =
                     String.format(
-                            "HTTP message validation failed on verifying digest with error code %s"
-                                    + " and message: %s",
-                            e.getErrorCode(), e.getMessage());
+                            "HTTP message validation failed on verifying digest" + CODE_AND_MESSAGE,
+                            e.getErrorCode(),
+                            e.getMessage());
             return buildCommandResult(
                     HttpMessageVerificationResultCode.DIGEST_VALIDATION_ERROR.name(), message);
         } catch (LollipopSignatureException e) {
             String message =
                     String.format(
-                            "HTTP message validation failed on verifying signatures with message:"
-                                    + " %s",
+                            "HTTP message validation failed on verifying signatures"
+                                    + CODE_AND_MESSAGE,
+                            e.getErrorCode(),
                             e.getMessage());
             return buildCommandResult(
                     HttpMessageVerificationResultCode.SIGNATURE_VALIDATION_ERROR.name(), message);
@@ -169,8 +175,9 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
         } catch (LollipopVerifierException e) {
             String message =
                     String.format(
-                            "HTTP message validation failed on content validation with message:"
-                                    + " %s",
+                            "HTTP message validation failed on content validation"
+                                    + CODE_AND_MESSAGE,
+                            e.getErrorCode(),
                             e.getMessage());
             return buildCommandResult(
                     HttpMessageVerificationResultCode.REQUEST_VALIDATION_ERROR.name(), message);

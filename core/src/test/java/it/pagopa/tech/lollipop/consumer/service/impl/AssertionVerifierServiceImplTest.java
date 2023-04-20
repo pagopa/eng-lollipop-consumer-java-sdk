@@ -528,6 +528,29 @@ class AssertionVerifierServiceImplTest {
 
     @SneakyThrows
     @Test
+    void validateLollipopGetIdpCertDataSuccessWithWarningForInvalidInstantDateFormat() {
+        LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
+
+        SamlAssertion assertion = new SamlAssertion();
+        assertion.setAssertionData(ASSERTION_XML_WITH_INVALID_INSTANT_FORMAT);
+
+        doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
+        doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(true)
+                .when(sut)
+                .validateInResponseTo(any(LollipopConsumerRequest.class), any(Document.class));
+        doReturn(true).when(sut).validateSignature(any(Document.class), anyList());
+
+        boolean result = sut.validateLollipop(request);
+
+        assertTrue(result);
+    }
+
+    @SneakyThrows
+    @Test
     void validateLollipopGetIdpCertDataSuccess() {
         LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
 

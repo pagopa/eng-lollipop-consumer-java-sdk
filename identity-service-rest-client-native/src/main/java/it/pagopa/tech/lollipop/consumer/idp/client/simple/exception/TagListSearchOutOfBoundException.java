@@ -1,5 +1,5 @@
 /* (C)2023 */
-package it.pagopa.tech.lollipop.consumer.exception;
+package it.pagopa.tech.lollipop.consumer.idp.client.simple.exception;
 
 public class TagListSearchOutOfBoundException extends Exception {
 
