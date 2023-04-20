@@ -2,6 +2,7 @@
 package it.pagopa.tech.lollipop.consumer.spring.config;
 
 import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
@@ -10,4 +11,5 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 @ConfigurationProperties(prefix = "lollipop.core.config")
 @ConfigurationPropertiesScan
 @NoArgsConstructor
+@Data
 public class SpringLollipopConsumerRequestConfig extends LollipopConsumerRequestConfig {}

@@ -17,6 +17,8 @@ import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
 import it.pagopa.tech.lollipop.consumer.service.AssertionVerifierService;
 import it.pagopa.tech.lollipop.consumer.utils.LollipopSamlAssertionWrapper;
 import java.io.ByteArrayInputStream;
+import it.pagopa.tech.lollipop.consumer.utils.LollipopSamlAssertionWrapper;
+import java.io.ByteArrayInputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -65,6 +67,7 @@ import java.util.*;
 
 @Slf4j
 /** Standard implementation of {@link AssertionVerifierService} */
+@Slf4j
 public class AssertionVerifierServiceImpl implements AssertionVerifierService {
 
     private final LollipopLoggerService lollipopLoggerService;

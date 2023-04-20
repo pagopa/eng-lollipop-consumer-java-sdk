@@ -48,4 +48,6 @@ public class LollipopConsumerRequestConfig {
     @Builder.Default private boolean enableAssertionLogging = true;
     @Builder.Default private boolean enableIdpCertDataLogging = true;
 
+    @Builder.Default private String assertionEntityIdTag = "Issuer";
+    @Builder.Default private String assertionInstantTag = "Assertion";
 }
