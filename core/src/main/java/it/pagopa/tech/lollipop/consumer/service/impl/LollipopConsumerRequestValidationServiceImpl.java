@@ -235,7 +235,7 @@ public class LollipopConsumerRequestValidationServiceImpl
     }
 
     private boolean isNotValidSignatureInput(String signatureInput) {
-        return !Pattern.compile("^(((sig[0-9]+)=[^,]*?)(, ?)?)+$")
+        return !Pattern.compile("^(((sig[\\d]+)=[^,]*?)+(, ?)?)+$")
                 .matcher(signatureInput)
                 .matches();
     }
@@ -256,7 +256,7 @@ public class LollipopConsumerRequestValidationServiceImpl
     }
 
     private boolean isNotValidSignature(String signature) {
-        return !Pattern.compile("^((sig[0-9]+)=:[A-Za-z0-9+/=]*:(, ?)?)+$")
+        return !Pattern.compile("^((sig[\\d]+)=:[A-Za-z0-9+/=]*+:(, ?)?)+$")
                 .matcher(signature)
                 .matches();
     }

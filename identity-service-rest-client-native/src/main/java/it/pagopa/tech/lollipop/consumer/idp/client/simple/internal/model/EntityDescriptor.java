@@ -30,6 +30,18 @@ public class EntityDescriptor {
     @SuppressWarnings("unchecked")
     @JsonProperty("IDPSSODescriptor")
     private void unpackNestedSignature(Map<String, Object> signature) {
+        List<Map<String, Object>> keyDescriptorsList = getKeyDescriptorsList(signature);
+
+        List<Map<String, Object>> keyInfosList = getKeyInfosList(keyDescriptorsList);
+
+        List<Map<String, Object>> listX509Data = getListX509Data(keyInfosList);
+
+        List<String> extractedSignatureList = getExtractedSignatureList(listX509Data);
+
+        this.signatureList = extractedSignatureList;
+    }
+
+    private List<Map<String, Object>> getKeyDescriptorsList(Map<String, Object> signature) {
         List<Map<String, Object>> keyDescriptorsList = new ArrayList<>();
         if (signature.get(KEY_DESCRIPTOR) instanceof List) {
 
@@ -46,7 +58,35 @@ public class EntityDescriptor {
                 keyDescriptorsList.add(keyDescriptorFound);
             }
         }
+        return keyDescriptorsList;
+    }
 
+    private List<String> getExtractedSignatureList(List<Map<String, Object>> listX509Data) {
+        List<String> extractedSignatureList = new ArrayList<>();
+        for (Map<String, Object> x509Data : listX509Data) {
+            if (x509Data.get(X_509_CERTIFICATE) instanceof List) {
+                signatureList = (List<String>) x509Data.get(X_509_CERTIFICATE);
+            } else {
+                signatureList.add((String) x509Data.get(X_509_CERTIFICATE));
+            }
+        }
+        return extractedSignatureList;
+    }
+
+    private List<Map<String, Object>> getListX509Data(List<Map<String, Object>> keyInfosList) {
+        List<Map<String, Object>> listX509Data = new ArrayList<>();
+        for (Map<String, Object> keyInfo : keyInfosList) {
+            if (keyInfo.get(X_509_DATA) instanceof List) {
+                listX509Data = (List<Map<String, Object>>) keyInfo.get(X_509_DATA);
+            } else {
+                listX509Data.add((Map<String, Object>) keyInfo.get(X_509_DATA));
+            }
+        }
+        return listX509Data;
+    }
+
+    private List<Map<String, Object>> getKeyInfosList(
+            List<Map<String, Object>> keyDescriptorsList) {
         List<Map<String, Object>> keyInfosList = new ArrayList<>();
         for (Map<String, Object> keyDescriptor : keyDescriptorsList) {
             if (keyDescriptor.get(KEY_INFO) instanceof List) {
@@ -57,25 +97,6 @@ public class EntityDescriptor {
                 keyInfosList.add(keyInfo);
             }
         }
-
-        List<Map<String, Object>> listX509Data = new ArrayList<>();
-        for (Map<String, Object> keyInfo : keyInfosList) {
-            if (keyInfo.get(X_509_DATA) instanceof List) {
-                listX509Data = (List<Map<String, Object>>) keyInfo.get(X_509_DATA);
-            } else {
-                listX509Data.add((Map<String, Object>) keyInfo.get(X_509_DATA));
-            }
-        }
-
-        List<String> signatureList = new ArrayList<>();
-        for (Map<String, Object> x509Data : listX509Data) {
-            if (x509Data.get(X_509_CERTIFICATE) instanceof List) {
-                signatureList = (List<String>) x509Data.get(X_509_CERTIFICATE);
-            } else {
-                signatureList.add((String) x509Data.get(X_509_CERTIFICATE));
-            }
-        }
-
-        this.signatureList = signatureList;
+        return keyInfosList;
     }
 }
