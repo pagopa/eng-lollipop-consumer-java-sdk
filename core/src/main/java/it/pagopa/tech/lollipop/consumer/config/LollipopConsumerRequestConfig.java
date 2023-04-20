@@ -43,6 +43,11 @@ public class LollipopConsumerRequestConfig {
     @Builder.Default private String assertionNotBeforeTag = "Conditions";
     @Builder.Default private String assertionFiscalCodeTag = "Attribute";
     @Builder.Default private String assertionInResponseToTag = "SubjectConfirmationData";
+
+    @Builder.Default private boolean enableConsumerLogging = true;
+    @Builder.Default private boolean enableAssertionLogging = true;
+    @Builder.Default private boolean enableIdpCertDataLogging = true;
+
     @Builder.Default private String assertionEntityIdTag = "Issuer";
     @Builder.Default private String assertionInstantTag = "Assertion";
 }

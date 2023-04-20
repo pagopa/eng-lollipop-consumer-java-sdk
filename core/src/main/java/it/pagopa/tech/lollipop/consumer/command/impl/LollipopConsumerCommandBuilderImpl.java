@@ -28,9 +28,11 @@ public class LollipopConsumerCommandBuilderImpl implements LollipopConsumerComma
     @Override
     public LollipopConsumerCommand createCommand(LollipopConsumerRequest lollipopConsumerRequest) {
         return new LollipopConsumerCommandImpl(
+                factoryHelper.getLollipopConsumerRequestConfig(),
                 factoryHelper.getHttpMessageVerifierService(),
                 factoryHelper.getAssertionVerifierService(),
                 factoryHelper.getRequestValidationService(),
+                factoryHelper.getLollipopLoggerService(),
                 lollipopConsumerRequest);
     }
 }

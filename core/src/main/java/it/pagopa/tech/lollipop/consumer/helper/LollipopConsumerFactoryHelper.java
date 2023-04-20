@@ -7,6 +7,8 @@ import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
 import it.pagopa.tech.lollipop.consumer.http_verifier.HttpMessageVerifierFactory;
 import it.pagopa.tech.lollipop.consumer.idp.IdpCertProvider;
 import it.pagopa.tech.lollipop.consumer.idp.IdpCertProviderFactory;
+import it.pagopa.tech.lollipop.consumer.logger.LollipopLoggerService;
+import it.pagopa.tech.lollipop.consumer.logger.LollipopLoggerServiceFactory;
 import it.pagopa.tech.lollipop.consumer.service.AssertionVerifierService;
 import it.pagopa.tech.lollipop.consumer.service.HttpMessageVerifierService;
 import it.pagopa.tech.lollipop.consumer.service.LollipopConsumerRequestValidationService;
@@ -17,10 +19,13 @@ import javax.inject.Inject;
 /** Helper class for retrieving instances */
 public class LollipopConsumerFactoryHelper {
 
+    private final LollipopLoggerServiceFactory lollipopLoggerServiceFactory;
+
     private final HttpMessageVerifierFactory httpMessageVerifierFactory;
     private final IdpCertProviderFactory idpCertProviderFactory;
     private final LollipopConsumerRequestValidationService lollipopConsumerRequestValidationService;
     private final AssertionServiceFactory assertionServiceFactory;
+
     private IdpCertProvider idpCertProvider;
     private AssertionService assertionService;
 
@@ -28,8 +33,11 @@ public class LollipopConsumerFactoryHelper {
     private AssertionVerifierService assertionVerifierService;
     private LollipopConsumerRequestConfig lollipopConsumerRequestConfig;
 
+    private LollipopLoggerService lollipopLoggerService;
+
     @Inject
     public LollipopConsumerFactoryHelper(
+            LollipopLoggerServiceFactory lollipopLoggerServiceFactory,
             HttpMessageVerifierFactory httpMessageVerifierFactory,
             IdpCertProviderFactory idpCertProviderFactory,
             AssertionServiceFactory assertionServiceFactory,
@@ -40,6 +48,7 @@ public class LollipopConsumerFactoryHelper {
         this.assertionServiceFactory = assertionServiceFactory;
         this.lollipopConsumerRequestValidationService = lollipopConsumerRequestValidationService;
         this.lollipopConsumerRequestConfig = lollipopConsumerRequestConfig;
+        this.lollipopLoggerServiceFactory = lollipopLoggerServiceFactory;
     }
 
     /**
@@ -50,9 +59,18 @@ public class LollipopConsumerFactoryHelper {
     public HttpMessageVerifierService getHttpMessageVerifierService() {
         return this.httpMessageVerifierService != null
                 ? this.httpMessageVerifierService
-                : new HttpMessageVerifierServiceImpl(
-                        getHttpMessageVerifierFactory().create(),
-                        getLollipopConsumerRequestConfig());
+                : createMessageVerifierService();
+    }
+
+    private HttpMessageVerifierService createMessageVerifierService() {
+
+        if (this.httpMessageVerifierService == null) {
+            this.httpMessageVerifierService =
+                    new HttpMessageVerifierServiceImpl(
+                            getHttpMessageVerifierFactory().create(),
+                            getLollipopConsumerRequestConfig());
+        }
+        return this.httpMessageVerifierService;
     }
 
     /**
@@ -64,10 +82,19 @@ public class LollipopConsumerFactoryHelper {
 
         return this.assertionVerifierService != null
                 ? this.assertionVerifierService
-                : new AssertionVerifierServiceImpl(
-                        createIdpCertProvider(),
-                        createAssertionService(),
-                        getLollipopConsumerRequestConfig());
+                : createAssertionVerifierService();
+    }
+
+    private synchronized AssertionVerifierService createAssertionVerifierService() {
+        if (this.assertionVerifierService == null) {
+            assertionVerifierService =
+                    new AssertionVerifierServiceImpl(
+                            getLollipopLoggerService(),
+                            createIdpCertProvider(),
+                            createAssertionService(),
+                            getLollipopConsumerRequestConfig());
+        }
+        return this.assertionVerifierService;
     }
 
     public HttpMessageVerifierFactory getHttpMessageVerifierFactory() {
@@ -121,5 +148,18 @@ public class LollipopConsumerFactoryHelper {
 
     public void setAssertionVerifierService(AssertionVerifierService assertionVerifierService) {
         this.assertionVerifierService = assertionVerifierService;
+    }
+
+    public LollipopLoggerService getLollipopLoggerService() {
+        return this.lollipopLoggerService != null
+                ? lollipopLoggerService
+                : createLollipopLoggerService();
+    }
+
+    private synchronized LollipopLoggerService createLollipopLoggerService() {
+        if (this.lollipopLoggerService == null) {
+            this.lollipopLoggerService = this.lollipopLoggerServiceFactory.create();
+        }
+        return this.lollipopLoggerService;
     }
 }

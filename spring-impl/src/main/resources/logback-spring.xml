@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSSZZ} [${appName:-}] %highlight(%-5level) [%t] %magenta([%X{user-id}/%X{session-id}/%X{request-id}]) %green([%c{32}.%M]) - %msg%n"/>
+    <property name="CONSOLE_LOG_CHARSET" value="${CONSOLE_LOG_CHARSET:-${file.encoding:-UTF-8}}"/>
+    <property name="CONSOLE_LOG_THRESHOLD" value="${CONSOLE_LOG_THRESHOLD:-TRACE}"/>
+    <property name="FILE_LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSSZZ} [${appName:-}] %highlight(%-5level) [%t] %magenta([%X{user-id}/%X{session-id}/%X{request-id}]) %green([%c{32}.%M]) - %msg%n"/>
+    <property name="FILE_LOG_CHARSET" value="${FILE_LOG_CHARSET:-${file.encoding:-UTF-8}}"/>
+    <property name="FILE_LOG_THRESHOLD" value="${FILE_LOG_THRESHOLD:-TRACE}"/>
+
+    <include
+            resource="it/pagopa/tech/lollipop/logging/logback/includes/defaults.xml"/>
+
+</configuration>

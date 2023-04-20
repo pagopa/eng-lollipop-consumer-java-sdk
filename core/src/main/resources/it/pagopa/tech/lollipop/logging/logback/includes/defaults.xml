@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<included>
+
+    <appender name="LOLLIPOP_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${CONSOLE_LOG_THRESHOLD}</level>
+        </filter>
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>${CONSOLE_LOG_CHARSET}</charset>
+        </encoder>
+    </appender>
+
+    <appender name="LOLLIPOP_ASYNC_STDOUT"
+              class="ch.qos.logback.classic.AsyncAppender">
+        <neverBlock>true</neverBlock>
+        <queueSize>20000</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <appender-ref ref="LOLLIPOP_STDOUT"/>
+    </appender>
+
+    <appender name="LOLLIPOP_ASYNC_FILE" class="ch.qos.logback.core.helpers.NOPAppender"/>
+    <if condition='"TRUE".equalsIgnoreCase("${ENABLE_FILE_APPENDER}")'>
+        <then>
+            <property name="LOG_FILE"
+                      value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}}/lollipop_audit.log}"/>
+
+            <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                    <level>${FILE_LOG_THRESHOLD}</level>
+                </filter>
+                <encoder>
+                    <pattern>${FILE_LOG_PATTERN}</pattern>
+                    <charset>${FILE_LOG_CHARSET}</charset>
+                </encoder>
+                <file>${LOG_FILE}</file>
+                <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                    <fileNamePattern>${LOGBACK_ROLLINGPOLICY_FILE_NAME_PATTERN:-${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz}</fileNamePattern>
+                    <cleanHistoryOnStart>${LOGBACK_ROLLINGPOLICY_CLEAN_HISTORY_ON_START:-false}</cleanHistoryOnStart>
+                    <maxFileSize>${LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE:-10MB}</maxFileSize>
+                    <totalSizeCap>${LOGBACK_ROLLINGPOLICY_TOTAL_SIZE_CAP:-0}</totalSizeCap>
+                    <maxHistory>${LOGBACK_ROLLINGPOLICY_MAX_HISTORY:-7}</maxHistory>
+                </rollingPolicy>
+            </appender>
+
+            <appender name="LOLLIPOP_ASYNC_FILE"
+                      class="ch.qos.logback.classic.AsyncAppender">
+                <neverBlock>true</neverBlock>
+                <queueSize>20000</queueSize>
+                <discardingThreshold>0</discardingThreshold>
+                <appender-ref ref="FILE"/>
+            </appender>
+
+        </then>
+    </if>
+
+    <logger name="it.pagopa.tech.lollipop.consumer.logger.impl.LollipopLogbackLoggerService">
+        <appender-ref ref="LOLLIPOP_ASYNC_STDOUT" />
+        <appender-ref ref="LOLLIPOP_ASYNC_FILE" />
+    </logger>
+
+</included>

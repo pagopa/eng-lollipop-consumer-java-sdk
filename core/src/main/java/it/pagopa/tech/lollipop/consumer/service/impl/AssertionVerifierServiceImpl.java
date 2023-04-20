@@ -10,6 +10,7 @@ import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
 import it.pagopa.tech.lollipop.consumer.enumeration.AssertionRefAlgorithms;
 import it.pagopa.tech.lollipop.consumer.exception.*;
 import it.pagopa.tech.lollipop.consumer.idp.IdpCertProvider;
+import it.pagopa.tech.lollipop.consumer.logger.LollipopLoggerService;
 import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
@@ -24,17 +25,16 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.w3c.dom.Document;
@@ -45,8 +45,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /** Standard implementation of {@link AssertionVerifierService} */
-@Log
+@Slf4j
 public class AssertionVerifierServiceImpl implements AssertionVerifierService {
+
+    private final LollipopLoggerService lollipopLoggerService;
 
     private final IdpCertProvider idpCertProvider;
     private final AssertionService assertionService;
@@ -58,9 +60,11 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
 
     @Inject
     public AssertionVerifierServiceImpl(
+            LollipopLoggerService lollipopLoggerService,
             IdpCertProvider idpCertProvider,
             AssertionService assertionService,
             LollipopConsumerRequestConfig lollipopRequestConfig) {
+        this.lollipopLoggerService = lollipopLoggerService;
         this.idpCertProvider = idpCertProvider;
         this.assertionService = assertionService;
         this.lollipopRequestConfig = lollipopRequestConfig;
@@ -112,6 +116,11 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         SamlAssertion assertion;
         try {
             assertion = assertionService.getAssertion(jwt, assertionRef);
+            assertionCheckLogging(
+                    "SAML Assertion found using assertionRef {} and jwt {}: {}",
+                    assertionRef,
+                    jwt,
+                    assertion);
         } catch (OidcAssertionNotSupported e) {
             throw new ErrorRetrievingAssertionException(
                     ErrorRetrievingAssertionException.ErrorCode.OIDC_TYPE_NOT_SUPPORTED,
@@ -220,7 +229,14 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         }
         instant = parseInstantToMillis(instant);
         try {
-            return idpCertProvider.getIdpCertData(instant, entityId.trim());
+            entityId = entityId.trim();
+            List<IdpCertData> idpCertData = idpCertProvider.getIdpCertData(instant, entityId);
+            this.idpCertDataLogging(
+                    "IdP certificates has been found for entityId {} at instant {}: {}",
+                    entityId,
+                    instant,
+                    idpCertData);
+            return idpCertData;
         } catch (CertDataNotFoundException e) {
             throw new ErrorRetrievingIdpCertDataException(
                     ErrorRetrievingIdpCertDataException.ErrorCode.IDP_CERT_DATA_NOT_FOUND,
@@ -402,11 +418,25 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         return null;
     }
 
+    private void assertionCheckLogging(String message, Object... args) {
+        if (lollipopRequestConfig.isEnableConsumerLogging()
+                && lollipopRequestConfig.isEnableAssertionLogging()) {
+            lollipopLoggerService.log(message, args);
+        }
+    }
+
+    private void idpCertDataLogging(String message, Object... args) {
+        if (lollipopRequestConfig.isEnableConsumerLogging()
+                && lollipopRequestConfig.isEnableIdpCertDataLogging()) {
+            lollipopLoggerService.log(message, args);
+        }
+    }
+
     private String getPublicKey(String publicKey) {
         try {
             publicKey = new String(Base64.getDecoder().decode(publicKey));
         } catch (Exception e) {
-            log.log(Level.FINE, "Key not in Base64");
+            log.debug("Key not in Base64");
         }
         return publicKey;
     }
@@ -421,7 +451,7 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
                     String.format(
                             "Retrieved instant %s does not match expected format %s",
                             instant, instantDateFormat);
-            log.log(Level.WARNING, msg);
+            log.debug(msg);
         }
         return instant;
     }
