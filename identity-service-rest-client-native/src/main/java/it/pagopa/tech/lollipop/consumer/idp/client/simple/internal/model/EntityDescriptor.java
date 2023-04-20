@@ -65,9 +65,9 @@ public class EntityDescriptor {
         List<String> extractedSignatureList = new ArrayList<>();
         for (Map<String, Object> x509Data : listX509Data) {
             if (x509Data.get(X_509_CERTIFICATE) instanceof List) {
-                signatureList = (List<String>) x509Data.get(X_509_CERTIFICATE);
+                extractedSignatureList = (List<String>) x509Data.get(X_509_CERTIFICATE);
             } else {
-                signatureList.add((String) x509Data.get(X_509_CERTIFICATE));
+                extractedSignatureList.add((String) x509Data.get(X_509_CERTIFICATE));
             }
         }
         return extractedSignatureList;
