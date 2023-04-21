@@ -4,6 +4,7 @@ package it.pagopa.tech.lollipop.consumer.command.impl;
 import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommand;
 import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommandBuilder;
 import it.pagopa.tech.lollipop.consumer.helper.LollipopConsumerFactoryHelper;
+import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import javax.inject.Inject;
 
 /**
@@ -25,9 +26,13 @@ public class LollipopConsumerCommandBuilderImpl implements LollipopConsumerComma
      * @return an instance of {@link LollipopConsumerCommand}
      */
     @Override
-    public LollipopConsumerCommand createCommand() {
+    public LollipopConsumerCommand createCommand(LollipopConsumerRequest lollipopConsumerRequest) {
         return new LollipopConsumerCommandImpl(
+                factoryHelper.getLollipopConsumerRequestConfig(),
                 factoryHelper.getHttpMessageVerifierService(),
-                factoryHelper.getAssertionVerifierService());
+                factoryHelper.getAssertionVerifierService(),
+                factoryHelper.getRequestValidationService(),
+                factoryHelper.getLollipopLoggerService(),
+                lollipopConsumerRequest);
     }
 }

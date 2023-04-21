@@ -4,10 +4,20 @@ plugins {
 	id("com.diffplug.spotless") version "6.17.0"
 	id("nebula.lint") version "18.0.3"
 	id("org.kordamp.gradle.reproducible") version "0.50.0"
+	id "org.sonarqube" version "3.5.0.2730"
+	id 'jacoco'
 }
 
 repositories {
+	mavenLocal()
 	mavenCentral()
+	maven {
+		url = uri("https://maven.pkg.github.com/pagopa/eng-http-signatures")
+		credentials {
+			username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+			password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+		}
+	}
 	gradlePluginPortal()
 }
 
@@ -18,7 +28,7 @@ allprojects {
 	targetCompatibility = '11'
 	apply plugin: 'com.diffplug.spotless'
 	apply plugin: 'nebula.lint'
-	gradleLint.rules = ['all-dependency']
+	gradleLint.rules = []
 
 	configurations {
 		spotless {
@@ -67,6 +77,15 @@ allprojects {
 }
 
 
+dependencies {
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.1'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.1'
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformats-text:2.14.1'
+	implementation 'com.fasterxml.jackson.module:jackson-modules-java8:2.14.1'
+	implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names:2.14.1'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.14.1'
+}
+
 // Settings for allowing reproducible build
 tasks.withType(AbstractArchiveTask).configureEach {
 	preserveFileTimestamps = false
@@ -79,6 +98,7 @@ subprojects {
 	apply plugin: 'java'
 	apply plugin: 'org.kordamp.gradle.reproducible'
 	apply plugin: 'maven-publish'
+	apply plugin: 'jacoco'
 	apply plugin: 'org.graalvm.buildtools.native'
 
 
@@ -130,8 +150,49 @@ subprojects {
 				}
 			}
 		}
+
+		sonar {
+			properties {
+				property "sonar.sources", "src/main/java"
+				property "sonar.tests", "src/test/java"
+			}
+		}
+
+
+		test {
+			finalizedBy jacocoTestReport // report is always generated after tests run
+			jacoco {
+				excludes = ["**/config/*","**/*Mock*","**/model/**","**/entity/*","**/*Stub*","**/*Config*"]
+
+			}
+		}
+		jacocoTestReport {
+			dependsOn test // tests are required to run before generating the report
+			reports {
+				xml.enabled true
+			}
+		}
+
 	}
 
+}
+
+project(":test-coverage") {
+	sonar {
+		skipProject = true
+	}
+	sonarqube {
+		skipProject = true
+	}
+}
+
+project(":redis-storage") {
+	sonar {
+		skipProject = true
+	}
+	sonarqube {
+		skipProject = true
+	}
 }
 
 graalvmNative {

@@ -1,0 +1,50 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '2.7.10'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+}
+
+group = 'it.pagopa.tech.lollipop.consumer'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+	mavenLocal()
+	maven {
+		url = uri("https://maven.pkg.github.com/pagopa/eng-http-signatures")
+		credentials {
+			username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+			password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+		}
+	}
+}
+
+dependencies {
+	implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:core:1.0.0-SNAPSHOT'
+	implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:assertion-rest-client-native:1.0.0-SNAPSHOT'
+	implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:identity-service-rest-client-native:1.0.0-SNAPSHOT'
+	implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:http-verifier:1.0.0-SNAPSHOT'
+	implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:spring-impl:1.0.0-SNAPSHOT'
+
+	implementation 'org.mock-server:mockserver-netty:5.15.0'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	testImplementation 'ch.qos.logback:logback-classic:1.2.11'
+	testImplementation 'ch.qos.logback:logback-core:1.2.11'
+	testImplementation 'org.codehaus.janino:janino:3.1.9'
+	testImplementation 'org.slf4j:slf4j-api:1.7.36'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

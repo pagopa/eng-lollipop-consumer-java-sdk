@@ -4,7 +4,7 @@ info:
   version: $npm_package_version
   x-logo:
     url: https://io.italia.it/assets/img/io-logo-blue.svg
-  description: |- 
+  description: |-
     Client used to get the assertion from the identity provider
 servers:
     - url: http://localhost:3000
