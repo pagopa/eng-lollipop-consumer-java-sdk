@@ -28,7 +28,7 @@ class LollipopConsumerCommandBuilderImplTest {
     public void testThatCreatsCommand() {
         assertThat(
                         lollipopConsumerCommandBuilder.createCommand(
-                                Mockito.mock(LollipopConsumerRequest.builder().build())))
+                                LollipopConsumerRequest.builder().build()))
                 .isInstanceOf(LollipopConsumerCommand.class);
     }
 }
