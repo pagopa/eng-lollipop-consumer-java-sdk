@@ -6,11 +6,15 @@
  * User Manual available at https://docs.gradle.org/8.0.2/userguide/building_java_projects.html
  */
 
-
 plugins {
     // Apply the java-library plugin for API and implementation separation.
     id 'application'
 }
+
+
+group = 'it.pagopa.tech.lollipop.consumer.samples'
+version = '1.0.0-RC1'
+sourceCompatibility = '11'
 
 application {
     mainClassName = "it.pagopa.tech.sample.LollipopConsumerSample"
@@ -19,23 +23,28 @@ application {
 repositories {
     mavenLocal()
     mavenCentral()
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/pagopa/eng-lollipop-consumer-java-sdk"
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
-            }
+    maven {
+        url = uri("https://maven.pkg.github.com/pagopa/eng-http-signatures")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
+    maven {
+        name = "GitHubPackages"
+        url = "https://maven.pkg.github.com/pagopa/eng-lollipop-consumer-java-sdk"
+        credentials {
+            username = System.getenv("GITHUB_ACTOR")
+            password = System.getenv("GITHUB_TOKEN")
         }
     }
 }
 
 dependencies {
-    implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:core:1.0.0-SNAPSHOT'
-    implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:assertion-rest-client-native:1.0.0-SNAPSHOT'
-    implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:identity-service-rest-client-native:1.0.0-SNAPSHOT'
-    implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:http-verifier:1.0.0-SNAPSHOT'
+    implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:core:1.0.0-RC1'
+    implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:assertion-rest-client-native:1.0.0-RC1'
+    implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:identity-service-rest-client-native:1.0.0-RC1'
+    implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:http-verifier:1.0.0-RC1'
     // Use JUnit Jupiter for testing.
     implementation 'org.mock-server:mockserver-netty:5.15.0'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'

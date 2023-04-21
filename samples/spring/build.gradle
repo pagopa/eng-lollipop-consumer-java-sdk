@@ -4,8 +4,8 @@ plugins {
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
 
-group = 'it.pagopa.tech.lollipop.consumer'
-version = '0.0.1-SNAPSHOT'
+group = 'it.pagopa.tech.lollipop.consumer.samples'
+version = '1.0.0-RC1'
 sourceCompatibility = '11'
 
 configurations {
@@ -24,14 +24,22 @@ repositories {
 			password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
 		}
 	}
+	maven {
+		name = "GitHubPackages"
+		url = "https://maven.pkg.github.com/pagopa/eng-lollipop-consumer-java-sdk"
+		credentials {
+			username = System.getenv("GITHUB_ACTOR")
+			password = System.getenv("GITHUB_TOKEN")
+		}
+	}
 }
 
 dependencies {
-	implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:core:1.0.0-SNAPSHOT'
-	implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:assertion-rest-client-native:1.0.0-SNAPSHOT'
-	implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:identity-service-rest-client-native:1.0.0-SNAPSHOT'
-	implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:http-verifier:1.0.0-SNAPSHOT'
-	implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:spring-impl:1.0.0-SNAPSHOT'
+	implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:core:1.0.0-RC1'
+	implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:assertion-rest-client-native:1.0.0-RC1'
+	implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:identity-service-rest-client-native:1.0.0-RC1'
+	implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:http-verifier:1.0.0-RC1'
+	implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:spring-impl:1.0.0-RC1'
 
 	implementation 'org.mock-server:mockserver-netty:5.15.0'
 	implementation 'org.springframework.boot:spring-boot-starter-web'

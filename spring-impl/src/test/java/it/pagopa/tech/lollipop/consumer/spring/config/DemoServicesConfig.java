@@ -12,7 +12,9 @@ import it.pagopa.tech.lollipop.consumer.http_verifier.visma.VismaHttpMessageVeri
 import it.pagopa.tech.lollipop.consumer.idp.IdpCertProviderFactory;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.IdpCertSimpleClientConfig;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.IdpCertSimpleClientProvider;
+import it.pagopa.tech.lollipop.consumer.idp.client.simple.storage.SimpleIdpCertStorageProvider;
 import it.pagopa.tech.lollipop.consumer.idp.impl.IdpCertProviderFactoryImpl;
+import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorageConfig;
 import it.pagopa.tech.lollipop.consumer.logger.LollipopLoggerServiceFactory;
 import it.pagopa.tech.lollipop.consumer.logger.impl.LollipopLogbackLoggerServiceFactory;
 import org.springframework.context.annotation.Bean;
@@ -39,7 +41,10 @@ public class DemoServicesConfig {
     @Bean
     public IdpCertProviderFactory idpCertProviderFactory() {
         return new IdpCertProviderFactoryImpl(
-                new IdpCertSimpleClientProvider(IdpCertSimpleClientConfig.builder().build()));
+                new IdpCertSimpleClientProvider(
+                        IdpCertSimpleClientConfig.builder().build(),
+                        new SimpleIdpCertStorageProvider(),
+                        new IdpCertStorageConfig()));
     }
 
     @Bean
