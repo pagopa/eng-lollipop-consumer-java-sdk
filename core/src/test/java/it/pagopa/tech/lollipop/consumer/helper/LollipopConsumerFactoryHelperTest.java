@@ -55,13 +55,13 @@ class LollipopConsumerFactoryHelperTest {
     }
 
     @Test
-    public void testThatRetunsAssertionVerifierService() {
+    void testThatRetunsAssertionVerifierService() {
         assertThat(lollipopConsumerFactoryHelper.getAssertionVerifierService())
                 .isInstanceOf(AssertionVerifierService.class);
     }
 
     @Test
-    public void testThatRetunsHttpMessageVerifierService() {
+    void testThatRetunsHttpMessageVerifierService() {
         assertThat(lollipopConsumerFactoryHelper.getHttpMessageVerifierService())
                 .isInstanceOf(HttpMessageVerifierService.class);
     }

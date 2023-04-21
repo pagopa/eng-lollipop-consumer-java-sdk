@@ -10,7 +10,7 @@ class LollipopLogbackLoggerServiceFactoryTest {
 
     @SneakyThrows
     @Test
-    public void instanceIsCreated() {
+    void instanceIsCreated() {
         assertThat(new LollipopLogbackLoggerServiceFactory().create())
                 .isInstanceOf(LollipopLogbackLoggerService.class);
     }

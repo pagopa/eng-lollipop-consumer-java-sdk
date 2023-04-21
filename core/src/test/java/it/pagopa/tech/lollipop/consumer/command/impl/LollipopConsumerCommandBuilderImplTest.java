@@ -25,7 +25,7 @@ class LollipopConsumerCommandBuilderImplTest {
     }
 
     @Test
-    public void testThatCreatsCommand() {
+    void testThatCreatsCommand() {
         assertThat(
                         lollipopConsumerCommandBuilder.createCommand(
                                 LollipopConsumerRequest.builder().build()))
