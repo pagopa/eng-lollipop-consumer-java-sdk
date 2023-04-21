@@ -37,6 +37,7 @@ dependencies {
     implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:identity-service-rest-client-native:1.0.0-SNAPSHOT'
     implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:http-verifier:1.0.0-SNAPSHOT'
     // Use JUnit Jupiter for testing.
+    implementation 'org.mock-server:mockserver-netty:5.15.0'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
 }
 

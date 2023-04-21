@@ -58,5 +58,10 @@ public class LollipopConstants {
             + "k2YURaSjdBOEx6bzBLU3kgIFpZb0E0ODVtcWNPMEdWQWRWdzlscTRhT1Q5djZkLW5iNGJuTmtRVmtsTFE"
             + "zZlZBdkptLXhkRE9wOUxDTkNONDhWICAycG5ET2tGVjYtVTluVjVveWM2WEkydyJ9";
 
+    public static final String VALID_ASSERTION_REF =
+            "sha256-_ZzL8qeuAM5kQ9pbMB4tn7IDSQZCVXAkW9fm4P7ULPI";
+    public static final String VALID_FISCAL_CODE = "AAAAAA89S20I111X";
+    public static final String VALID_JWT = "aValidJWT";
+
     public LollipopConstants() {}
 }
