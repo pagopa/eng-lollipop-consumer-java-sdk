@@ -35,6 +35,10 @@ dependencies {
 
 	implementation 'org.mock-server:mockserver-netty:5.15.0'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	testImplementation 'ch.qos.logback:logback-classic:1.2.11'
+	testImplementation 'ch.qos.logback:logback-core:1.2.11'
+	testImplementation 'org.codehaus.janino:janino:3.1.9'
+	testImplementation 'org.slf4j:slf4j-api:1.7.36'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'

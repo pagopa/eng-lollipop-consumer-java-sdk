@@ -9,4 +9,6 @@
 
     <include
             resource="it/pagopa/tech/lollipop/logging/logback/includes/defaults.xml"/>
+
+
 </configuration>

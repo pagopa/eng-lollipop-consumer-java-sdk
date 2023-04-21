@@ -19,7 +19,6 @@ import static org.mockserver.model.HttpResponse.response;
 public class SampleApplication {
 
     public static void main(String[] args) {
-
         SpringApplication.run(SampleApplication.class, args);
         createExpectationAssertionFound();
     }
