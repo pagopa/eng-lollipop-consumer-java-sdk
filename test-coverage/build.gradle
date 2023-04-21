@@ -42,7 +42,7 @@ testCodeCoverageReport {
 			project(':spring-impl')
 			].collect {
 				it.fileTree(dir: "${it.buildDir}/classes", exclude: [
-						"**/config/*","**/*Mock*","**/model/**","**/entity/*","**/*Stub*","**/*Config*"
+						"**/config/*","**/*Mock*","**/model/**","**/entity/*","**/*Stub*","**/*Config*","**/*Exception*"
 				])
 			}
 	))

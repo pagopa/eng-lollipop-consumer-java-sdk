@@ -162,7 +162,7 @@ subprojects {
 		test {
 			finalizedBy jacocoTestReport // report is always generated after tests run
 			jacoco {
-				excludes = ["**/config/*","**/*Mock*","**/model/**","**/entity/*","**/*Stub*","**/*Config*"]
+				excludes = ["**/config/*","**/*Mock*","**/model/**","**/entity/*","**/*Stub*","**/*Config*","**/*Exception*"]
 
 			}
 		}
