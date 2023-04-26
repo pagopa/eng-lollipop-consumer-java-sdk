@@ -14,6 +14,10 @@ import javax.servlet.http.HttpServletResponse;
 
 public class LollipopConsumerConverter {
 
+    private LollipopConsumerConverter() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * Utility method to be used to generate a LollipopConsumerRequest from a HttpServletRequest
      *

@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-public class LollipopConsumerConverterTest {
+class LollipopConsumerConverterTest {
 
     String REQUEST_BODY_STRING = "{\"message\":\"a valid message payload\"}";
     String COMMAND_RESPONSE_SUCCESS = "SAML assertion validated successfully";
@@ -65,7 +65,7 @@ public class LollipopConsumerConverterTest {
         HttpServletResponse response =
                 LollipopConsumerConverter.interceptResult(result, mockResponse);
 
-        Assertions.assertTrue(response.getStatus() == MOCK_RESPONSE_STATUS);
+        Assertions.assertEquals(MOCK_RESPONSE_STATUS, response.getStatus());
     }
 
     @Test
@@ -76,8 +76,8 @@ public class LollipopConsumerConverterTest {
         HttpServletResponse response =
                 LollipopConsumerConverter.interceptResult(result, mockResponse);
 
-        Assertions.assertTrue(response.getStatus() == 401);
-        Assertions.assertTrue(
-                ((MockHttpServletResponse) response).getErrorMessage() == COMMAND_RESPONSE_FAILED);
+        Assertions.assertEquals(401, response.getStatus());
+        Assertions.assertSame(
+                COMMAND_RESPONSE_FAILED, ((MockHttpServletResponse) response).getErrorMessage());
     }
 }
