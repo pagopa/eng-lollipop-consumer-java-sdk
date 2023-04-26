@@ -3,6 +3,7 @@ FROM eclipse-temurin:11-jdk-alpine as build
 WORKDIR /build
 COPY ./samples/spring .
 
+RUN chmod +x ./gradlew
 RUN ./gradlew bootJar
 
 FROM eclipse-temurin:11-jdk-alpine as runtime
