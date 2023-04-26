@@ -17,7 +17,9 @@ import it.pagopa.tech.lollipop.consumer.http_verifier.visma.VismaHttpMessageVeri
 import it.pagopa.tech.lollipop.consumer.idp.IdpCertProviderFactory;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.IdpCertSimpleClientConfig;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.IdpCertSimpleClientProvider;
+import it.pagopa.tech.lollipop.consumer.idp.client.simple.storage.SimpleIdpCertStorageProvider;
 import it.pagopa.tech.lollipop.consumer.idp.impl.IdpCertProviderFactoryImpl;
+import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorageConfig;
 import it.pagopa.tech.lollipop.consumer.logger.LollipopLoggerServiceFactory;
 import it.pagopa.tech.lollipop.consumer.logger.impl.LollipopLogbackLoggerServiceFactory;
 import it.pagopa.tech.lollipop.consumer.model.CommandResult;
@@ -89,7 +91,8 @@ public class LollipopConsumerSample {
                 LollipopConsumerRequestConfig.builder().build());
         AssertionStorageProvider assertionStorageProvider = new SimpleAssertionStorageProvider();
         IdpCertProviderFactory idpCertProviderFactory = new IdpCertProviderFactoryImpl(
-                new IdpCertSimpleClientProvider(IdpCertSimpleClientConfig.builder().build()));
+                new IdpCertSimpleClientProvider(IdpCertSimpleClientConfig.builder().build(),
+                        new SimpleIdpCertStorageProvider(), new IdpCertStorageConfig()));
         AssertionClientProvider assertionClientProvider =
                 new AssertionSimpleClientProvider(AssertionSimpleClientConfig.builder().build());
         AssertionServiceFactory assertionServiceFactory = new AssertionServiceFactoryImpl(

@@ -1,4 +1,4 @@
-package test.java.it.pagopa.tech.lollipop.consumer.sample;
+package it.pagopa.tech.lollipop.consumer.sample;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
