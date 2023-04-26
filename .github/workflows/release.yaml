@@ -47,7 +47,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Make spring sample gradlew executable
-        run: chmod +x .gradlew
+        run: chmod +x ./gradlew
         working-directory: ./samples/spring
       - name: Run build with Gradle Wrapper on Spring Sample
         run: ./gradlew bootJar
