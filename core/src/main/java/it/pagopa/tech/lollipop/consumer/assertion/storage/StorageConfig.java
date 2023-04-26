@@ -11,4 +11,5 @@ public class StorageConfig {
     private boolean assertionStorageEnabled = true;
     private long storageEvictionDelay = 1L;
     private TimeUnit storageEvictionDelayTimeUnit = TimeUnit.MINUTES;
+    private long maxNumberOfElements = 100;
 }

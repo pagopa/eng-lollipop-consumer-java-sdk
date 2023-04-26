@@ -5,11 +5,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
+import it.pagopa.tech.lollipop.consumer.model.DelayedCacheObject;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.ref.SoftReference;
 import java.util.concurrent.*;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,36 +27,10 @@ class SimpleAssertionStorageTest {
     }
 
     @Test
-    void getExistingAssertionAndResetScheduleEvictionWithStorageEnabled()
-            throws InterruptedException, ExecutionException {
-        doReturn(true).when(storageConfigMock).isAssertionStorageEnabled();
-
-        Map<String, SamlAssertion> assertionMap = new HashMap<>();
-        SamlAssertion samlAssertion = new SamlAssertion();
-        assertionMap.put(ASSERTION_REF_1, samlAssertion);
-        Map<String, ScheduledFuture<?>> scheduledEvictionsMap = new HashMap<>();
-        ScheduledFuture<?> scheduledFutureMock = mock(ScheduledFuture.class);
-        scheduledEvictionsMap.put(ASSERTION_REF_1, scheduledFutureMock);
-
-        sut = new SimpleAssertionStorage(assertionMap, scheduledEvictionsMap, storageConfigMock);
-
-        SamlAssertion result = sut.getAssertion(ASSERTION_REF_1);
-
-        assertNotNull(result);
-        assertEquals(samlAssertion, result);
-        assertEquals(1, scheduledEvictionsMap.size());
-
-        CompletableFuture<Boolean> future = waitEvictionEnd(scheduledEvictionsMap);
-        assertEquals(true, future.get());
-        assertEquals(0, assertionMap.size());
-        assertEquals(0, scheduledEvictionsMap.size());
-    }
-
-    @Test
     void getNotExistingAssertionWithStorageEnabled() {
         doReturn(true).when(storageConfigMock).isAssertionStorageEnabled();
 
-        sut = new SimpleAssertionStorage(new HashMap<>(), new HashMap<>(), storageConfigMock);
+        sut = new SimpleAssertionStorage(storageConfigMock);
 
         SamlAssertion result = sut.getAssertion(ASSERTION_REF_1);
 
@@ -68,30 +41,66 @@ class SimpleAssertionStorageTest {
     void saveAssertionAndScheduleEvictionWithStorageEnabled()
             throws InterruptedException, ExecutionException {
         doReturn(true).when(storageConfigMock).isAssertionStorageEnabled();
+        doReturn(1000L).when(storageConfigMock).getStorageEvictionDelay();
+        doReturn(TimeUnit.MILLISECONDS).when(storageConfigMock).getStorageEvictionDelayTimeUnit();
+        doReturn(100L).when(storageConfigMock).getMaxNumberOfElements();
 
-        Map<String, SamlAssertion> assertionMap = new HashMap<>();
-        Map<String, ScheduledFuture<?>> scheduledEvictionsMap = new HashMap<>();
+        ConcurrentHashMap<String, SoftReference<SamlAssertion>> assertionMap =
+                new ConcurrentHashMap<>();
+        DelayQueue<DelayedCacheObject<SamlAssertion>> delayedCacheObjects = new DelayQueue<>();
 
-        sut = new SimpleAssertionStorage(assertionMap, scheduledEvictionsMap, storageConfigMock);
+        sut = new SimpleAssertionStorage(assertionMap, delayedCacheObjects, storageConfigMock);
         SamlAssertion samlAssertion = new SamlAssertion();
 
         sut.saveAssertion(ASSERTION_REF_1, samlAssertion);
+        delayedCacheObjects.poll(100, TimeUnit.MILLISECONDS);
 
         assertEquals(1, assertionMap.size());
-        assertEquals(1, scheduledEvictionsMap.size());
-        assertEquals(samlAssertion, assertionMap.get(ASSERTION_REF_1));
+        assertEquals(1, delayedCacheObjects.size());
+        assertEquals(samlAssertion, assertionMap.get(ASSERTION_REF_1).get());
 
-        CompletableFuture<Boolean> future = waitEvictionEnd(scheduledEvictionsMap);
-        assertEquals(true, future.get());
+        delayedCacheObjects.poll(1000, TimeUnit.MILLISECONDS);
         assertEquals(0, assertionMap.size());
-        assertEquals(0, scheduledEvictionsMap.size());
+        assertEquals(0, delayedCacheObjects.size());
+    }
+
+    @Test
+    void saveAssertionToMaximumCapacityWithStorageEnabled()
+            throws InterruptedException, ExecutionException {
+        doReturn(true).when(storageConfigMock).isAssertionStorageEnabled();
+        doReturn(1000L).when(storageConfigMock).getStorageEvictionDelay();
+        doReturn(TimeUnit.MILLISECONDS).when(storageConfigMock).getStorageEvictionDelayTimeUnit();
+        doReturn(100L).when(storageConfigMock).getMaxNumberOfElements();
+
+        ConcurrentHashMap<String, SoftReference<SamlAssertion>> assertionMap =
+                new ConcurrentHashMap<>();
+        DelayQueue<DelayedCacheObject<SamlAssertion>> delayedCacheObjects = new DelayQueue<>();
+
+        sut = new SimpleAssertionStorage(assertionMap, delayedCacheObjects, storageConfigMock);
+        SamlAssertion samlAssertion = new SamlAssertion();
+
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+
+        for (int i = 0; i < 101; i++) {
+            executor.submit(() -> sut.saveAssertion(ASSERTION_REF_1, samlAssertion));
+        }
+        delayedCacheObjects.poll(100, TimeUnit.MILLISECONDS);
+
+        assertEquals(100, delayedCacheObjects.size());
+        assertEquals(samlAssertion, assertionMap.get(ASSERTION_REF_1).get());
+
+        //        delayedCacheObjects.poll(1000, TimeUnit.MILLISECONDS);
+        //        assertEquals(0, assertionMap.size());
+        //        assertEquals(0, delayedCacheObjects.size());
     }
 
     @Test
     void getAssertionWithStorageDisabled() {
         doReturn(false).when(storageConfigMock).isAssertionStorageEnabled();
+        doReturn(1000L).when(storageConfigMock).getStorageEvictionDelay();
+        doReturn(TimeUnit.MILLISECONDS).when(storageConfigMock).getStorageEvictionDelayTimeUnit();
 
-        sut = new SimpleAssertionStorage(new HashMap<>(), new HashMap<>(), storageConfigMock);
+        sut = new SimpleAssertionStorage(storageConfigMock);
 
         SamlAssertion result = sut.getAssertion(ASSERTION_REF_1);
 
@@ -102,32 +111,15 @@ class SimpleAssertionStorageTest {
     void savaAssertionWithStorageDisabled() {
         doReturn(false).when(storageConfigMock).isAssertionStorageEnabled();
 
-        Map<String, SamlAssertion> assertionMap = new HashMap<>();
-        Map<String, ScheduledFuture<?>> scheduledEvictionsMap = new HashMap<>();
+        ConcurrentHashMap<String, SoftReference<SamlAssertion>> assertionMap =
+                new ConcurrentHashMap<>();
+        DelayQueue<DelayedCacheObject<SamlAssertion>> delayedCacheObjects = new DelayQueue<>();
 
-        sut = new SimpleAssertionStorage(assertionMap, scheduledEvictionsMap, storageConfigMock);
+        sut = new SimpleAssertionStorage(assertionMap, delayedCacheObjects, storageConfigMock);
 
         sut.saveAssertion(ASSERTION_REF_1, new SamlAssertion());
 
         assertEquals(0, assertionMap.size());
-        assertEquals(0, scheduledEvictionsMap.size());
-    }
-
-    private CompletableFuture<Boolean> waitEvictionEnd(
-            Map<String, ScheduledFuture<?>> scheduledEvictionsMap) {
-        CompletableFuture<Boolean> future = new CompletableFuture<>();
-        ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.submit(
-                new Runnable() {
-                    @SneakyThrows
-                    @Override
-                    public void run() {
-                        ScheduledFuture<?> scheduledFuture =
-                                scheduledEvictionsMap.get(ASSERTION_REF_1);
-                        scheduledFuture.get();
-                        future.complete(true);
-                    }
-                });
-        return future;
+        assertEquals(0, delayedCacheObjects.size());
     }
 }
