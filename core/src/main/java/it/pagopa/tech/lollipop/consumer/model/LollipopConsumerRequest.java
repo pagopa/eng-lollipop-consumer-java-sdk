@@ -11,6 +11,6 @@ import lombok.ToString;
 @Builder
 public class LollipopConsumerRequest {
     private String requestBody;
-    private Map<String, String> requestParams;
+    private Map<String, String[]> requestParams;
     private Map<String, String> headerParams;
 }
