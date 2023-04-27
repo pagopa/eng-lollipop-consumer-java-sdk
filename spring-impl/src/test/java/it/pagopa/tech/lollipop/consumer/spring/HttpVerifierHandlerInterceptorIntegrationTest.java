@@ -1,13 +1,13 @@
 /* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.spring;
 
+import static it.pagopa.tech.lollipop.consumer.spring.SimpleClientsTestUtils.*;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 
-import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
-import it.pagopa.tech.lollipop.consumer.helper.LollipopConsumerFactoryHelper;
-import it.pagopa.tech.lollipop.consumer.service.impl.MockAssertionVerifierService;
+import it.pagopa.tech.lollipop.consumer.idp.client.simple.IdpCertSimpleClientConfig;
 import it.pagopa.tech.lollipop.consumer.spring.config.HttpVerifierConfiguration;
 import it.pagopa.tech.lollipop.consumer.spring.config.SpringLollipopConsumerRequestConfig;
+import java.io.IOException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -35,31 +35,35 @@ public class HttpVerifierHandlerInterceptorIntegrationTest {
 
     @LocalServerPort private int port;
     @Autowired private TestRestTemplate restTemplate;
-    @Autowired private LollipopConsumerFactoryHelper factoryHelper;
-
-    @BeforeAll
-    public static void startServer() {
-        mockServer = startClientAndServer(3000);
-    }
+    @Autowired private SpringLollipopConsumerRequestConfig springLollipopConsumerRequestConfig;
+    @Autowired private HttpVerifierHandlerInterceptor interceptor;
+    @Autowired private IdpCertSimpleClientConfig idpCertSimpleClientConfig;
 
     private static ClientAndServer mockServer;
 
-    @Autowired private HttpVerifierHandlerInterceptor interceptor;
+    private static final String CONTENT_DIGEST =
+            "sha-256=:cpyRqJ1VhoVC+MSs9fq4/4wXs4c46EyEFriskys43Zw=:";
+    private static final String USER_ID = "GDNNWA12H81Y874F";
+    private static final String SIGNATURE_INPUT =
+            "sig123=(\"content-digest\" \"x-pagopa-lollipop-original-method\""
+                + " \"x-pagopa-lollipop-original-url\");created=1678293988;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\"";
+    private static final String SIGNATURE =
+            "sig123=:6scl8sMzJdyG/OrnJXHRM9ajmIjrJ/zrLUDqvfOxj2h51DUKztTua3vR1kSUj/c/VT1ioDlt1QIMARABhquewg==:";
+
+    @BeforeAll
+    public static void startServer() {
+        mockServer = startClientAndServer(3000, 3001);
+    }
 
     @Test
-    void testWithValidRequestReturnsSuccess() {
-        AssertionSimpleClientTestUtils.createExpectationAssertionFound();
-        factoryHelper.setAssertionVerifierService(
-                new MockAssertionVerifierService(
-                        factoryHelper.getIdpCertProviderFactory().create(),
-                        factoryHelper.getAssertionServiceFactory().create(),
-                        LollipopConsumerRequestConfig.builder().build()));
-
-        String signatureInput =
-                "sig123=(\"content-digest\" \"x-pagopa-lollipop-original-method\""
-                    + " \"x-pagopa-lollipop-original-url\");created=1678293988;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\"";
-        var signature =
-                "sig123=:lTuoRytp53GuUMOB4Rz1z97Y96gfSeEOm/xVpO39d3HR6lLAy4KYiGq+1hZ7nmRFBt2bASWEpen7ov5O4wU3kQ==:";
+    void testWithValidRequestReturnsSuccess() throws IOException {
+        SimpleClientsTestUtils.createExpectationAssertionFound();
+        SimpleClientsTestUtils.createExpectationIdpFound();
+        springLollipopConsumerRequestConfig.setAssertionNotBeforeDateFormat(
+                "yyyy-MM-dd'T'HH:mm:ss'Z'");
+        springLollipopConsumerRequestConfig.setAssertionInstantDateFormat(
+                "yyyy-MM-dd'T'HH:mm:ss'Z'");
+        idpCertSimpleClientConfig.setBaseUri("http://localhost:3001");
 
         RestTemplate exec = restTemplate.getRestTemplate();
         exec.getClientHttpRequestInitializers()
@@ -67,30 +71,54 @@ public class HttpVerifierHandlerInterceptorIntegrationTest {
                         request -> {
                             request.getHeaders()
                                     .add(
-                                            "Content-Digest",
-                                            "sha-256=:cpyRqJ1VhoVC+MSs9fq4/4wXs4c46EyEFriskys43Zw=:");
+                                            springLollipopConsumerRequestConfig
+                                                    .getContentDigestHeader(),
+                                            CONTENT_DIGEST);
                             request.getHeaders()
                                     .add(
-                                            "x-pagopa-lollipop-original-url",
-                                            "https://api-app.io.pagopa.it/first-lollipop/sign");
-                            request.getHeaders().add("x-pagopa-lollipop-original-method", "POST");
+                                            springLollipopConsumerRequestConfig
+                                                    .getOriginalURLHeader(),
+                                            springLollipopConsumerRequestConfig
+                                                    .getExpectedFirstLcOriginalUrl());
                             request.getHeaders()
                                     .add(
-                                            "x-pagopa-lollipop-public-key",
-                                            "eyJrdHkiOiJFQyIsIngiOiJGcUZEd"
-                                                + "XdFZ3U0TVVYRVJQTVZMLTg1cEd2MkQzWW1MNEoxZ2ZNa2RiYzI0IiwieSI6Im"
-                                                + "hkVjBveG1XRlN4TW9KVURwZGlocjc2clM4VlJCRXFNRmViWXlBZks5LWsiLCJjcnYiO"
-                                                + "iJQLTI1NiJ9");
+                                            springLollipopConsumerRequestConfig
+                                                    .getOriginalMethodHeader(),
+                                            springLollipopConsumerRequestConfig
+                                                    .getExpectedFirstLcOriginalMethod());
                             request.getHeaders()
                                     .add(
-                                            "x-pagopa-lollipop-assertion-ref",
-                                            "sha256-_ZzL8qeuAM5kQ9pbMB4tn7IDSQZCVXAkW9fm4P7ULPI");
-                            request.getHeaders().add("x-pagopa-lollipop-assertion-type", "SAML");
-                            request.getHeaders().add("x-pagopa-lollipop-auth-jwt", "aValidJWT");
+                                            springLollipopConsumerRequestConfig
+                                                    .getPublicKeyHeader(),
+                                            VALID_PUBLIC_KEY);
                             request.getHeaders()
-                                    .add("x-pagopa-lollipop-user-id", "AAAAAA89S20I111X");
-                            request.getHeaders().add("Signature-Input", signatureInput);
-                            request.getHeaders().add("Signature", signature);
+                                    .add(
+                                            springLollipopConsumerRequestConfig
+                                                    .getAssertionRefHeader(),
+                                            ASSERTION_REF);
+                            request.getHeaders()
+                                    .add(
+                                            springLollipopConsumerRequestConfig
+                                                    .getAssertionTypeHeader(),
+                                            "SAML");
+                            request.getHeaders()
+                                    .add(
+                                            springLollipopConsumerRequestConfig.getAuthJWTHeader(),
+                                            JWT);
+                            request.getHeaders()
+                                    .add(
+                                            springLollipopConsumerRequestConfig.getUserIdHeader(),
+                                            USER_ID);
+                            request.getHeaders()
+                                    .add(
+                                            springLollipopConsumerRequestConfig
+                                                    .getSignatureInputHeader(),
+                                            SIGNATURE_INPUT);
+                            request.getHeaders()
+                                    .add(
+                                            springLollipopConsumerRequestConfig
+                                                    .getSignatureHeader(),
+                                            SIGNATURE);
                         });
 
         ResponseEntity<String> response =
@@ -103,14 +131,8 @@ public class HttpVerifierHandlerInterceptorIntegrationTest {
     }
 
     @Test
-    void testWithinvalidPayloadRequestReturnsUnauthorized() {
-        AssertionSimpleClientTestUtils.createExpectationAssertionFound();
-
-        String signatureInput =
-                "sig123=(\"content-digest\" \"x-pagopa-lollipop-original-method\""
-                    + " \"x-pagopa-lollipop-original-url\");created=1678293988;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\"";
-        var signature =
-                "sig123=:lTuoRytp53GuUMOB4Rz1z97Y96gfSeEOm/xVpO39d3HR6lLAy4KYiGq+1hZ7nmRFBt2bASWEpen7ov5O4wU3kQ==:";
+    void testWithInvalidPayloadRequestReturnsUnauthorized() throws IOException {
+        SimpleClientsTestUtils.createExpectationAssertionFound();
 
         RestTemplate exec = restTemplate.getRestTemplate();
         exec.getClientHttpRequestInitializers()
@@ -118,30 +140,54 @@ public class HttpVerifierHandlerInterceptorIntegrationTest {
                         request -> {
                             request.getHeaders()
                                     .add(
-                                            "Content-Digest",
-                                            "sha-256=:cpyRqJ1VhoVC+MSs9fq4/4wXs4c46EyEFriskys43Zw=:");
+                                            springLollipopConsumerRequestConfig
+                                                    .getContentDigestHeader(),
+                                            CONTENT_DIGEST);
                             request.getHeaders()
                                     .add(
-                                            "x-pagopa-lollipop-original-url",
-                                            "https://api-app.io.pagopa.it/first-lollipop/sign");
-                            request.getHeaders().add("x-pagopa-lollipop-original-method", "POST");
+                                            springLollipopConsumerRequestConfig
+                                                    .getOriginalURLHeader(),
+                                            springLollipopConsumerRequestConfig
+                                                    .getExpectedFirstLcOriginalUrl());
                             request.getHeaders()
                                     .add(
-                                            "x-pagopa-lollipop-public-key",
-                                            "eyJrdHkiOiJFQyIsIngiOiJGcUZEd"
-                                                + "XdFZ3U0TVVYRVJQTVZMLTg1cEd2MkQzWW1MNEoxZ2ZNa2RiYzI0IiwieSI6Im"
-                                                + "hkVjBveG1XRlN4TW9KVURwZGlocjc2clM4VlJCRXFNRmViWXlBZks5LWsiLCJjcnYiO"
-                                                + "iJQLTI1NiJ9");
+                                            springLollipopConsumerRequestConfig
+                                                    .getOriginalMethodHeader(),
+                                            springLollipopConsumerRequestConfig
+                                                    .getExpectedFirstLcOriginalMethod());
                             request.getHeaders()
                                     .add(
-                                            "x-pagopa-lollipop-assertion-ref",
-                                            "sha256-_ZzL8qeuAM5kQ9pbMB4tn7IDSQZCVXAkW9fm4P7ULPI");
-                            request.getHeaders().add("x-pagopa-lollipop-assertion-type", "SAML");
-                            request.getHeaders().add("x-pagopa-lollipop-auth-jwt", "aValidJWT");
+                                            springLollipopConsumerRequestConfig
+                                                    .getPublicKeyHeader(),
+                                            VALID_PUBLIC_KEY);
                             request.getHeaders()
-                                    .add("x-pagopa-lollipop-user-id", "AAAAAA89S20I111X");
-                            request.getHeaders().add("Signature-Input", signatureInput);
-                            request.getHeaders().add("Signature", signature);
+                                    .add(
+                                            springLollipopConsumerRequestConfig
+                                                    .getAssertionRefHeader(),
+                                            ASSERTION_REF);
+                            request.getHeaders()
+                                    .add(
+                                            springLollipopConsumerRequestConfig
+                                                    .getAssertionTypeHeader(),
+                                            "SAML");
+                            request.getHeaders()
+                                    .add(
+                                            springLollipopConsumerRequestConfig.getAuthJWTHeader(),
+                                            JWT);
+                            request.getHeaders()
+                                    .add(
+                                            springLollipopConsumerRequestConfig.getUserIdHeader(),
+                                            USER_ID);
+                            request.getHeaders()
+                                    .add(
+                                            springLollipopConsumerRequestConfig
+                                                    .getSignatureInputHeader(),
+                                            SIGNATURE_INPUT);
+                            request.getHeaders()
+                                    .add(
+                                            springLollipopConsumerRequestConfig
+                                                    .getSignatureHeader(),
+                                            SIGNATURE);
                         });
 
         ResponseEntity<String> response =

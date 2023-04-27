@@ -42,7 +42,7 @@ public class DemoServicesConfig {
     public IdpCertProviderFactory idpCertProviderFactory() {
         return new IdpCertProviderFactoryImpl(
                 new IdpCertSimpleClientProvider(
-                        IdpCertSimpleClientConfig.builder().build(),
+                        idpCertSimpleClientConfig(),
                         new SimpleIdpCertStorageProvider(),
                         new IdpCertStorageConfig()));
     }
@@ -58,5 +58,10 @@ public class DemoServicesConfig {
     @Bean
     public StorageConfig storageConfig() {
         return new StorageConfig();
+    }
+
+    @Bean
+    public IdpCertSimpleClientConfig idpCertSimpleClientConfig() {
+        return IdpCertSimpleClientConfig.builder().build();
     }
 }

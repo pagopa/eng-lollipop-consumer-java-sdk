@@ -1,17 +1,17 @@
 /* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.KeyType;
 import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
 import it.pagopa.tech.lollipop.consumer.enumeration.AssertionRefAlgorithms;
 import it.pagopa.tech.lollipop.consumer.enumeration.AssertionType;
 import it.pagopa.tech.lollipop.consumer.enumeration.LollipopRequestMethod;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopRequestContentValidationException;
-import it.pagopa.tech.lollipop.consumer.model.ECPublicKey;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
-import it.pagopa.tech.lollipop.consumer.model.RSAPublicKey;
 import it.pagopa.tech.lollipop.consumer.service.LollipopConsumerRequestValidationService;
+import java.text.ParseException;
 import java.util.Base64;
 import java.util.Map;
 import java.util.logging.Level;
@@ -58,19 +58,23 @@ public class LollipopConsumerRequestValidationServiceImpl
             log.log(Level.FINE, "Key not in Base64");
         }
 
-        if (isNotValidPublicKey(publicKey, ECPublicKey.class)
-                && isNotValidPublicKey(publicKey, RSAPublicKey.class)) {
+        if (isNotValidPublicKey(publicKey)) {
             throw new LollipopRequestContentValidationException(
                     LollipopRequestContentValidationException.ErrorCode.INVALID_PUBLIC_KEY,
                     "Invalid Public Key Header value");
         }
     }
 
-    private boolean isNotValidPublicKey(String publicKey, Class<?> clazz) {
-        ObjectMapper mapper = new ObjectMapper();
+    private boolean isNotValidPublicKey(String publicKey) {
         try {
-            mapper.readValue(publicKey, clazz);
-        } catch (JsonProcessingException e) {
+            JWK jwk = JWK.parse(publicKey);
+            KeyType keyType = jwk.getKeyType();
+            if (KeyType.EC.equals(keyType)) {
+                jwk.toECKey().toECPublicKey();
+            } else if (KeyType.RSA.equals(keyType)) {
+                jwk.toRSAKey().toRSAPublicKey();
+            }
+        } catch (JOSEException | ParseException e) {
             return true;
         }
         return false;
