@@ -1,10 +1,9 @@
 /* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal.model.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;

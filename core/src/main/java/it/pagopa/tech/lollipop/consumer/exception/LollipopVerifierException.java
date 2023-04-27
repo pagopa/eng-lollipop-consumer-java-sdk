@@ -46,6 +46,7 @@ public class LollipopVerifierException extends Exception {
 
     /** Error codes to classify Lollipop Request Exceptions */
     public enum ErrorCode {
+        UNAVAILABLE_ENCODING,
         MISSING_SIGNATURE,
 
         MISSING_SIGNATURE_INPUT

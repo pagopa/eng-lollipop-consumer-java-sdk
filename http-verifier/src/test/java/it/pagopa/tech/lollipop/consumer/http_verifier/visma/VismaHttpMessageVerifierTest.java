@@ -12,13 +12,13 @@ import java.util.Map;
 import net.visma.autopay.http.digest.DigestException;
 import org.junit.jupiter.api.Test;
 
-public class VismaHttpMessageVerifierTest {
+class VismaHttpMessageVerifierTest {
 
     public VismaHttpMessageVerifier vismaDigestVerifier =
             new VismaHttpMessageVerifier("UTF-8", LollipopConsumerRequestConfig.builder().build());
 
     @Test
-    public void correctDigestIsVerified() {
+    void correctDigestIsVerified() {
         // setup
         var content = new String(new byte[] {1, 2, 4});
         var header =
@@ -30,7 +30,7 @@ public class VismaHttpMessageVerifierTest {
     }
 
     @Test
-    public void invalidDigestIsDetected() {
+    void invalidDigestIsDetected() {
         // setup
         var content = new String(new byte[] {1, 2, 4});
         var header = "sha-256=:A5BYxvLAy0ksUzsKTRTvd8wPeKvMztUofYShogEc+4E=:";
@@ -47,7 +47,7 @@ public class VismaHttpMessageVerifierTest {
     }
 
     @Test
-    public void malformedDigestIsDetected() {
+    void malformedDigestIsDetected() {
         // setup
         var content = new String(new byte[] {1, 2, 4});
         var header = "sha-256=1LKaloxAFzY43tjRdMhpV6+iEb5HnO4CDbpd/hJ9kco=";
@@ -64,7 +64,7 @@ public class VismaHttpMessageVerifierTest {
     }
 
     @Test
-    public void unsupportedAlgorithmsAreDetected() {
+    void unsupportedAlgorithmsAreDetected() {
         // setup
         var content = new String(new byte[] {1, 2, 4});
         var header = "md5=:V9tg6T+1JldSH4+Zy8c5jw==: ,sha=:q3kRUT3rxwFa1QQpqBWXcUWLJM4=:";
@@ -81,7 +81,7 @@ public class VismaHttpMessageVerifierTest {
     }
 
     @Test
-    public void emptyHeaderIsDetected() {
+    void emptyHeaderIsDetected() {
         // setup
         var content = new String(new byte[] {1, 2, 4});
         var header = "";
@@ -98,7 +98,7 @@ public class VismaHttpMessageVerifierTest {
     }
 
     @Test
-    public void invalidDictionaryValuesAreDetected() {
+    void invalidDictionaryValuesAreDetected() {
         // setup
         var content = new String(new byte[] {1, 2, 4});
         var header = "sha-256=ok";
@@ -115,7 +115,7 @@ public class VismaHttpMessageVerifierTest {
     }
 
     @Test
-    public void invalidContentEncoding() {
+    void invalidContentEncoding() {
         // setup
         var content = new String(new byte[] {1, 2, 4});
         var header = "sha-256=ok";
@@ -126,7 +126,7 @@ public class VismaHttpMessageVerifierTest {
     }
 
     @Test
-    public void validLollipopSignatureCheckSingleEcdaSha256() {
+    void validLollipopSignatureCheckSingleEcdaSha256() {
 
         String signatureInput =
                 "sig123=(\"content-digest\" \"x-pagopa-lollipop-original-method\""
@@ -162,7 +162,7 @@ public class VismaHttpMessageVerifierTest {
     }
 
     @Test
-    public void invalidLollipopSignatureCheck() {
+    void invalidLollipopSignatureCheck() {
 
         String signatureInput =
                 "sig123=(\"content-digest\" \"x-pagopa-lollipop-original-method\""
@@ -205,7 +205,7 @@ public class VismaHttpMessageVerifierTest {
     }
 
     @Test
-    public void validLollipopSignatureCheckSingleRsaSha256() {
+    void validLollipopSignatureCheckSingleRsaSha256() {
 
         String signatureInput =
                 "sig1=(\"content-digest\" \"x-pagopa-lollipop-original-method\""
@@ -248,7 +248,7 @@ public class VismaHttpMessageVerifierTest {
     }
 
     @Test
-    public void validLollipopMultipleSignatureCheckEcdaSha256() {
+    void validLollipopMultipleSignatureCheckEcdaSha256() {
 
         String signatureInput =
                 "sig1=(\"x-io-sign-qtspclauses\");created=1678299228;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\","
@@ -284,7 +284,7 @@ public class VismaHttpMessageVerifierTest {
     }
 
     @Test
-    public void invalidLollipopMultipleSignatureWithLessInput() {
+    void invalidLollipopMultipleSignatureWithLessInput() {
 
         String signatureInput =
                 "sig1=(\"x-io-sign-qtspclauses\");created=1678299228;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\","
