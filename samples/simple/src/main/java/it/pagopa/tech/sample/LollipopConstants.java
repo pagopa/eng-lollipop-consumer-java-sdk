@@ -20,7 +20,7 @@ public class LollipopConstants {
                     + " \"x-pagopa-lollipop-original-url\");created=1678299228;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\"";
     public static final String VALID_MULTI_ECDSA_SIGNATURE =
             "sig1=:8MB/iT9iZO2HfVjMds6WdFMQeutkPnoyBDhzeyvIQDhb/tX0nE6HeRSoRBsrl4GUzo6OItnzfzF43Sd14P7tAw==:,"
-            + "sig2=:6scl8sMzJdyG/OrnJXHRM9ajmIjrJ/zrLUDqvfOxj2h51DUKztTua3vR1kSUj/c/VT1ioDlt1QIMARABhquewg==:";
+            + "sig2=:ZDWu2x+6APQG0Ioj10uNzTBv+5JbFBYnjhqcpL66oGFtwznROAUouXkx80ekzUY5h0HoJWE/ecqxRK2OVeHTiQ==:";
 
     public static final String VALID_RSA_PSS_SIGNATURE_INPUT =
             "sig1=(\"content-digest\" \"x-pagopa-lollipop-original-method\""
