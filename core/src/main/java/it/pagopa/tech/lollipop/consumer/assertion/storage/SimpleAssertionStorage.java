@@ -5,10 +5,7 @@ import it.pagopa.tech.lollipop.consumer.model.DelayedCacheObject;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
 import java.lang.ref.SoftReference;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.DelayQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 
@@ -30,12 +27,15 @@ public class SimpleAssertionStorage implements AssertionStorage {
     private AtomicInteger numberOfElements;
     private final StorageConfig storageConfig;
 
+    private Executor executor;
+
     @Inject
     public SimpleAssertionStorage(StorageConfig storageConfig) {
         cache = new ConcurrentHashMap<>();
         cleaningUpQueue = new DelayQueue<>();
         initCleanerThread();
         this.storageConfig = storageConfig;
+        executor = new ScheduledThreadPoolExecutor(1);
         numberOfElements = new AtomicInteger(0);
     }
 
@@ -48,6 +48,7 @@ public class SimpleAssertionStorage implements AssertionStorage {
         cleaningUpQueue = queue;
         initCleanerThread();
         this.storageConfig = storageConfig;
+        executor = new ScheduledThreadPoolExecutor(1);
         numberOfElements = new AtomicInteger(0);
     }
 
@@ -62,7 +63,12 @@ public class SimpleAssertionStorage implements AssertionStorage {
                                     this.cache.remove(
                                             delayedCacheObject.getKey(),
                                             delayedCacheObject.getReference());
-                                    numberOfElements.decrementAndGet();
+                                    CompletableFuture.supplyAsync(
+                                            () -> {
+                                                numberOfElements.decrementAndGet();
+                                                return true;
+                                            },
+                                            executor);
                                 } catch (InterruptedException e) {
                                     Thread.currentThread().interrupt();
                                 }
@@ -89,7 +95,25 @@ public class SimpleAssertionStorage implements AssertionStorage {
             return null;
         }
 
-        return Optional.ofNullable(cache.get(assertionRef)).map(SoftReference::get).orElse(null);
+        SamlAssertion samlAssertion =
+                Optional.ofNullable(cache.get(assertionRef)).map(SoftReference::get).orElse(null);
+
+        if (samlAssertion != null) {
+            CompletableFuture.supplyAsync(
+                    () -> {
+                        cleaningUpQueue.removeIf(
+                                cacheObject ->
+                                        cacheObject
+                                                .getKey()
+                                                .equals(samlAssertion.getAssertionRef()));
+                        numberOfElements.decrementAndGet();
+                        saveAssertion(samlAssertion.getAssertionRef(), samlAssertion);
+                        return true;
+                    },
+                    executor);
+        }
+
+        return samlAssertion;
     }
 
     /**
@@ -116,28 +140,22 @@ public class SimpleAssertionStorage implements AssertionStorage {
         } else {
             CompletableFuture.supplyAsync(
                     () -> {
-                        synchronized (numberOfElements) {
-                            if (numberOfElements.get() >= storageConfig.getMaxNumberOfElements()) {
-                                try {
-                                    cleaningUpQueue.take();
-                                } catch (InterruptedException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            }
-                            long expiryTime =
-                                    System.currentTimeMillis()
-                                            + TimeUnit.MILLISECONDS.convert(
-                                                    storageConfig.getStorageEvictionDelay(),
-                                                    storageConfig
-                                                            .getStorageEvictionDelayTimeUnit());
-                            SoftReference<SamlAssertion> reference = new SoftReference<>(assertion);
-                            cache.put(assertionRef, reference);
-                            cleaningUpQueue.put(
-                                    new DelayedCacheObject<>(assertionRef, reference, expiryTime));
-                            numberOfElements.incrementAndGet();
+                        if (numberOfElements.get() >= storageConfig.getMaxNumberOfElements()) {
+                            cleaningUpQueue.remove();
                         }
+                        long expiryTime =
+                                System.currentTimeMillis()
+                                        + TimeUnit.MILLISECONDS.convert(
+                                                storageConfig.getStorageEvictionDelay(),
+                                                storageConfig.getStorageEvictionDelayTimeUnit());
+                        SoftReference<SamlAssertion> reference = new SoftReference<>(assertion);
+                        cache.put(assertionRef, reference);
+                        cleaningUpQueue.put(
+                                new DelayedCacheObject<>(assertionRef, reference, expiryTime));
+                        numberOfElements.incrementAndGet();
                         return true;
-                    });
+                    },
+                    executor);
         }
     }
 }

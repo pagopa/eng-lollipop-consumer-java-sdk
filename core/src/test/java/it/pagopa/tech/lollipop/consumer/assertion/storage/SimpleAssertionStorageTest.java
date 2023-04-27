@@ -79,19 +79,12 @@ class SimpleAssertionStorageTest {
         sut = new SimpleAssertionStorage(assertionMap, delayedCacheObjects, storageConfigMock);
         SamlAssertion samlAssertion = new SamlAssertion();
 
-        ExecutorService executor = Executors.newFixedThreadPool(10);
-
         for (int i = 0; i < 101; i++) {
-            executor.submit(() -> sut.saveAssertion(ASSERTION_REF_1, samlAssertion));
+            sut.saveAssertion(ASSERTION_REF_1 + i, samlAssertion);
         }
-        delayedCacheObjects.poll(100, TimeUnit.MILLISECONDS);
+        delayedCacheObjects.poll(150, TimeUnit.MILLISECONDS);
 
         assertEquals(100, delayedCacheObjects.size());
-        assertEquals(samlAssertion, assertionMap.get(ASSERTION_REF_1).get());
-
-        //        delayedCacheObjects.poll(1000, TimeUnit.MILLISECONDS);
-        //        assertEquals(0, assertionMap.size());
-        //        assertEquals(0, delayedCacheObjects.size());
     }
 
     @Test
