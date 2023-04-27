@@ -210,14 +210,4 @@ public class VismaHttpMessageVerifier implements HttpMessageVerifier {
                     "Available signatures and signature-inputs differ in number");
         }
     }
-
-    private static PublicKey getPublicKey(JWK jwk, KeyType keyType) throws JOSEException {
-        PublicKey publicKey = null;
-        if (KeyType.EC.equals(keyType)) {
-            publicKey = jwk.toECKey().toECPublicKey();
-        } else if (KeyType.RSA.equals(keyType)) {
-            publicKey = jwk.toRSAKey().toRSAPublicKey();
-        }
-        return publicKey;
-    }
 }
