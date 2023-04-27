@@ -13,12 +13,10 @@ import it.pagopa.tech.lollipop.consumer.logger.impl.LollipopLogbackLoggerService
 import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
 import lombok.SneakyThrows;
-import org.apache.geronimo.mail.util.Base64;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -189,10 +187,12 @@ class AssertionVerifierServiceImplTest {
         LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
 
         SamlAssertion assertion = new SamlAssertion();
-        assertion.setAssertionData(
-                new String(Base64.decode(ASSERTION_XML_TIM.getBytes(StandardCharsets.UTF_8))));
+        assertion.setAssertionData(VALID_ASSERTION_XML);
 
         doReturn(365 * 20).when(lollipopRequestConfigMock).getAssertionExpireInDays();
+        doReturn("yyyy-MM-dd'T'HH:mm:ss'Z'")
+                .when(lollipopRequestConfigMock)
+                .getAssertionNotBeforeDateFormat();
 
         doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
         doReturn(true)
@@ -583,7 +583,7 @@ class AssertionVerifierServiceImplTest {
         assertion.setAssertionData(EMPTY_ASSERTION_XML);
 
         IdpCertData idpCertData = new IdpCertData();
-        idpCertData.setCertData(Collections.singletonList(CERTIFICATE_TIM_LATEST));
+        idpCertData.setCertData(Collections.singletonList(VALID_IDP_CERTIFICATE));
 
         doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
         doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
@@ -616,7 +616,7 @@ class AssertionVerifierServiceImplTest {
         assertion.setAssertionData(ASSERTION_XML_WITH_VALID_INRESPONSETO_SHA256_ALGORITHM);
 
         IdpCertData idpCertData = new IdpCertData();
-        idpCertData.setCertData(Collections.singletonList(CERTIFICATE_TIM_LATEST));
+        idpCertData.setCertData(Collections.singletonList(VALID_IDP_CERTIFICATE));
 
         doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
         doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
@@ -649,7 +649,7 @@ class AssertionVerifierServiceImplTest {
         assertion.setAssertionData(ASSERTION_XML_WITH_INVALID_SIGNATURE);
 
         IdpCertData idpCertData = new IdpCertData();
-        idpCertData.setCertData(Collections.singletonList(CERTIFICATE_TIM_LATEST));
+        idpCertData.setCertData(Collections.singletonList(VALID_IDP_CERTIFICATE));
 
         doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
         doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));
@@ -674,11 +674,10 @@ class AssertionVerifierServiceImplTest {
         LollipopConsumerRequest request = getLollipopConsumerRequest("", "", "");
 
         SamlAssertion assertion = new SamlAssertion();
-        assertion.setAssertionData(
-                new String(Base64.decode(ASSERTION_XML_TIM.getBytes(StandardCharsets.UTF_8))));
+        assertion.setAssertionData(VALID_ASSERTION_XML);
 
         IdpCertData idpCertData = new IdpCertData();
-        idpCertData.setCertData(Collections.singletonList(CERTIFICATE_TIM_LATEST));
+        idpCertData.setCertData(Collections.singletonList(VALID_IDP_CERTIFICATE));
 
         doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
         doReturn(true).when(sut).validateAssertionPeriod(any(Document.class));

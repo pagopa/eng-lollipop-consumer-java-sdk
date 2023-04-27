@@ -1,24 +1,39 @@
 /* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.idp.client.simple;
 
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+import static org.mockserver.model.HttpRequest.request;
+import static org.mockserver.model.HttpResponse.response;
+
 import it.pagopa.tech.lollipop.consumer.exception.CertDataNotFoundException;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.internal.ApiClient;
 import it.pagopa.tech.lollipop.consumer.idp.client.simple.storage.SimpleIdpCertStorageProvider;
 import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorageConfig;
 import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
+import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
+import lombok.SneakyThrows;
+import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.mockserver.client.MockServerClient;
+import org.mockserver.integration.ClientAndServer;
 
 class IdpCertSimpleClientTest {
 
     private static IdpCertSimpleClient idpCertSimpleClient;
-    private static IdpCertSimpleClientConfig entityConfig;
+
+    private static ClientAndServer mockServer;
 
     private static final String INSTANT = String.valueOf(Instant.now().getEpochSecond());
+    private static final String TAG1 = String.valueOf(Instant.now().getEpochSecond() - 1);
+    private static final String TAG2 = String.valueOf(Instant.now().getEpochSecond() + 1);
     private static final String SPID_ENTITY_ID = "https://posteid.poste.it";
     private static final String SPID_ENTITY_ID_MULTIPLE_SIGNATURE = "https://loginspid.aruba.it";
     private static final String CIE_ENTITY_ID =
@@ -29,7 +44,8 @@ class IdpCertSimpleClientTest {
 
     @BeforeAll
     public static void startServer() {
-        entityConfig = Mockito.spy(IdpCertSimpleClientConfig.builder().build());
+        mockServer = startClientAndServer(3001);
+        IdpCertSimpleClientConfig entityConfig = spy(IdpCertSimpleClientConfig.builder().build());
         ApiClient client = new ApiClient(entityConfig);
         SimpleIdpCertStorageProvider storageProvider = new SimpleIdpCertStorageProvider();
         idpCertSimpleClient =
@@ -37,10 +53,17 @@ class IdpCertSimpleClientTest {
                         client,
                         entityConfig,
                         storageProvider.provideStorage(new IdpCertStorageConfig()));
+        doReturn("http://localhost:3001").when(entityConfig).getBaseUri();
+    }
+
+    @AfterAll
+    public static void stopServer() {
+        mockServer.stop();
     }
 
     @Test
     void certSPIDDataFound() throws CertDataNotFoundException {
+        createExpectationIdpSpidFound();
         List<IdpCertData> response = idpCertSimpleClient.getCertData(SPID_ENTITY_ID, INSTANT);
 
         Assertions.assertNotNull(response);
@@ -48,6 +71,7 @@ class IdpCertSimpleClientTest {
 
     @Test
     void certSPIDDataFoundMultipleSignature() throws CertDataNotFoundException {
+        createExpectationIdpSpidFound();
         List<IdpCertData> response =
                 idpCertSimpleClient.getCertData(SPID_ENTITY_ID_MULTIPLE_SIGNATURE, INSTANT);
 
@@ -57,6 +81,7 @@ class IdpCertSimpleClientTest {
 
     @Test
     void certCIEDataFound() throws CertDataNotFoundException {
+        createExpectationIdpCieFound();
         List<IdpCertData> response = idpCertSimpleClient.getCertData(CIE_ENTITY_ID, INSTANT);
 
         Assertions.assertNotNull(response);
@@ -64,6 +89,7 @@ class IdpCertSimpleClientTest {
 
     @Test
     void getCertDataWrongEntityID() {
+        createExpectationIdpSpidFound();
         Assertions.assertThrows(
                 CertDataNotFoundException.class,
                 () -> idpCertSimpleClient.getCertData(WRONG_ENTITY_ID, INSTANT));
@@ -95,5 +121,69 @@ class IdpCertSimpleClientTest {
         Assertions.assertThrows(
                 IllegalArgumentException.class,
                 () -> idpCertSimpleClient.getCertData(CIE_ENTITY_ID, null));
+    }
+
+    public static void createExpectationIdpSpidFound() {
+        new MockServerClient("localhost", 3001)
+                .when(request().withMethod("GET").withPath("/idp-keys/spid"))
+                .respond(
+                        response()
+                                .withStatusCode(200)
+                                .withBody("[\"" + TAG1 + "\",\"" + TAG2 + "\"]"));
+        new MockServerClient("localhost", 3001)
+                .when(
+                        request()
+                                .withMethod("GET")
+                                .withPath("/idp-keys/spid/{tag}")
+                                .withPathParameter("tag", TAG1))
+                .respond(
+                        response()
+                                .withStatusCode(200)
+                                .withBody(retrieveDataFromFile("idp_spid_data_tag1.xml")));
+        new MockServerClient("localhost", 3001)
+                .when(
+                        request()
+                                .withMethod("GET")
+                                .withPath("/idp-keys/spid/{tag}")
+                                .withPathParameter("tag", TAG2))
+                .respond(
+                        response()
+                                .withStatusCode(200)
+                                .withBody(retrieveDataFromFile("idp_spid_data_tag2.xml")));
+    }
+
+    public static void createExpectationIdpCieFound() {
+        new MockServerClient("localhost", 3001)
+                .when(request().withMethod("GET").withPath("/idp-keys/cie"))
+                .respond(
+                        response()
+                                .withStatusCode(200)
+                                .withBody("[\"" + TAG1 + "\",\"" + TAG2 + "\"]"));
+        new MockServerClient("localhost", 3001)
+                .when(
+                        request()
+                                .withMethod("GET")
+                                .withPath("/idp-keys/cie/{tag}")
+                                .withPathParameter("tag", TAG1))
+                .respond(
+                        response()
+                                .withStatusCode(200)
+                                .withBody(retrieveDataFromFile("idp_cie_data_tag1.xml")));
+        new MockServerClient("localhost", 3001)
+                .when(
+                        request()
+                                .withMethod("GET")
+                                .withPath("/idp-keys/cie/{tag}")
+                                .withPathParameter("tag", TAG2))
+                .respond(
+                        response()
+                                .withStatusCode(200)
+                                .withBody(retrieveDataFromFile("idp_cie_data_tag1.xml")));
+    }
+
+    @SneakyThrows
+    private static String retrieveDataFromFile(String fileName) {
+        FileInputStream fis = new FileInputStream("src/test/resources/" + fileName);
+        return IOUtils.toString(fis, StandardCharsets.UTF_8);
     }
 }
