@@ -1,10 +1,12 @@
 /* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.spring;
 
+import static it.pagopa.tech.lollipop.consumer.command.impl.LollipopConsumerCommandImpl.VERIFICATION_SUCCESS_CODE;
+
 import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommand;
 import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommandBuilder;
 import it.pagopa.tech.lollipop.consumer.model.CommandResult;
-import it.pagopa.tech.lollipop.consumer.spring.converter.LollipopConsumerRequestConverter;
+import it.pagopa.tech.lollipop.consumer.utils.LollipopConsumerConverter;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,14 +38,14 @@ public class HttpVerifierHandlerInterceptor implements HandlerInterceptor {
 
         LollipopConsumerCommand lollipopConsumerCommand =
                 consumerCommandBuilder.createCommand(
-                        LollipopConsumerRequestConverter.convert(request));
+                        LollipopConsumerConverter.convertToLollipopRequest(request));
 
         try {
             CommandResult commandResult = lollipopConsumerCommand.doExecute();
 
-            if (!commandResult.getResultCode().equals("SUCCESS")) {
-                response.sendError(401, commandResult.getResultMessage());
-            } else {
+            LollipopConsumerConverter.interceptResult(commandResult, response);
+
+            if (commandResult.getResultCode().equals(VERIFICATION_SUCCESS_CODE)) {
                 return true;
             }
 
