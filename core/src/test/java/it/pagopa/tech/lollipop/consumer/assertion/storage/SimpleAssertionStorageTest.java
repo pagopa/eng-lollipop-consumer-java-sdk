@@ -16,7 +16,7 @@ class SimpleAssertionStorageTest {
 
     private static final long EVICTION_DELAY = 5000L;
     private static StorageConfig storageConfigMock;
-    private AssertionStorage sut;
+    private SimpleAssertionStorage sut;
     private static final String ASSERTION_REF_1 = "assertionRef1";
 
     @BeforeEach
@@ -24,6 +24,38 @@ class SimpleAssertionStorageTest {
         storageConfigMock = mock(StorageConfig.class);
         doReturn(EVICTION_DELAY).when(storageConfigMock).getStorageEvictionDelay();
         doReturn(TimeUnit.MILLISECONDS).when(storageConfigMock).getStorageEvictionDelayTimeUnit();
+    }
+
+    @Test
+    void getExistingAssertionAndResetScheduleEvictionWithStorageEnabled()
+            throws InterruptedException, ExecutionException {
+        doReturn(true).when(storageConfigMock).isAssertionStorageEnabled();
+        doReturn(1000L).when(storageConfigMock).getStorageEvictionDelay();
+        doReturn(TimeUnit.MILLISECONDS).when(storageConfigMock).getStorageEvictionDelayTimeUnit();
+        doReturn(100L).when(storageConfigMock).getMaxNumberOfElements();
+
+        ConcurrentHashMap<String, SoftReference<SamlAssertion>> assertionMap =
+                new ConcurrentHashMap<>();
+        DelayQueue<DelayedCacheObject<SamlAssertion>> delayedCacheObjects = new DelayQueue<>();
+
+        sut = new SimpleAssertionStorage(assertionMap, delayedCacheObjects, storageConfigMock);
+        SamlAssertion samlAssertion = new SamlAssertion();
+
+        sut.saveAssertion(ASSERTION_REF_1, samlAssertion);
+        delayedCacheObjects.poll(20, TimeUnit.MILLISECONDS);
+
+        SamlAssertion result = sut.getAssertion(ASSERTION_REF_1);
+
+        assertNotNull(result);
+        assertEquals(samlAssertion, result);
+        delayedCacheObjects.poll(20, TimeUnit.MILLISECONDS);
+        assertEquals(1, delayedCacheObjects.size());
+
+        delayedCacheObjects.poll(1000, TimeUnit.MILLISECONDS);
+        assertEquals(0, assertionMap.size());
+        assertEquals(0, delayedCacheObjects.size());
+
+        sut.close();
     }
 
     @Test
@@ -35,6 +67,8 @@ class SimpleAssertionStorageTest {
         SamlAssertion result = sut.getAssertion(ASSERTION_REF_1);
 
         assertNull(result);
+
+        sut.close();
     }
 
     @Test
@@ -62,6 +96,8 @@ class SimpleAssertionStorageTest {
         delayedCacheObjects.poll(1000, TimeUnit.MILLISECONDS);
         assertEquals(0, assertionMap.size());
         assertEquals(0, delayedCacheObjects.size());
+
+        sut.close();
     }
 
     @Test
@@ -85,6 +121,8 @@ class SimpleAssertionStorageTest {
         delayedCacheObjects.poll(150, TimeUnit.MILLISECONDS);
 
         assertEquals(100, delayedCacheObjects.size());
+
+        sut.close();
     }
 
     @Test
@@ -98,6 +136,8 @@ class SimpleAssertionStorageTest {
         SamlAssertion result = sut.getAssertion(ASSERTION_REF_1);
 
         assertNull(result);
+
+        sut.close();
     }
 
     @Test
@@ -114,5 +154,7 @@ class SimpleAssertionStorageTest {
 
         assertEquals(0, assertionMap.size());
         assertEquals(0, delayedCacheObjects.size());
+
+        sut.close();
     }
 }

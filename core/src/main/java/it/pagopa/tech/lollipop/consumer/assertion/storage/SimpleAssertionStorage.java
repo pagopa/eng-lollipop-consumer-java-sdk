@@ -158,4 +158,10 @@ public class SimpleAssertionStorage implements AssertionStorage {
                     executor);
         }
     }
+
+    public void close() {
+        this.cleanerThread.interrupt();
+        this.cleaningUpQueue.clear();
+        this.cache.clear();
+    }
 }
