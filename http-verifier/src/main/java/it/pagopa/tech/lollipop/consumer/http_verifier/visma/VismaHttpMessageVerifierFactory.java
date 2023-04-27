@@ -2,6 +2,7 @@
 package it.pagopa.tech.lollipop.consumer.http_verifier.visma;
 
 import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
+import it.pagopa.tech.lollipop.consumer.exception.LollipopVerifierException;
 import it.pagopa.tech.lollipop.consumer.http_verifier.HttpMessageVerifier;
 import it.pagopa.tech.lollipop.consumer.http_verifier.HttpMessageVerifierFactory;
 import java.nio.charset.Charset;
@@ -14,9 +15,11 @@ public class VismaHttpMessageVerifierFactory implements HttpMessageVerifierFacto
 
     public VismaHttpMessageVerifierFactory(
             String defaultEncoding, LollipopConsumerRequestConfig lollipopConsumerRequestConfig)
-            throws Exception {
+            throws LollipopVerifierException {
         if (Charset.availableCharsets().get(defaultEncoding) == null) {
-            throw new Exception("Unavailable Encoding: " + defaultEncoding);
+            throw new LollipopVerifierException(
+                    LollipopVerifierException.ErrorCode.UNAVAILABLE_ENCODING,
+                    "Unavailable Encoding: " + defaultEncoding);
         }
         this.defaultEncoding = defaultEncoding;
         this.lollipopConsumerRequestConfig = lollipopConsumerRequestConfig;

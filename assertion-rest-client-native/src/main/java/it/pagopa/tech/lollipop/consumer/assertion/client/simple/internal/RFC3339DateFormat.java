@@ -36,9 +36,4 @@ public class RFC3339DateFormat extends DateFormat {
     public StringBuffer format(Date date, StringBuffer toAppendTo, FieldPosition fieldPosition) {
         return fmt.format(date, toAppendTo, fieldPosition);
     }
-
-    @Override
-    public Object clone() {
-        return super.clone();
-    }
 }

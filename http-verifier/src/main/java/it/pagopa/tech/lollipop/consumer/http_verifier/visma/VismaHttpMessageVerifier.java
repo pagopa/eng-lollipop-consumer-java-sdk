@@ -78,20 +78,12 @@ public class VismaHttpMessageVerifier implements HttpMessageVerifier {
         parameters.remove(lollipopConsumerRequestConfig.getSignatureHeader());
 
         String lollipopKey = parameters.get(lollipopConsumerRequestConfig.getPublicKeyHeader());
-        if (lollipopKey == null) {
-            throw new LollipopSignatureException(
-                    LollipopSignatureException.ErrorCode.MISSING_PUBLIC_KEY,
-                    "Could not find the public key within the expected header");
-        }
+        isLollipopKeyNotNull(lollipopKey);
 
         String[] signatures = signature.split(",");
         String[] signatureInputs = signatureInput.split(",");
 
-        if (signatures.length != signatureInputs.length) {
-            throw new LollipopSignatureException(
-                    LollipopSignatureException.ErrorCode.INVALID_SIGNATURE_NUMBER,
-                    "Available signatures and signature-inputs differ in number");
-        }
+        verifySignatureLength(signatures, signatureInputs);
 
         /* cicle through all signatures to validate */
         for (int i = 0; i < signatures.length; i++) {
@@ -110,13 +102,9 @@ public class VismaHttpMessageVerifier implements HttpMessageVerifier {
                     String algToUse = matcher.group(0);
                     signatureAlgorithm =
                             SignatureAlgorithm.fromIdentifier(
-                                    algToUse.replaceAll("\"", "").split("=")[1]);
+                                    algToUse.replace("\"", "").split("=")[1]);
 
-                    if (signatureAlgorithm == null) {
-                        throw new LollipopSignatureException(
-                                LollipopSignatureException.ErrorCode.INVALID_SIGNATURE_ALG,
-                                "Missing Signature Algorithm");
-                    }
+                    isSignatureAlgorithmNotNull(signatureAlgorithm);
 
                 } catch (IndexOutOfBoundsException | IllegalStateException e) {
                     throw new LollipopSignatureException(
@@ -195,5 +183,41 @@ public class VismaHttpMessageVerifier implements HttpMessageVerifier {
             log.debug("Could not convert EC signature to valid format");
         }
         return signatureToProcess;
+    }    
+
+    private static void isSignatureAlgorithmNotNull(SignatureAlgorithm signatureAlgorithm)
+            throws LollipopSignatureException {
+        if (signatureAlgorithm == null) {
+            throw new LollipopSignatureException(
+                    LollipopSignatureException.ErrorCode.INVALID_SIGNATURE_ALG,
+                    "Missing Signature Algorithm");
+        }
+    }
+
+    private static void isLollipopKeyNotNull(String lollipopKey) throws LollipopSignatureException {
+        if (lollipopKey == null) {
+            throw new LollipopSignatureException(
+                    LollipopSignatureException.ErrorCode.MISSING_PUBLIC_KEY,
+                    "Could not find the public key within the expected header");
+        }
+    }
+
+    private static void verifySignatureLength(String[] signatures, String[] signatureInputs)
+            throws LollipopSignatureException {
+        if (signatures.length != signatureInputs.length) {
+            throw new LollipopSignatureException(
+                    LollipopSignatureException.ErrorCode.INVALID_SIGNATURE_NUMBER,
+                    "Available signatures and signature-inputs differ in number");
+        }
+    }
+
+    private static PublicKey getPublicKey(JWK jwk, KeyType keyType) throws JOSEException {
+        PublicKey publicKey = null;
+        if (KeyType.EC.equals(keyType)) {
+            publicKey = jwk.toECKey().toECPublicKey();
+        } else if (KeyType.RSA.equals(keyType)) {
+            publicKey = jwk.toRSAKey().toRSAPublicKey();
+        }
+        return publicKey;
     }
 }

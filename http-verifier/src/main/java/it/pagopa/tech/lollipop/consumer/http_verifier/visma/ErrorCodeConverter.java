@@ -10,6 +10,10 @@ import net.visma.autopay.http.digest.DigestException;
  */
 public class ErrorCodeConverter {
 
+    private ErrorCodeConverter() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * @param errorCode {@link DigestException.ErrorCode} to convert
      * @return converted {@link LollipopDigestException.ErrorCode}
