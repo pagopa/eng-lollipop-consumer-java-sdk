@@ -330,7 +330,7 @@ public class VismaHttpMessageVerifierTest {
     }
 
     @Test
-    public void validLollipopSignatureCheckSingleEcdaSha256WithDer() {
+    void validLollipopSignatureCheckSingleEcdaSha256WithDer() {
 
         String signatureInput =
                 "sig1=(\"x-pagopa-lollipop-original-method\""

@@ -133,25 +133,7 @@ public class VismaHttpMessageVerifier implements HttpMessageVerifier {
                 KeyType keyType = jwk.getKeyType();
                 if (KeyType.EC.equals(keyType)) {
                     publicKey = jwk.toECKey().toECPublicKey();
-                    try {
-                        String[] signatureParts = signatureToProcess.split("=", 2);
-                        String signatureValue =
-                                StructuredBytes.of(
-                                                ECDSA.transcodeSignatureToConcat(
-                                                        Base64.getMimeDecoder()
-                                                                .decode(
-                                                                        signatureParts[1]
-                                                                                .getBytes()),
-                                                        ECDSA.getSignatureByteArrayLength(
-                                                                JWSAlgorithm.ES256)))
-                                        .toString();
-                        ECDSA.ensureLegalSignature(
-                                Base64.getMimeDecoder().decode(signatureValue.getBytes()),
-                                JWSAlgorithm.ES256);
-                        signatureToProcess = signatureParts[0].concat("=").concat(signatureValue);
-                    } catch (Exception e) {
-                        log.debug("Could not convert EC signature to valid format");
-                    }
+                    signatureToProcess = transcodeSignature(signatureToProcess);
                 } else if (KeyType.RSA.equals(keyType)) {
                     publicKey = jwk.toRSAKey().toRSAPublicKey();
                 }
@@ -194,5 +176,24 @@ public class VismaHttpMessageVerifier implements HttpMessageVerifier {
         }
 
         return true;
+    }
+
+    private String transcodeSignature(String signatureToProcess) {
+        try {
+            String[] signatureParts = signatureToProcess.split("=", 2);
+            String signatureValue =
+                    StructuredBytes.of(
+                                    ECDSA.transcodeSignatureToConcat(
+                                            Base64.getMimeDecoder()
+                                                    .decode(signatureParts[1].getBytes()),
+                                            ECDSA.getSignatureByteArrayLength(JWSAlgorithm.ES256)))
+                            .toString();
+            ECDSA.ensureLegalSignature(
+                    Base64.getMimeDecoder().decode(signatureValue.getBytes()), JWSAlgorithm.ES256);
+            signatureToProcess = signatureParts[0].concat("=").concat(signatureValue);
+        } catch (Exception e) {
+            log.debug("Could not convert EC signature to valid format");
+        }
+        return signatureToProcess;
     }
 }
