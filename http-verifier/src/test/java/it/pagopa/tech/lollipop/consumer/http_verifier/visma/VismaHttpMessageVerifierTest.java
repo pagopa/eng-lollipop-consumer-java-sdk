@@ -328,4 +328,45 @@ public class VismaHttpMessageVerifierTest {
                                                     .INVALID_SIGNATURE_NUMBER);
                         });
     }
+
+    @Test
+    public void validLollipopSignatureCheckSingleEcdaSha256WithDer() {
+
+        String signatureInput =
+                "sig1=(\"x-pagopa-lollipop-original-method\""
+                    + " \"x-pagopa-lollipop-original-url\");created=1681473980;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid=\"sha256-HiNolL87UYKQfaKISwIzyWY4swKPUzpaOWJCxaHy89M\"";
+        var signature =
+                "sig1=:MEUCIFiZHxuLhk2Jlt46E5kbB8hCx7fN7QeeAj2gaSK3Y+WzAiEAtggj3Jwu8RbTGdNmsDix2zymh0gKwKxoPlolL7j6VTg=:";
+
+        Map<String, String> requestHeaders =
+                new HashMap<>(
+                        Map.of(
+                                "x-pagopa-lollipop-assertion-ref",
+                                "sha256-HiNolL87UYKQfaKISwIzyWY4swKPUzpaOWJCxaHy89M",
+                                "x-pagopa-lollipop-assertion-type",
+                                "SAML",
+                                "x-pagopa-lollipop-user-id",
+                                "aFiscalCode",
+                                "x-pagopa-lollipop-public-key",
+                                "eyJrdHkiOiJFQyIsInkiOiJNdkVCMENsUHFnTlhrNVhIYm9xN1hZUnE2TnJTQkFTVmZhT2wzWnAxQmJzPSIsImNydiI6IlAtMjU2IiwieCI6InF6YTQzdGtLTnIrYWlTZFdNL0Q1cTdxMElmV3lZVUFIVEhSNng3dFByZEU9In0",
+                                "x-pagopa-lollipop-auth-jwt",
+                                "aValidJWT",
+                                "x-pagopa-lollipop-original-method",
+                                "POST",
+                                "x-pagopa-lollipop-original-url",
+                                "https://api-app.io.pagopa.it/first-lollipop/sign",
+                                "content-digest",
+                                "sha-256=:cpyRqJ1VhoVC+MSs9fq4/4wXs4c46EyEFriskys43Zw=:",
+                                "Signature-Input",
+                                signatureInput,
+                                "Signature",
+                                signature));
+
+        // execute & verify
+        assertThatNoException()
+                .isThrownBy(
+                        () ->
+                                vismaDigestVerifier.verifyHttpSignature(
+                                        signature, signatureInput, requestHeaders));
+    }
 }

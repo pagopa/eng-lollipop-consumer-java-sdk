@@ -2,6 +2,8 @@
 package it.pagopa.tech.lollipop.consumer.http_verifier.visma;
 
 import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.crypto.impl.ECDSA;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.KeyType;
 import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
@@ -16,14 +18,17 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.visma.autopay.http.digest.DigestException;
 import net.visma.autopay.http.signature.*;
+import net.visma.autopay.http.structured.StructuredBytes;
 
 /**
  * Implementation of the @HttpMessageVerifier using Visma-AutoPay http-signature of the
  * http-signature draft
  */
 @AllArgsConstructor
+@Slf4j
 public class VismaHttpMessageVerifier implements HttpMessageVerifier {
 
     String defaultEncoding;
@@ -121,13 +126,6 @@ public class VismaHttpMessageVerifier implements HttpMessageVerifier {
                 }
             }
 
-            var signatureContext =
-                    SignatureContext.builder()
-                            .headers(parameters)
-                            .header("Signature-Input", signatureInputToProcess)
-                            .header("Signature", signatureToProcess)
-                            .build();
-
             /* Attempt to recover a valid key from the provided jwt */
             PublicKey publicKey = null;
             try {
@@ -135,6 +133,25 @@ public class VismaHttpMessageVerifier implements HttpMessageVerifier {
                 KeyType keyType = jwk.getKeyType();
                 if (KeyType.EC.equals(keyType)) {
                     publicKey = jwk.toECKey().toECPublicKey();
+                    try {
+                        String[] signatureParts = signatureToProcess.split("=", 2);
+                        String signatureValue =
+                                StructuredBytes.of(
+                                                ECDSA.transcodeSignatureToConcat(
+                                                        Base64.getMimeDecoder()
+                                                                .decode(
+                                                                        signatureParts[1]
+                                                                                .getBytes()),
+                                                        ECDSA.getSignatureByteArrayLength(
+                                                                JWSAlgorithm.ES256)))
+                                        .toString();
+                        ECDSA.ensureLegalSignature(
+                                Base64.getMimeDecoder().decode(signatureValue.getBytes()),
+                                JWSAlgorithm.ES256);
+                        signatureToProcess = signatureParts[0].concat("=").concat(signatureValue);
+                    } catch (Exception e) {
+                        log.debug("Could not convert EC signature to valid format");
+                    }
                 } else if (KeyType.RSA.equals(keyType)) {
                     publicKey = jwk.toRSAKey().toRSAPublicKey();
                 }
@@ -143,6 +160,13 @@ public class VismaHttpMessageVerifier implements HttpMessageVerifier {
                         LollipopSignatureException.ErrorCode.INVALID_SIGNATURE_ALG,
                         "Missing Signature Algorithm");
             }
+
+            var signatureContext =
+                    SignatureContext.builder()
+                            .headers(parameters)
+                            .header("Signature-Input", signatureInputToProcess)
+                            .header("Signature", signatureToProcess)
+                            .build();
 
             /* Populate Visma Sign Validator*/
             SignatureAlgorithm finalSignatureAlgorithm = signatureAlgorithm;
