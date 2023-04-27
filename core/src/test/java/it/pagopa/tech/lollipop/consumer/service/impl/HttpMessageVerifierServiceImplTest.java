@@ -35,8 +35,8 @@ class HttpMessageVerifierServiceImplTest {
     final String INVALID_PAYLOAD = "an invalid payload";
     final String VALID_ENCODING = "UTF-8";
 
-    private LollipopConsumerRequestConfig httpMessageVerifierConfig;
-    private HttpMessageVerifier httpMessageVerifier;
+    private final LollipopConsumerRequestConfig httpMessageVerifierConfig;
+    private final HttpMessageVerifier httpMessageVerifier;
 
     private HttpMessageVerifierServiceImpl httpMessageVerifierService;
 
@@ -82,7 +82,7 @@ class HttpMessageVerifierServiceImplTest {
     }
 
     @Test
-    public void validRequestIsProcessed() {
+    void validRequestIsProcessed() {
         assertThatNoException()
                 .isThrownBy(
                         () ->
@@ -91,7 +91,7 @@ class HttpMessageVerifierServiceImplTest {
     }
 
     @Test
-    public void invalidRequestIsProcessedWithStrictDigestValidation() {
+    void invalidRequestIsProcessedWithStrictDigestValidation() {
         LollipopConsumerRequest lollipopConsumerRequest = getLollipopConsumerRequest();
         this.httpMessageVerifierConfig.setStrictDigestVerify(true);
         lollipopConsumerRequest.setRequestBody(INVALID_PAYLOAD);
@@ -117,7 +117,7 @@ class HttpMessageVerifierServiceImplTest {
     }
 
     @Test
-    public void requestWithInvalidDigestThrowsException() {
+    void requestWithInvalidDigestThrowsException() {
         LollipopConsumerRequest lollipopConsumerRequest = getLollipopConsumerRequest();
         lollipopConsumerRequest.setRequestBody(INVALID_PAYLOAD);
         // execute & verify
@@ -135,7 +135,7 @@ class HttpMessageVerifierServiceImplTest {
     }
 
     @Test
-    public void requestWithoutContentDigestToValidateThrowsException() {
+    void requestWithoutContentDigestToValidateThrowsException() {
         LollipopConsumerRequest lollipopConsumerRequest = getLollipopConsumerRequest();
         lollipopConsumerRequest.getHeaderParams().remove("Content-Digest");
         // execute & verify
@@ -153,7 +153,7 @@ class HttpMessageVerifierServiceImplTest {
     }
 
     @Test
-    public void requestWithoutRequestBodyToValidateThrowsException() {
+    void requestWithoutRequestBodyToValidateThrowsException() {
         LollipopConsumerRequest lollipopConsumerRequest = getLollipopConsumerRequest();
         lollipopConsumerRequest.setRequestBody(null);
         // execute & verify
@@ -171,7 +171,7 @@ class HttpMessageVerifierServiceImplTest {
     }
 
     @Test
-    public void requestWithoutSignatureToValidateThrowsException() {
+    void requestWithoutSignatureToValidateThrowsException() {
         LollipopConsumerRequest lollipopConsumerRequest = getLollipopConsumerRequest();
         lollipopConsumerRequest.getHeaderParams().remove("Signature");
         // execute & verify
@@ -188,7 +188,7 @@ class HttpMessageVerifierServiceImplTest {
     }
 
     @Test
-    public void requestWithoutSignatureInputToValidateThrowsException() {
+    void requestWithoutSignatureInputToValidateThrowsException() {
         LollipopConsumerRequest lollipopConsumerRequest = getLollipopConsumerRequest();
         lollipopConsumerRequest.getHeaderParams().remove("Signature-Input");
         // execute & verify
@@ -206,7 +206,7 @@ class HttpMessageVerifierServiceImplTest {
     }
 
     @Test
-    public void requestWithInvalidSignatureRetunsFalse() {
+    void requestWithInvalidSignatureRetunsFalse() {
         AtomicBoolean result = new AtomicBoolean(false);
         LollipopConsumerRequest lollipopConsumerRequest = getLollipopConsumerRequest();
         lollipopConsumerRequest.getHeaderParams().put("Signature", INVALID_SIGNATURE);

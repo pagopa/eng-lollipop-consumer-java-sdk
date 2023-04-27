@@ -23,7 +23,7 @@ public class IdpCertSimpleClient implements IdpCertClient {
     private final DefaultApi defaultApi;
 
     private final IdpCertSimpleClientConfig entityConfig;
-    private IdpCertStorage storage;
+    private final IdpCertStorage storage;
 
     @Inject
     public IdpCertSimpleClient(
@@ -50,7 +50,6 @@ public class IdpCertSimpleClient implements IdpCertClient {
     public List<IdpCertData> getCertData(String entityId, String instant)
             throws CertDataNotFoundException {
         List<IdpCertData> listCertData = new ArrayList<>();
-        List<String> tagList;
 
         if (entityId == null || instant == null || entityId.isBlank() || instant.isBlank()) {
             throw new IllegalArgumentException("EntityID or Assertion Issue Instant missing");
@@ -186,39 +185,27 @@ public class IdpCertSimpleClient implements IdpCertClient {
             throws TagListSearchOutOfBoundException, InvalidInstantFormatException {
         List<String> newTagList = new ArrayList<>();
         String latest = "latest";
-        long longInstant;
 
-        try {
-            longInstant = Long.parseLong(instant);
-        } catch (Exception e) {
-            throw new InvalidInstantFormatException(
-                    "The given insant " + instant + " is not a valid timestamp");
-        }
+        long longInstant = getLongInstant(instant);
 
         boolean latestRemoved = tagList.remove(latest);
 
         Collections.sort(tagList);
 
-        if (latestRemoved) {
-            tagList.add(latest);
-        }
+        ifLatestRemovedAddLatest(tagList, latest, latestRemoved);
 
         int index = tagList.size() / 2;
 
         boolean notFound = true;
         while (notFound) {
             try {
-                if (tagList.size() <= 2) {
-                    String firstTimestamp = tagList.get(0);
-                    if (firstTimestamp.equals(latest)
-                            || Long.parseLong(firstTimestamp) <= longInstant) {
-                        return tagList;
-                    }
+                if (isTagListAlreadyFiltered(tagList, latest, longInstant)) {
+                    return tagList;
                 }
 
                 String upperTag = tagList.get(index);
                 String lowerTag = tagList.get(index - 1);
-                if (upperTag.equals(latest) || longInstant <= Long.parseLong(upperTag)) {
+                if (upperTagIsHigherOrLatest(latest, longInstant, upperTag)) {
                     if (longInstant >= Long.parseLong(lowerTag)) {
                         notFound = false;
                         newTagList.add(upperTag);
@@ -236,6 +223,38 @@ public class IdpCertSimpleClient implements IdpCertClient {
         }
 
         return newTagList;
+    }
+
+    private static boolean isTagListAlreadyFiltered(
+            List<String> tagList, String latest, long longInstant) {
+        if (tagList.size() <= 2) {
+            String firstTimestamp = tagList.get(0);
+            return firstTimestamp.equals(latest) || Long.parseLong(firstTimestamp) <= longInstant;
+        }
+        return false;
+    }
+
+    private static long getLongInstant(String instant) throws InvalidInstantFormatException {
+        long longInstant;
+        try {
+            longInstant = Long.parseLong(instant);
+        } catch (Exception e) {
+            throw new InvalidInstantFormatException(
+                    "The given instant " + instant + " is not a valid timestamp");
+        }
+        return longInstant;
+    }
+
+    private static boolean upperTagIsHigherOrLatest(
+            String latest, long longInstant, String upperTag) {
+        return upperTag.equals(latest) || longInstant <= Long.parseLong(upperTag);
+    }
+
+    private static void ifLatestRemovedAddLatest(
+            List<String> tagList, String latest, boolean latestRemoved) {
+        if (latestRemoved) {
+            tagList.add(latest);
+        }
     }
 
     private String codifyStorageTag(String tag, String entityId) {

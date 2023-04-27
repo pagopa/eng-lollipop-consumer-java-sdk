@@ -20,7 +20,7 @@ class VismaHttpMessageVerifierFactoryTest {
     }
 
     @Test
-    public void encodingInCostructorIsInvalid() {
+    void encodingInCostructorIsInvalid() {
         assertThatThrownBy(
                         () ->
                                 new VismaHttpMessageVerifierFactory(
@@ -31,7 +31,7 @@ class VismaHttpMessageVerifierFactoryTest {
     }
 
     @Test
-    public void encodingInCostructorIsValid() {
+    void encodingInCostructorIsValid() {
         assertThatNoException()
                 .isThrownBy(
                         () ->
@@ -41,7 +41,7 @@ class VismaHttpMessageVerifierFactoryTest {
 
     @SneakyThrows
     @Test
-    public void instanceIsCreated() {
+    void instanceIsCreated() {
         assertThat(
                         new VismaHttpMessageVerifierFactory("UTF-8", lollipopConsumerRequestConfig)
                                 .create())
