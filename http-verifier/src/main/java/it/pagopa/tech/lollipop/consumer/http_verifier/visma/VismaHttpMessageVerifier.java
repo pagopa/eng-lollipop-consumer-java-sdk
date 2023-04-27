@@ -183,7 +183,7 @@ public class VismaHttpMessageVerifier implements HttpMessageVerifier {
             log.debug("Could not convert EC signature to valid format");
         }
         return signatureToProcess;
-    }    
+    }
 
     private static void isSignatureAlgorithmNotNull(SignatureAlgorithm signatureAlgorithm)
             throws LollipopSignatureException {
