@@ -4,10 +4,12 @@ package it.pagopa.tech.lollipop.consumer.assertion.storage;
 import it.pagopa.tech.lollipop.consumer.model.DelayedCacheObject;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
 import java.lang.ref.SoftReference;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Implementation of the {@link AssertionStorage} interface as a simple in memory storage.
@@ -18,6 +20,7 @@ import javax.inject.Inject;
  * eviction operations, every time an assertion is accessed the associated eviction operation is
  * rescheduled.
  */
+@Slf4j
 public class SimpleAssertionStorage implements AssertionStorage {
 
     private final ConcurrentHashMap<String, SoftReference<SamlAssertion>> cache;
@@ -141,7 +144,18 @@ public class SimpleAssertionStorage implements AssertionStorage {
             CompletableFuture.supplyAsync(
                     () -> {
                         if (numberOfElements.get() >= storageConfig.getMaxNumberOfElements()) {
-                            cleaningUpQueue.remove();
+                            DelayedCacheObject<SamlAssertion> delayedCacheObject =
+                                    cleaningUpQueue.remove();
+                            if (delayedCacheObject != null) {
+                                SoftReference<SamlAssertion> removedElement =
+                                        cache.remove(delayedCacheObject.getKey());
+                                if (removedElement != null && removedElement.get() != null) {
+                                    log.trace(
+                                            "Removed object: "
+                                                    + Objects.requireNonNull(removedElement.get())
+                                                            .getAssertionRef());
+                                }
+                            }
                         }
                         long expiryTime =
                                 System.currentTimeMillis()
