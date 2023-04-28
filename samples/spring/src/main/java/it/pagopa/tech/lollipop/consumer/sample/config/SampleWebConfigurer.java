@@ -4,6 +4,7 @@ import it.pagopa.tech.lollipop.consumer.spring.HttpVerifierHandlerInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -24,8 +25,11 @@ public class SampleWebConfigurer implements WebMvcConfigurer {
         return filter;
     }
 
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(interceptor);
+        registry.addInterceptor(interceptor)
+                .addPathPatterns("/")
+                .pathMatcher(new AntPathMatcher());
     }
 }
