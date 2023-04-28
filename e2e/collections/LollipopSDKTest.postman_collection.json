@@ -1,0 +1,691 @@
+{
+	"info": {
+		"_postman_id": "3b7deb11-2758-4c4f-9c1d-4ff1b9d627b4",
+		"name": "LollipopSDKTest",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25397617"
+	},
+	"item": [
+		{
+			"name": "Success",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Expected HTTP Status\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Digest",
+						"value": "{{validContentDigest}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-original-url",
+						"value": "{{expectedOriginalURL}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-original-method",
+						"value": "{{expectedOriginalMethod}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-public-key",
+						"value": "{{validPublicKey}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-assertion-ref",
+						"value": "{{validAssertionRef}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-assertion-type",
+						"value": "{{validAssertionType}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-auth-jwt",
+						"value": "{{validAuthJWT}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-user-id",
+						"value": "{{validUserId}}",
+						"type": "text"
+					},
+					{
+						"key": "Signature-Input",
+						"value": "{{validSignatureInput}}",
+						"type": "text"
+					},
+					{
+						"key": "Signature",
+						"value": "{{validSignature}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"message\":\"a valid message payload\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{PROTOCOL}}{{BASE_URL}}",
+					"host": [
+						"{{PROTOCOL}}{{BASE_URL}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Success with multi signature",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Expected HTTP Status\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Digest",
+						"value": "{{validContentDigest}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-original-url",
+						"value": "{{expectedOriginalURL}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-original-method",
+						"value": "{{expectedOriginalMethod}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-public-key",
+						"value": "{{validPublicKey}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-assertion-ref",
+						"value": "{{validAssertionRef}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-assertion-type",
+						"value": "{{validAssertionType}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-auth-jwt",
+						"value": "{{validAuthJWT}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-user-id",
+						"value": "{{validUserId}}",
+						"type": "text"
+					},
+					{
+						"key": "x-io-sign-qtspclauses",
+						"value": "anIoSignClauses",
+						"type": "text"
+					},
+					{
+						"key": "Signature-Input",
+						"value": "sig1=(\"x-io-sign-qtspclauses\");created=1678299228;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\", sig2=(\"content-digest\" \"x-pagopa-lollipop-original-method\" \"x-pagopa-lollipop-original-url\");created=1678299228;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\"",
+						"type": "text"
+					},
+					{
+						"key": "Signature",
+						"value": "sig1=:8MB/iT9iZO2HfVjMds6WdFMQeutkPnoyBDhzeyvIQDhb/tX0nE6HeRSoRBsrl4GUzo6OItnzfzF43Sd14P7tAw==:,sig2=:ZDWu2x+6APQG0Ioj10uNzTBv+5JbFBYnjhqcpL66oGFtwznROAUouXkx80ekzUY5h0HoJWE/ecqxRK2OVeHTiQ==:",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"message\":\"a valid message payload\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{PROTOCOL}}{{BASE_URL}}",
+					"host": [
+						"{{PROTOCOL}}{{BASE_URL}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Failed with invalid content digest",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Expected HTTP Status\", function () {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Digest",
+						"value": "sha-256=:cpyRqJ1VhoVC+MSs9fq4/4wXs4c46EyEFriskyXXXXX=:",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-original-url",
+						"value": "{{expectedOriginalURL}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-original-method",
+						"value": "{{expectedOriginalMethod}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-public-key",
+						"value": "{{validPublicKey}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-assertion-ref",
+						"value": "{{validAssertionRef}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-assertion-type",
+						"value": "{{validAssertionType}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-auth-jwt",
+						"value": "{{validAuthJWT}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-user-id",
+						"value": "{{validUserId}}",
+						"type": "text"
+					},
+					{
+						"key": "Signature-Input",
+						"value": "{{validSignatureInput}}",
+						"type": "text"
+					},
+					{
+						"key": "Signature",
+						"value": "{{validSignature}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"message\":\"a valid message payload\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{PROTOCOL}}{{BASE_URL}}",
+					"host": [
+						"{{PROTOCOL}}{{BASE_URL}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Failed with invalid body",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Expected HTTP Status\", function () {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Digest",
+						"value": "{{validContentDigest}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-original-url",
+						"value": "{{expectedOriginalURL}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-original-method",
+						"value": "{{expectedOriginalMethod}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-public-key",
+						"value": "{{validPublicKey}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-assertion-ref",
+						"value": "{{validAssertionRef}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-assertion-type",
+						"value": "{{validAssertionType}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-auth-jwt",
+						"value": "{{validAuthJWT}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-user-id",
+						"value": "{{validUserId}}",
+						"type": "text"
+					},
+					{
+						"key": "Signature-Input",
+						"value": "{{validSignatureInput}}",
+						"type": "text"
+					},
+					{
+						"key": "Signature",
+						"value": "{{validSignature}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"message\":\"an invalid message payload\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{PROTOCOL}}{{BASE_URL}}",
+					"host": [
+						"{{PROTOCOL}}{{BASE_URL}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Failed with invalid encoding",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Expected HTTP Status\", function () {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Digest",
+						"value": "{{validContentDigest}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-original-url",
+						"value": "{{expectedOriginalURL}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-original-method",
+						"value": "{{expectedOriginalMethod}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-public-key",
+						"value": "{{validPublicKey}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-assertion-ref",
+						"value": "{{validAssertionRef}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-assertion-type",
+						"value": "{{validAssertionType}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-auth-jwt",
+						"value": "{{validAuthJWT}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-user-id",
+						"value": "{{validUserId}}",
+						"type": "text"
+					},
+					{
+						"key": "Signature-Input",
+						"value": "{{validSignatureInput}}",
+						"type": "text"
+					},
+					{
+						"key": "Signature",
+						"value": "{{validSignature}}",
+						"type": "text"
+					},
+					{
+						"key": "content-encoding",
+						"value": "UTF-326",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"message\":\"a valid message payload\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{PROTOCOL}}{{BASE_URL}}",
+					"host": [
+						"{{PROTOCOL}}{{BASE_URL}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Failed with invalid signature",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Expected HTTP Status\", function () {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Digest",
+						"value": "{{validContentDigest}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-original-url",
+						"value": "{{expectedOriginalURL}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-original-method",
+						"value": "{{expectedOriginalMethod}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-public-key",
+						"value": "{{validPublicKey}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-assertion-ref",
+						"value": "{{validAssertionRef}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-assertion-type",
+						"value": "{{validAssertionType}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-auth-jwt",
+						"value": "{{validAuthJWT}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-user-id",
+						"value": "{{validUserId}}",
+						"type": "text"
+					},
+					{
+						"key": "Signature-Input",
+						"value": "{{validSignatureInput}}",
+						"type": "text"
+					},
+					{
+						"key": "Signature",
+						"value": "sig123=:lTTTRytp53GuUMOB4Rz1z97Y96gfSeEOm/xVpO39d3HR6lLAy4KYiGq+1hZ7nmRFBt2bASWEpen7ov5O4wU3kQ==:",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"message\":\"a valid message payload\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{PROTOCOL}}{{BASE_URL}}",
+					"host": [
+						"{{PROTOCOL}}{{BASE_URL}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Failed on thumprint validation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Expected HTTP Status\", function () {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Digest",
+						"value": "{{validContentDigest}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-original-url",
+						"value": "{{expectedOriginalURL}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-original-method",
+						"value": "{{expectedOriginalMethod}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-public-key",
+						"value": "eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsImtpZCI6InRlc3Qta2V5LXJzYS1wc3MiLCJuIjoicjR0bW0zcjIwV2RfUGJxdlAxczItUUV0dnB1UmFWOFlxNDBnalVSOHkyUmp4YTZkcEcyR1hIYlBmdk0gIHM4Y3QtTGgxR0g0NXgyOFJ3M1J5NTNtbS1vQVhqeVE4Nk9uRGtaNU44bFliZ2dENE8zdzZNNnBBdkxraGs5NUFuICBkVHJpZmJJRlBOVThQUE1PN095ckZBSHFnRHN6bmpQRm1UT3RDRWNOMloxRnBXZ2Nod3VZTFBMLVdva3FsdGQxMSAgbnFxemktYko5Y3ZTS0FEWWRVQUFONVdVdHpkcGl5NkxiVGdTeFA3b2NpVTRUbjBnNUk2YURaSjdBOEx6bzBLU3kgIFpZb0E0ODVtcWNPMEdWQWRWdzlscTRhT1Q5djZkLW5iNGJuTmtRVmtsTFEzZlZBdkptLXhkRE9wOUxDTkNONDhWICAycG5ET2tGVjYtVTluVjVveWM2WEkydyJ9",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-assertion-ref",
+						"value": "{{validAssertionRef}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-assertion-type",
+						"value": "{{validAssertionType}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-auth-jwt",
+						"value": "{{validAuthJWT}}",
+						"type": "text"
+					},
+					{
+						"key": "x-pagopa-lollipop-user-id",
+						"value": "{{validUserId}}",
+						"type": "text"
+					},
+					{
+						"key": "Signature-Input",
+						"value": "sig1=(\\\"content-digest\\\" \\\"x-pagopa-lollipop-original-method\\\" \\\"x-pagopa-lollipop-original-url\\\");created=1678814391;nonce=\\\"aNonce\\\";alg=\\\"rsa-pss-sha256\\\";keyid=\\\"sha256-A3OhKGLYwSvdJ2txHi_SGQ3G-sHLh2Ibu91ErqFx_58\\\"",
+						"type": "text"
+					},
+					{
+						"key": "Signature",
+						"value": "sig1=:q3Og7m8yL18HkrY+zgV92Gj05lrWaFMIEFSPg2PEnO5a46+2Tt/2n7kjqVaGjI1ZXtys+Wyh3cVXCddadNARizt0BpCRdT9S4r48xsGO79Ucq4IFwZyyHNudKu5WSH4/55j5yX/YmeCtH+Nt6Nun02OZynn3iQwgLJB+CGe3h6X02iSvl4wJjKaMGE64RFHa5osE4MctoPD1j0tRkcOtgwrGmFMr282Kqrkabbx1vUpmO9T1khjouxIryfUln9zIaZ+wWmukpAZv7TKO3CltNWgfx1XT9m/iwzHiGmtvcHbWVExdAyey8lH23MgLY43AM7ytLQNSlk1s/bPNbGmPwg==:",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"message\":\"a valid message payload\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{PROTOCOL}}{{BASE_URL}}",
+					"host": [
+						"{{PROTOCOL}}{{BASE_URL}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "validContentDigest",
+			"value": "sha-256=:cpyRqJ1VhoVC+MSs9fq4/4wXs4c46EyEFriskys43Zw=:"
+		},
+		{
+			"key": "expectedOriginalURL",
+			"value": "https://api-app.io.pagopa.it/first-lollipop/sign"
+		},
+		{
+			"key": "expectedOriginalMethod",
+			"value": "POST"
+		},
+		{
+			"key": "validPublicKey",
+			"value": "eyJrdHkiOiJFQyIsIngiOiJTaHlZa0ZyN1F3eE9rOE5BRXF6aklkTnc4dEVKODlZOVBlWFF1eVVOWDVjIiwieSI6InlULVJxNWc2VlVadENUd0ZnRExDM2RneGNuM2RsSmNGRjhnWGdxYWgyS0UiLCJjcnYiOiJQLTI1NiJ9"
+		},
+		{
+			"key": "validAssertionRef",
+			"value": "sha256-chG21HBOK-wJp2hHuYPrx7tAII2UGWVF-IFo0crUOtw"
+		},
+		{
+			"key": "validAssertionType",
+			"value": "SAML"
+		},
+		{
+			"key": "validAuthJWT",
+			"value": "aValidJWT"
+		},
+		{
+			"key": "validUserId",
+			"value": "GDNNWA12H81Y874F"
+		},
+		{
+			"key": "validSignatureInput",
+			"value": "sig123=(\"content-digest\" \"x-pagopa-lollipop-original-method\" \"x-pagopa-lollipop-original-url\");created=1678293988;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\""
+		},
+		{
+			"key": "validSignature",
+			"value": "sig123=:6scl8sMzJdyG/OrnJXHRM9ajmIjrJ/zrLUDqvfOxj2h51DUKztTua3vR1kSUj/c/VT1ioDlt1QIMARABhquewg==:"
+		}
+	]
+}
