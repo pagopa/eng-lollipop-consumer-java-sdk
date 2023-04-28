@@ -144,18 +144,7 @@ public class SimpleAssertionStorage implements AssertionStorage {
             CompletableFuture.supplyAsync(
                     () -> {
                         if (numberOfElements.get() >= storageConfig.getMaxNumberOfElements()) {
-                            DelayedCacheObject<SamlAssertion> delayedCacheObject =
-                                    cleaningUpQueue.remove();
-                            if (delayedCacheObject != null) {
-                                SoftReference<SamlAssertion> removedElement =
-                                        cache.remove(delayedCacheObject.getKey());
-                                if (removedElement != null && removedElement.get() != null) {
-                                    log.trace(
-                                            "Removed object: "
-                                                    + Objects.requireNonNull(removedElement.get())
-                                                            .getAssertionRef());
-                                }
-                            }
+                            removeDelayedObject();
                         }
                         long expiryTime =
                                 System.currentTimeMillis()
@@ -170,6 +159,20 @@ public class SimpleAssertionStorage implements AssertionStorage {
                         return true;
                     },
                     executor);
+        }
+    }
+
+    protected void removeDelayedObject() {
+        DelayedCacheObject<SamlAssertion> delayedCacheObject = cleaningUpQueue.peek();
+        boolean isRemoved = cleaningUpQueue.remove(delayedCacheObject);
+        if (isRemoved) {
+            assert delayedCacheObject != null;
+            SoftReference<SamlAssertion> removedElement = cache.remove(delayedCacheObject.getKey());
+            if (removedElement != null && removedElement.get() != null) {
+                log.trace(
+                        "Removed object: "
+                                + Objects.requireNonNull(removedElement.get()).getAssertionRef());
+            }
         }
     }
 
