@@ -6,6 +6,5 @@ newman.run({
    reporters: 'cli',
    bail: true
 }, function (err, summary) {
-  if (err) { throw err; }
-  console.info('collection run complete!');
+  throw err;
 });
