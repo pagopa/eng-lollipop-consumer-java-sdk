@@ -32,8 +32,8 @@ jobs:
 #        path: ~/.sonar-project.properties/cache
 #        key: ${{ runner.os }}-sonar-project.properties
 #        restore-keys: ${{ runner.os }}-sonar-project.properties
-#    - name: Make gradlew executable
-#      run: chmod +x ./gradlew
+    - name: Make gradlew executable
+      run: chmod +x ./gradlew
 #    - name: Run build with Gradle Wrapper
 #      run: ./gradlew build testCodeCoverageReport
 #    - name: Add coverage to PR
@@ -85,7 +85,7 @@ jobs:
 #        -Dsonar.login=${{ env.SONAR_TOKEN }}
 #        -Dsonar.branch.name=${{ github.head_ref }}
     - name: Build Spring Sample
-      run: cd samples/spring && ./gradlew bootJar
+      run: cd samples/spring && gradlew bootJar
     - name: Build Docker compose
       run: docker compose build
     - name: Run Docker compose dev
