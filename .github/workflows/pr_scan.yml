@@ -89,10 +89,8 @@ jobs:
       - name: Build Spring Sample
         working-directory: ./samples/spring
         run: chmod +x ./gradlew && ./gradlew bootJar
-      - name: Build Docker compose
-        run: docker compose build
-      - name: Run Docker compose dev
-        run: docker compose --env-file .env.dev up -d
+      - name: Run Docker compose with .env.dev
+        run: docker compose --env-file .env.dev up -d --build
       - name: Install node modules and execute e2e tests
         working-directory: ./e2e
         run: npm install && npm run execute-test
