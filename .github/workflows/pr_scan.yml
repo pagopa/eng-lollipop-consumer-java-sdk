@@ -84,3 +84,11 @@ jobs:
         -Dsonar.java.libraries="**/*.jar"
         -Dsonar.login=${{ env.SONAR_TOKEN }}
         -Dsonar.branch.name=${{ github.head_ref }}
+    - name: Run docker compose dev
+      run: docker compose --env-file .env.dev up
+    - name: Install node modules
+      run: cd e2e && npm install
+    - name: Execute e2e tests
+      run: npm run execute-test
+    - name: Shutdown docker compose
+      run: docker compose down
