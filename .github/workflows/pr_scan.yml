@@ -84,6 +84,8 @@ jobs:
       #        -Dsonar.java.libraries="**/*.jar"
       #        -Dsonar.login=${{ env.SONAR_TOKEN }}
       #        -Dsonar.branch.name=${{ github.head_ref }}
+      - name: Publish to Maven Local
+        run: ./gradlew publishToMavenLocal
       - name: Build Spring Sample
         working-directory: ./samples/spring
         run: chmod +x ./gradlew && ./gradlew bootJar
