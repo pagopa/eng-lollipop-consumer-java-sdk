@@ -154,7 +154,8 @@
 					{
 						"key": "x-io-sign-qtspclauses",
 						"value": "anIoSignClauses",
-						"type": "text"
+						"type": "text",
+						"disabled": true
 					},
 					{
 						"key": "Signature-Input",
