@@ -57,7 +57,8 @@ public class LollipopConsumerConverter {
             CommandResult commandResult, HttpServletResponse httpResponse) throws IOException {
 
         if (!commandResult.getResultCode().equals(VERIFICATION_SUCCESS_CODE)) {
-            httpResponse.sendError(401, commandResult.getResultMessage());
+            httpResponse.setStatus(401);
+            httpResponse.getWriter().write(commandResult.getResultMessage());
         }
 
         return httpResponse;

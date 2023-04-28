@@ -77,7 +77,7 @@ class LollipopConsumerConverterTest {
                 LollipopConsumerConverter.interceptResult(result, mockResponse);
 
         Assertions.assertEquals(401, response.getStatus());
-        Assertions.assertSame(
-                COMMAND_RESPONSE_FAILED, ((MockHttpServletResponse) response).getErrorMessage());
+        Assertions.assertEquals(
+                COMMAND_RESPONSE_FAILED, ((MockHttpServletResponse) response).getContentAsString());
     }
 }
