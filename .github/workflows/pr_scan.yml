@@ -92,7 +92,7 @@ jobs:
       - name: Build Docker compose
         run: docker compose build
       - name: Run Docker compose dev
-        run: docker compose --env-file .env.dev up
+        run: docker compose --env-file .env.dev up -d
       - name: Install node modules and execute e2e tests
         working-directory: ./e2e
         run: npm install && npm run execute-test
