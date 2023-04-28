@@ -85,7 +85,7 @@ jobs:
 #        -Dsonar.login=${{ env.SONAR_TOKEN }}
 #        -Dsonar.branch.name=${{ github.head_ref }}
     - name: Build Spring Sample
-      run: cd samples/spring && gradlew bootJar
+      run: cd samples/spring && ./gradlew bootJar
     - name: Build Docker compose
       run: docker compose build
     - name: Run Docker compose dev
