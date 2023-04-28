@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "d72dcca1-95d6-43bf-9272-da8a4efa16e1",
+		"_postman_id": "3b7deb11-2758-4c4f-9c1d-4ff1b9d627b4",
 		"name": "LollipopSDKTest",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "26867059"
+		"_exporter_id": "25397617"
 	},
 	"item": [
 		{
@@ -94,7 +94,7 @@
 			"response": []
 		},
 		{
-			"name": "Success with multi signaure",
+			"name": "Success with multi signature",
 			"event": [
 				{
 					"listen": "test",
@@ -149,6 +149,11 @@
 					{
 						"key": "x-pagopa-lollipop-user-id",
 						"value": "{{validUserId}}",
+						"type": "text"
+					},
+					{
+						"key": "x-io-sign-qtspclauses",
+						"value": "anIoSignClauses",
 						"type": "text"
 					},
 					{
