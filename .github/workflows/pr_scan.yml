@@ -24,8 +24,8 @@ jobs:
       uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       with:
         fetch-depth: 0
-#    - name: Setup Gradle
-#      uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
 #    - name: Cache SonarCloud packages
 #      uses: actions/cache@v1
 #      with:
