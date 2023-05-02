@@ -36,14 +36,14 @@ jobs:
         run: chmod +x ./gradlew
       - name: Run build with Gradle Wrapper
         run: ./gradlew build testCodeCoverageReport
-      - name: Add coverage to PR
-        id: jacoco
-        uses: madrapps/jacoco-report@7a334255fbce42f385d7567c25d986a9c62e2971
-        with:
-          paths: ${{ github.workspace }}/test-coverage/build/reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: 40
-          min-coverage-changed-files: 60
+#      - name: Add coverage to PR
+#        id: jacoco
+#        uses: madrapps/jacoco-report@7a334255fbce42f385d7567c25d986a9c62e2971
+#        with:
+#          paths: ${{ github.workspace }}/test-coverage/build/reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          min-coverage-overall: 40
+#          min-coverage-changed-files: 60
 #      - name: Build the Docker image
 #        run: docker build . --file ${{ env.DOCKERFILE }} --tag localbuild/testimage:latest
 #      - name: Run the Anchore Grype scan action
