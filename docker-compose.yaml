@@ -12,6 +12,7 @@ services:
       - ./e2e/mockoon/mockoonIDP.json:/data:readonly
   web:
     build: .
+    image: localbuild/testimage:latest
     ports:
       - "8080:8080"
     healthcheck:
