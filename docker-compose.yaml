@@ -1,13 +1,23 @@
 version: "3.9"
 services:
+  mockserverAssertion:
+    image: mockoon/cli:latest
+    command: [ "--data", "data", "--port", "3000" ]
+    volumes:
+      - ./e2e/mockoon/mockoonAssertions.json:/data:readonly
+  mockserverIDP:
+    image: mockoon/cli:latest
+    command: [ "--data", "data", "--port", "3001" ]
+    volumes:
+      - ./e2e/mockoon/mockoonIDP.json:/data:readonly
   web:
     build: .
     ports:
       - "8080:8080"
     environment:
       ##Client mocks config
-      ASSERTION_CLIENT_MOCK_ENABLED: ${ASSERTION_CLIENT_MOCK_ENABLED}
-      IDP_CLIENT_MOCK_ENABLED: ${IDP_CLIENT_MOCK_ENABLED}
+      ASSERTION_CLIENT_MOCK_ENABLED: ${ASSERTION_CLIENT_MOCK_ENABLED:-false}
+      IDP_CLIENT_MOCK_ENABLED: ${IDP_CLIENT_MOCK_ENABLED:-false}
 
       ##General Lollipop Configs Sample
       LOLLIPOP_ASSERTION_EXPIRE_IN_DAYS: ${LOLLIPOP_ASSERTION_EXPIRE_IN_DAYS:-180}
