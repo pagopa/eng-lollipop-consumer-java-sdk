@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SampleController {
 
-    @RequestMapping("/")
-    public @ResponseBody String sample() { return "Sample";};
+    @RequestMapping("${sample.lollipop.consumer.config.endpoint}")
+    public @ResponseBody String sample() { return "Sample";}
 }
