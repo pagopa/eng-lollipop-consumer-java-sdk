@@ -41,6 +41,8 @@ dependencies {
 	implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:http-verifier:1.0.0-RC1'
 	implementation 'it.pagopa.tech.lollipop-consumer-java-sdk:spring-impl:1.0.0-RC1'
 
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
 	implementation 'org.mock-server:mockserver-netty:5.15.0'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'ch.qos.logback:logback-classic:1.2.11'
