@@ -1,12 +1,9 @@
 package it.pagopa.tech.lollipop.consumer.sample.config;
 
 import it.pagopa.tech.lollipop.consumer.assertion.AssertionServiceFactory;
-import it.pagopa.tech.lollipop.consumer.assertion.client.simple.AssertionSimpleClientConfig;
 import it.pagopa.tech.lollipop.consumer.assertion.client.simple.AssertionSimpleClientProvider;
 import it.pagopa.tech.lollipop.consumer.assertion.impl.AssertionServiceFactoryImpl;
 import it.pagopa.tech.lollipop.consumer.assertion.storage.SimpleAssertionStorageProvider;
-import it.pagopa.tech.lollipop.consumer.assertion.storage.StorageConfig;
-import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
 import it.pagopa.tech.lollipop.consumer.http_verifier.HttpMessageVerifierFactory;
 import it.pagopa.tech.lollipop.consumer.http_verifier.visma.VismaHttpMessageVerifierFactory;
 import it.pagopa.tech.lollipop.consumer.idp.IdpCertProviderFactory;
@@ -24,7 +21,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableConfigurationProperties(value = {SpringLollipopConsumerRequestConfig.class, SpringAssertionStorageConfig.class,
-        SpringAssertionSimpleClientConfig.class, SpringIdpCertSimpleClientConfig.class, SpringIdpCertStorageConfig.class})
+        SpringAssertionSimpleClientConfig.class, SpringIdpCertSimpleClientConfig.class, SpringIdpCertStorageConfig.class, SampleLollipopConsumerConfig.class})
 public class SampleServicesConfig {
 
     @Bean
