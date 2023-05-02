@@ -14,6 +14,8 @@ public class SampleWebConfigurer implements WebMvcConfigurer {
 
     @Autowired
     private HttpVerifierHandlerInterceptor interceptor;
+    @Autowired
+    private SampleLollipopConsumerConfig sampleLollipopConsumerConfig;
 
     @Bean
     public CommonsRequestLoggingFilter loggingFilter() {
@@ -29,7 +31,7 @@ public class SampleWebConfigurer implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(interceptor)
-                .addPathPatterns("/")
+                .addPathPatterns(sampleLollipopConsumerConfig.getEndpoint())
                 .pathMatcher(new AntPathMatcher());
     }
 }
