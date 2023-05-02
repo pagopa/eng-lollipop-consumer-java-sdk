@@ -44,6 +44,20 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 40
           min-coverage-changed-files: 60
+      - name: Build the Docker image
+        run: docker build . --file ${{ env.DOCKERFILE }} --tag localbuild/testimage:latest
+      - name: Run the Anchore Grype scan action
+        uses: anchore/scan-action@d5aa5b6cb9414b0c7771438046ff5bcfa2854ed7
+        id: scan
+        with:
+          image: "localbuild/testimage:latest"
+          fail-build: true
+          severity-cutoff: "high"
+      - name: Upload Anchore Scan Report
+        uses: github/codeql-action/upload-sarif@9885f86fab4879632b7e44514f19148225dfbdcd
+        if: always()
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
       - name: Run Sonar Scanner on Pull Request
         if: ${{ github.event_name == 'pull_request' }}
         run: ./gradlew sonar --info
@@ -82,15 +96,3 @@ jobs:
         run: npm install && npm run execute-test
       - name: Shutdown docker compose
         run: docker compose down
-      - name: Run the Anchore Grype scan action
-        uses: anchore/scan-action@d5aa5b6cb9414b0c7771438046ff5bcfa2854ed7
-        id: scan
-        with:
-          image: "localbuild/testimage:latest"
-          fail-build: true
-          severity-cutoff: "high"
-      - name: Upload Anchore Scan Report
-        uses: github/codeql-action/upload-sarif@9885f86fab4879632b7e44514f19148225dfbdcd
-        if: always()
-        with:
-          sarif_file: ${{ steps.scan.outputs.sarif }}
