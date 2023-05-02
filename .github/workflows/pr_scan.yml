@@ -32,10 +32,10 @@ jobs:
 #          path: ~/.sonar-project.properties/cache
 #          key: ${{ runner.os }}-sonar-project.properties
 #          restore-keys: ${{ runner.os }}-sonar-project.properties
-#      - name: Make gradlew executable
-#        run: chmod +x ./gradlew
-#      - name: Run build with Gradle Wrapper
-#        run: ./gradlew build testCodeCoverageReport
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+      - name: Run build with Gradle Wrapper
+        run: ./gradlew build testCodeCoverageReport
 #      - name: Add coverage to PR
 #        id: jacoco
 #        uses: madrapps/jacoco-report@7a334255fbce42f385d7567c25d986a9c62e2971
