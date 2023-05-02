@@ -91,6 +91,9 @@ jobs:
         run: chmod +x ./gradlew && ./gradlew bootJar
       - name: Run Docker compose with .env.dev
         run: docker compose --env-file e2e/.env.dev up -d --build --wait
+      - name: Sleep for 30 seconds
+        run: sleep 30s
+        shell: bash
       - name: Install node modules and execute e2e tests
         working-directory: ./e2e
         run: npm install && npm run execute-test

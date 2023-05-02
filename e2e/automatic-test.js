@@ -10,10 +10,7 @@ newman.run({
   if(summary?.run?.error){ throw 'collection run encountered an error.';}
 
   if(summary?.run?.failures?.length > 0){
-    console.log(summary);
-    console.log(summary.run);
     const errors = summary.run.failures;
-    console.log(errors);
     throw `following collection tests failed: ${errors.map((er) => `\n${er.source.name}`)}`;
   }
 
