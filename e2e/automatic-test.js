@@ -1,8 +1,8 @@
 const newman = require('newman');
 
 newman.run({
-   collection: require('./collections/LollipopSDKTest.postman_collection.json'),
-   environment: './env/Lollipop environment variables.postman_environment.json',
+   collection: require('./collections/lollipopSDKTest.postman_collection.json'),
+   environment: './env/lollipopEnvironmentVariables.postman_environment.json',
    reporters: ['cli', 'htmlextra'],
    bail: true
 }, function (err, summary) {
@@ -10,7 +10,10 @@ newman.run({
   if(summary?.run?.error){ throw 'collection run encountered an error.';}
 
   if(summary?.run?.failures?.length > 0){
+    console.log(summary);
+    console.log(summary.run);
     const errors = summary.run.failures;
+    console.log(errors);
     throw `following collection tests failed: ${errors.map((er) => `\n${er.source.name}`)}`;
   }
 
