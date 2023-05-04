@@ -24,3 +24,15 @@ The client uri, endpoints and the entity id of the CIE identity provider are con
 | baseUri             | https://api.is.eng.pagopa.it                                          | base uri of the api for retrieving the certifications |
 | idpKeysCieEndpoint  | /idp-keys/cie                                                         | endpoint for CIE certifications                       |
 | idpKeysSpidEndpoint | /idp-keys/spid                                                        | endpoint for SPID certifications                      |
+
+## Example
+
+In order to create a new instance of the client using the provider and an instance of the configuration class. Note that
+in order to use instances of a IdpCertStorageProvider and related configs (as described in the root Readme.md) should be
+available for this implementation:
+
+```
+AssertionClientConfig config = AssertionSimpleClientConfig.builder().build();
+IdpCertSimpleClientProvider idpCertSimpleClientProvider =
+        new IdpCertSimpleClientProvider(config, idpCertStorageProvider, idpCertStorageConfig);
+```
