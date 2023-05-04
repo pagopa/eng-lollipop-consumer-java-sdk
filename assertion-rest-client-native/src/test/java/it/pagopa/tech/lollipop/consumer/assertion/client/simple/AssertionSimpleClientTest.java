@@ -3,7 +3,6 @@ package it.pagopa.tech.lollipop.consumer.assertion.client.simple;
 
 import static it.pagopa.tech.lollipop.consumer.assertion.client.simple.AssertionSimpleClientTestUtils.*;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
-import static org.mockserver.model.HttpResponse.response;
 
 import it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal.ApiClient;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopAssertionNotFoundException;

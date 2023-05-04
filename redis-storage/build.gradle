@@ -52,6 +52,7 @@ dependencies {
 	implementation project(path: ':core')
 	// Use JUnit Jupiter for testing.
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+	implementation 'io.lettuce:lettuce-core:6.2.3.RELEASE'
 }
 
 tasks.named('test') {
