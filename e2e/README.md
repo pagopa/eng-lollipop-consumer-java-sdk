@@ -1,6 +1,4 @@
-# eng-lollipop-consumer-java-sdk
-
-## End-to-end test
+# End-to-end test
 
 ### Testing models
 

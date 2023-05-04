@@ -1,6 +1,4 @@
-# eng-lollipop-consumer-java-sdk
-
-## Identity service rest client
+# Identity service rest client
 This module is used to obtain the identity provider certification data.
 
 The parameters needed to find the right certificate are the entity id and the assertion's issue instant,

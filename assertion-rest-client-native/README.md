@@ -1,7 +1,5 @@
-# eng-lollipop-consumer-java-sdk
-
-## Assertion rest client
-This module is used to obtain the user's assertion.
+# Assertion rest client
+This module is used to obtain the user's SAML assertion.
 
 The parameters needed to get the assertion are the jwt and the assertion's ref,
 both retrieved from the http request's headers.
