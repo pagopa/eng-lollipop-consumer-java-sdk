@@ -13,3 +13,13 @@ The client uri, endpoints and the entity id of the CIE identity provider are con
 |--------------------------|-----------------------|---------------------------------------------------|
 | baseUri                  | http://localhost:3000 | base uri of the api for retrieving the assertions |
 | assertionRequestEndpoint | /assertions           | endpoint of the request                           |
+
+## Example
+
+In order to create a new instance of the client using the provider and an instance of the configuration class:
+
+```
+AssertionClientConfig config = AssertionSimpleClientConfig.builder().build();
+AssertionClientProvider assertionClientProvider =
+        new AssertionSimpleClientProvider(config);
+```
