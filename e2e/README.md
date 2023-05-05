@@ -4,6 +4,9 @@
 + [Node.js](https://nodejs.org/en/download)
 + [Gradle](https://gradle.org/install/)
 + [Docker Compose](https://docs.docker.com/compose/)
++ Define in your system the following environment variables:
+  + GITHUB_ACTOR : [github username](https://github.com/settings/profile)
+  + GITHUB_TOKEN : [github personal access token (classic)](https://github.com/settings/tokens) with read permissions
 
 ### Testing models
 
