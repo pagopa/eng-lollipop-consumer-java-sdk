@@ -1,24 +1,34 @@
+# eng-lollipop-consumer-java-sdk
+
 # End-to-end test
+
+### Prerequisites
++ [Node.js](https://nodejs.org/en/download)
++ [Gradle](https://gradle.org/install/)
++ [Docker Compose](https://docs.docker.com/compose/)
 
 ### Testing models
 
 + #### Publish library dependencies to maven local
-In the root folder run
+In the root folder, update gradlew permission and publish the dependencies
 
 ```bash
+chmod +x ./gradlew 
 ./gradlew publishToMavenLocal
 ```
 
 + #### Build spring sample application
-Change directory to ./samples/spring folder and build the sample with
+Change directory to ./samples/spring folder,
+update also this gradlew file permission and build the sample
 
 ```bash
 cd samples/spring
+chmod +x ./gradlew 
 ./gradlew bootJar
 ```
 
 + #### Run docker container
-Return to root folder and run docker compose in the e2e folder with
+Return to root folder and run docker compose in the e2e folder
 
 ```bash
 cd ..
@@ -44,7 +54,7 @@ npm run execute-test
 Newman generates a detailed report in the "newman" folder, you can open it with your preferred browser
 
 ### Configuration
-The sample configuration can be changed with environment variables in the .env.dev files
+The sample configuration can be changed with environment variables in the .env.dev file
 (or using a different .env file in the docker compose command)
 
 The configurable variables are the following:
