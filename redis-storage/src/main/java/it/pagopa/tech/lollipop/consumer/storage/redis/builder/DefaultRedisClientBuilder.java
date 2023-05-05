@@ -8,26 +8,50 @@ import io.lettuce.core.SocketOptions;
 import io.lettuce.core.cluster.ClusterClientOptions;
 import io.lettuce.core.cluster.RedisClusterClient;
 import it.pagopa.tech.lollipop.consumer.storage.redis.RedisStorage;
+import it.pagopa.tech.lollipop.consumer.storage.redis.config.RedisStorageConfig;
+import it.pagopa.tech.lollipop.consumer.storage.redis.storage.ClusteredRedisStorage;
 import it.pagopa.tech.lollipop.consumer.storage.redis.storage.SimpleRedisStorage;
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * An implementation of the {@link ClientBuilder} interface, to be used in order to define instances
+ * of Lettuce Redis clients
+ */
 public class DefaultRedisClientBuilder implements ClientBuilder {
 
-    @Override
-    public RedisStorage createStorage() {
-        return new SimpleRedisStorage(createRedisClient("TBD", 9000, "TBD", "TBD"));
+    private final RedisStorageConfig redisStorageConfig;
+
+    public DefaultRedisClientBuilder(RedisStorageConfig redisStorageConfig) {
+        this.redisStorageConfig = redisStorageConfig;
     }
 
-    private RedisClient createRedisClient(
-            String hostName, int port, String username, String password) {
+    /**
+     * Creates an instance of {@link RedisStorage} using the generated RedisClient, depending on the
+     * configured parameter it will be used a Clustered or Simple instance
+     *
+     * @return an instance of a RedisStorage
+     */
+    @Override
+    public RedisStorage createStorage() {
+        return redisStorageConfig.isClusterConnection()
+                ? new ClusteredRedisStorage(createRedisClusterClient())
+                : new SimpleRedisStorage(createRedisClient());
+    }
+
+    /**
+     * Creates a simple Redis Client using the provided configurations
+     *
+     * @return a RedisClient
+     */
+    private RedisClient createRedisClient() {
 
         // Build Redis URI with host and authentication details.
+
         RedisURI redisURI =
-                RedisURI.Builder.redis(hostName)
-                        .withPort(port)
-                        .withSsl(true)
-                        .withAuthentication(username, password)
-                        .withClientName("LettuceClient")
-                        .build();
+                getRedisURI(
+                        redisStorageConfig.getMainNode().getHostname(),
+                        redisStorageConfig.getMainNode().getPort());
 
         // Create Lettuce Redis Client
         RedisClient client = RedisClient.create(redisURI);
@@ -42,20 +66,27 @@ public class DefaultRedisClientBuilder implements ClientBuilder {
         return client;
     }
 
-    private RedisClusterClient createRedisClusterClient(
-            String hostName, int port, String username, String password) {
+    /**
+     * Creates a Clustered Redis Client using the provided configurations
+     *
+     * @return a RedisClient
+     */
+    private RedisClusterClient createRedisClusterClient() {
 
-        // Build Redis URI with host and authentication details.
-        RedisURI redisURI =
-                RedisURI.Builder.redis(hostName)
-                        .withPort(port)
-                        .withSsl(true)
-                        .withAuthentication(username, password)
-                        .withClientName("LettuceClient")
-                        .build();
+        List<RedisURI> redisURIList = new ArrayList<>();
+        redisURIList.add(
+                getRedisURI(
+                        redisStorageConfig.getMainNode().getHostname(),
+                        redisStorageConfig.getMainNode().getPort()));
+
+        if (redisStorageConfig.getClusterNodeList() != null) {
+            for (RedisStorageConfig.RedisNode redisNode : redisStorageConfig.getClusterNodeList()) {
+                redisURIList.add(getRedisURI(redisNode.getHostname(), redisNode.getPort()));
+            }
+        }
 
         // Create Lettuce Redis Client
-        RedisClusterClient client = RedisClusterClient.create(redisURI);
+        RedisClusterClient client = RedisClusterClient.create(redisURIList);
 
         // Configure the client options.
         client.setOptions(
@@ -65,5 +96,23 @@ public class DefaultRedisClientBuilder implements ClientBuilder {
                         .build());
 
         return client;
+    }
+
+    private RedisURI getRedisURI(String hostname, Integer port) {
+        // Build Redis URI with host and authentication details.
+        RedisURI.Builder builder =
+                RedisURI.Builder.redis(hostname)
+                        .withPort(port)
+                        .withSsl(redisStorageConfig.isWithSsl());
+
+        if (redisStorageConfig.isWithAuth()) {
+            builder.withAuthentication(
+                    redisStorageConfig.getUsername(), redisStorageConfig.getPassword());
+        }
+
+        builder.withClientName(redisStorageConfig.getClientName());
+
+        RedisURI redisURI = builder.build();
+        return redisURI;
     }
 }

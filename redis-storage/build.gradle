@@ -51,8 +51,16 @@ dependencies {
 	}
 	implementation project(path: ':core')
 	// Use JUnit Jupiter for testing.
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
 	implementation 'io.lettuce:lettuce-core:6.2.3.RELEASE'
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.2'
+	implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2'
+	// Use JUnit Jupiter for testing.
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+	testImplementation 'org.mockito:mockito-core:5.2.0'
+	testImplementation 'org.mockito:mockito-junit-jupiter:5.2.0'
+	testImplementation 'org.assertj:assertj-core:3.24.2'
+	testImplementation 'com.github.codemonstur:embedded-redis:1.0.0'
 }
 
 tasks.named('test') {
