@@ -1,5 +1,3 @@
-# eng-lollipop-consumer-java-sdk
-
 # End-to-end test
 
 ### Prerequisites
