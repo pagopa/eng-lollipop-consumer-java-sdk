@@ -14,7 +14,7 @@
 In the root folder, update gradlew permission and publish the dependencies
 
 ```bash
-chmod +x ./gradlew 
+chmod +x ./gradlew
 ./gradlew publishToMavenLocal
 ```
 
@@ -24,7 +24,7 @@ update also this gradlew file permission and build the sample
 
 ```bash
 cd samples/spring
-chmod +x ./gradlew 
+chmod +x ./gradlew
 ./gradlew bootJar
 ```
 
@@ -75,18 +75,18 @@ The configurable variables are the following:
 | IDP_CLIENT_CIE_ENDPOINT                   | /idp-keys/cie                                                         | Define endpoint to IDP_CLIENT_BASE_URI for CIE's certification     |
 | IDP_CLIENT_SPID_ENDPOINT                  | /idp-keys/spid                                                        | Define endpoint to IDP_CLIENT_BASE_URI for SPID's certification    |
 | IDP_STORAGE_ENABLED                       | true                                                                  | Enable internal cache storage  for IDP certification data          |
-| IDP_STORAGE_EVICTION_DELAY                | 1                                                                     | Define storage eviction delay for IDP's storage                    |
+| IDP_STORAGE_EVICTION_DELAY                | 1                                                                     | Define storage eviction delay for IDP's storage (in Minutes by default) |
 | ASSERTION_REST_URI                        | http://localhost:3000                                                 | Define base uri to retrieve the Assertion                          |
 | ASSERTION_REST_ENDPOINT                   | /assertions                                                           | Define endpoint to ASSERTION_REST_URI                              |
 | ASSERTION_STORAGE_ENABLED                 | true                                                                  | Enable internal cache storage  for assertions                      |
-| ASSERTION_STORAGE_EVICTION_DELAY          | 1                                                                     | Define storage eviction delay for assertion's storage              |
+| ASSERTION_STORAGE_EVICTION_DELAY          | 1                                                                     | Define storage eviction delay for assertion's storage (in Minutes by default) |
 
 ### Troubleshooting
 
 - ##### Docker image incompatibility
 
-    The docker image [eclipse-temurin:11-jdk-alpine](https://hub.docker.com/layers/library/eclipse-temurin/11-jdk-alpine/images/sha256-ea0ec99f8cfbaff4d61fec32af9430097e152860ec58b3cf2cb06454d75c61b0?context=explore) 
+    The docker image [eclipse-temurin:11-jdk-alpine](https://hub.docker.com/layers/library/eclipse-temurin/11-jdk-alpine/images/sha256-ea0ec99f8cfbaff4d61fec32af9430097e152860ec58b3cf2cb06454d75c61b0?context=explore)
     used to build the sample is compatible only with amd64 cpus and not with
     apple's silicon cpus (arc64), if you have an arc cpu and having trouble building the docker image
     change it in the Dockerfile to [eclipse-temurin:11-jre-jammy](https://hub.docker.com/layers/library/eclipse-temurin/11-jre-jammy/images/sha256-18c3e334425f4fbf3a53f2f0df713e4d206894fb00ab2edde6df0311f5b63550?context=explore).
-    
+
