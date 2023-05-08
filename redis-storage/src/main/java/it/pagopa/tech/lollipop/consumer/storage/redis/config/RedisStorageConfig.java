@@ -34,6 +34,6 @@ public class RedisStorageConfig {
     public static class RedisNode {
 
         @Builder.Default private String hostname = "localhost";
-        @Builder.Default private Integer port = 6370;
+        @Builder.Default private Integer port = 6379;
     }
 }
