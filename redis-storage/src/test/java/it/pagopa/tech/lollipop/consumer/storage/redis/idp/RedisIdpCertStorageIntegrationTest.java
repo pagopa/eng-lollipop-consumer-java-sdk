@@ -138,6 +138,8 @@ class RedisIdpCertStorageIntegrationTest {
                 + "  <\\/saml:Assertion>\\n"
                 + "<\\/samlp:Response>\"}";
     private RedisServer redisServer;
+
+    private RedisSentinel redisSentinel;
     private IdpCertStorage redisStorage;
 
     private IdpCertStorageConfig idpCertStorageConfig;
@@ -148,7 +150,7 @@ class RedisIdpCertStorageIntegrationTest {
         idpCertStorageConfig.setStorageEvictionDelay(1);
         idpCertStorageConfig.setStorageEvictionDelayTimeUnit(TimeUnit.SECONDS);
         redisServer = RedisServer.newRedisServer().build();
-        RedisSentinel redisSentinel = RedisSentinel.newRedisSentinel().build();
+        redisSentinel = RedisSentinel.newRedisSentinel().build();
         redisServer.start();
         redisSentinel.start();
         redisStorage =
@@ -240,5 +242,6 @@ class RedisIdpCertStorageIntegrationTest {
     @AfterAll
     public void tearDown() throws IOException {
         redisServer.stop();
+        redisSentinel.stop();
     }
 }
