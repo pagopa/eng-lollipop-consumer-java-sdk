@@ -65,7 +65,7 @@ public class ClusteredRedisStorage extends RedisStorage {
                 .thenAccept(
                         result -> {
                             if ("OK".equals(result)) {
-                                statefulRedisConnection.async().expire(key, delayTime);
+                                statefulRedisConnection.sync().expire(key, delayTime);
                             }
                             statefulRedisConnection.closeAsync();
                         });

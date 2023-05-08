@@ -172,7 +172,7 @@ class RedisIdpCertStorageIntegrationTest {
         Thread.sleep(150);
         IdpCertData result = redisStorage.getIdpCertData("test-key");
         Assertions.assertEquals(idpCertDataToSave, result);
-        Thread.sleep(1500);
+        Thread.sleep(2000);
         result = redisStorage.getIdpCertData("test-key");
         Assertions.assertNull(result);
     }
