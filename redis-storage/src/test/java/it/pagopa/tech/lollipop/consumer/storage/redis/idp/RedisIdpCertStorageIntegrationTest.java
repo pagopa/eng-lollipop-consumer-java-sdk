@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
+import redis.embedded.RedisSentinel;
 import redis.embedded.RedisServer;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -139,13 +140,17 @@ class RedisIdpCertStorageIntegrationTest {
     private RedisServer redisServer;
     private IdpCertStorage redisStorage;
 
+    private IdpCertStorageConfig idpCertStorageConfig;
+
     @BeforeAll
     public void setUp() throws IOException {
-        IdpCertStorageConfig idpCertStorageConfig = new IdpCertStorageConfig();
+        idpCertStorageConfig = new IdpCertStorageConfig();
         idpCertStorageConfig.setStorageEvictionDelay(1);
         idpCertStorageConfig.setStorageEvictionDelayTimeUnit(TimeUnit.SECONDS);
         redisServer = RedisServer.newRedisServer().build();
+        RedisSentinel redisSentinel = RedisSentinel.newRedisSentinel().build();
         redisServer.start();
+        redisSentinel.start();
         redisStorage =
                 new RedisIdpCertStorageProvider(
                                 new RedisStorageProvisioner(
@@ -163,6 +168,64 @@ class RedisIdpCertStorageIntegrationTest {
     @SneakyThrows
     @Test
     public void successfulOperationsOnRedisStorage() {
+        IdpCertData idpCertDataToSave = new IdpCertData();
+        idpCertDataToSave.setTag("aTag");
+        idpCertDataToSave.setEntityId("anEntityId");
+        idpCertDataToSave.setCertData(
+                new ArrayList<>(Collections.singletonList(VALID_ASSERTION_XML)));
+        redisStorage.saveIdpCertData("test-key", idpCertDataToSave);
+        Thread.sleep(150);
+        IdpCertData result = redisStorage.getIdpCertData("test-key");
+        Assertions.assertEquals(idpCertDataToSave, result);
+    }
+
+    @SneakyThrows
+    @Test
+    public void successfulOperationsOnRedisStorageWithConnectionPooling() {
+        redisStorage =
+                new RedisIdpCertStorageProvider(
+                                new RedisStorageProvisioner(
+                                        new DefaultRedisClientBuilder(
+                                                RedisStorageConfig.builder()
+                                                        .withConnectionPooling(true)
+                                                        .mainNode(
+                                                                RedisStorageConfig.RedisNode
+                                                                        .builder()
+                                                                        .port(6379)
+                                                                        .build())
+                                                        .build())))
+                        .provideStorage(idpCertStorageConfig);
+        IdpCertData idpCertDataToSave = new IdpCertData();
+        idpCertDataToSave.setTag("aTag");
+        idpCertDataToSave.setEntityId("anEntityId");
+        idpCertDataToSave.setCertData(
+                new ArrayList<>(Collections.singletonList(VALID_ASSERTION_XML)));
+        redisStorage.saveIdpCertData("test-key", idpCertDataToSave);
+        Thread.sleep(150);
+        IdpCertData result = redisStorage.getIdpCertData("test-key");
+        Assertions.assertEquals(idpCertDataToSave, result);
+    }
+
+    @SneakyThrows
+    @Test
+    public void successfulOperationsOnRedisStorageWithSentinelConnectionPooling() {
+        redisStorage =
+                new RedisIdpCertStorageProvider(
+                                new RedisStorageProvisioner(
+                                        new DefaultRedisClientBuilder(
+                                                RedisStorageConfig.builder()
+                                                        .withSentinel(true)
+                                                        .withConnectionPooling(true)
+                                                        .masterIds(
+                                                                Collections.singletonList(
+                                                                        "mymaster"))
+                                                        .mainNode(
+                                                                RedisStorageConfig.RedisNode
+                                                                        .builder()
+                                                                        .port(26379)
+                                                                        .build())
+                                                        .build())))
+                        .provideStorage(idpCertStorageConfig);
         IdpCertData idpCertDataToSave = new IdpCertData();
         idpCertDataToSave.setTag("aTag");
         idpCertDataToSave.setEntityId("anEntityId");

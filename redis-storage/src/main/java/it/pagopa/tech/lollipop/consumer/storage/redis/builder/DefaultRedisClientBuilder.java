@@ -35,7 +35,10 @@ public class DefaultRedisClientBuilder implements ClientBuilder {
     @Override
     public RedisStorage createStorage() {
         return redisStorageConfig.isClusterConnection()
-                ? new ClusteredRedisStorage(createRedisClusterClient())
+                ? new ClusteredRedisStorage(
+                        createRedisClusterClient(),
+                        redisStorageConfig.getDefaultDelay(),
+                        redisStorageConfig.isWithConnectionPooling())
                 : new SimpleRedisStorage(
                         createRedisClient(),
                         redisStorageConfig.getDefaultDelay(),

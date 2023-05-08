@@ -13,8 +13,6 @@ import redis.embedded.RedisServer;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SimpleRedisStorageTest {
 
-    private String bindAddress;
-
     private RedisServer redisServer;
     private RedisSentinel redisSentinel;
     private SimpleRedisStorage redisStorage;

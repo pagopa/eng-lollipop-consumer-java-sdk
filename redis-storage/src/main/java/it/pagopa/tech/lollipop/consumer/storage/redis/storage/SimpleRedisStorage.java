@@ -145,6 +145,5 @@ public class SimpleRedisStorage extends RedisStorage {
                         result -> {
                             statefulConnection.closeAsync();
                         });
-        ;
     }
 }
