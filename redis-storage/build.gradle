@@ -61,6 +61,7 @@ dependencies {
 	testImplementation 'org.mockito:mockito-junit-jupiter:5.2.0'
 	testImplementation 'org.assertj:assertj-core:3.24.2'
 	testImplementation 'com.github.codemonstur:embedded-redis:1.0.0'
+	implementation 'org.apache.commons:commons-pool2:2.11.1'
 }
 
 tasks.named('test') {

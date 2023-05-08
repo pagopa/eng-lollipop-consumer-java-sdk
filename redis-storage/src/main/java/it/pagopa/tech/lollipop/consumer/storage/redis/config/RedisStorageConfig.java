@@ -21,7 +21,11 @@ public class RedisStorageConfig {
     @Builder.Default private boolean withSsl = false;
     @Builder.Default private String clientName = "LettuceClient";
     @Builder.Default private Long defaultDelay = 60L;
+    @Builder.Default private boolean withConnectionPooling = false;
+    @Builder.Default private boolean withSentinel = false;
     private List<RedisNode> clusterNodeList;
+    private List<String> sentinelHostList;
+    private List<String> masterIds;
 
     @NoArgsConstructor
     @AllArgsConstructor

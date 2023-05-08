@@ -10,6 +10,7 @@ import it.pagopa.tech.lollipop.consumer.storage.redis.config.RedisStorageConfig;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
 import redis.embedded.RedisServer;
@@ -140,7 +141,10 @@ class RedisIdpCertStorageIntegrationTest {
 
     @BeforeAll
     public void setUp() throws IOException {
-        redisServer = RedisServer.newRedisServer().port(6999).build();
+        IdpCertStorageConfig idpCertStorageConfig = new IdpCertStorageConfig();
+        idpCertStorageConfig.setStorageEvictionDelay(1);
+        idpCertStorageConfig.setStorageEvictionDelayTimeUnit(TimeUnit.SECONDS);
+        redisServer = RedisServer.newRedisServer().build();
         redisServer.start();
         redisStorage =
                 new RedisIdpCertStorageProvider(
@@ -150,10 +154,10 @@ class RedisIdpCertStorageIntegrationTest {
                                                         .mainNode(
                                                                 RedisStorageConfig.RedisNode
                                                                         .builder()
-                                                                        .port(6999)
+                                                                        .port(6379)
                                                                         .build())
                                                         .build())))
-                        .provideStorage(new IdpCertStorageConfig());
+                        .provideStorage(idpCertStorageConfig);
     }
 
     @SneakyThrows
@@ -165,10 +169,10 @@ class RedisIdpCertStorageIntegrationTest {
         idpCertDataToSave.setCertData(
                 new ArrayList<>(Collections.singletonList(VALID_ASSERTION_XML)));
         redisStorage.saveIdpCertData("test-key", idpCertDataToSave);
-        Thread.sleep(100);
+        Thread.sleep(150);
         IdpCertData result = redisStorage.getIdpCertData("test-key");
         Assertions.assertEquals(idpCertDataToSave, result);
-        Thread.sleep(1100);
+        Thread.sleep(1500);
         result = redisStorage.getIdpCertData("test-key");
         Assertions.assertNull(result);
     }

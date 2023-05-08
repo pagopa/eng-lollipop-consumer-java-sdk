@@ -36,7 +36,10 @@ public class DefaultRedisClientBuilder implements ClientBuilder {
     public RedisStorage createStorage() {
         return redisStorageConfig.isClusterConnection()
                 ? new ClusteredRedisStorage(createRedisClusterClient())
-                : new SimpleRedisStorage(createRedisClient());
+                : new SimpleRedisStorage(
+                        createRedisClient(),
+                        redisStorageConfig.getDefaultDelay(),
+                        redisStorageConfig.isWithConnectionPooling());
     }
 
     /**
@@ -99,11 +102,22 @@ public class DefaultRedisClientBuilder implements ClientBuilder {
     }
 
     private RedisURI getRedisURI(String hostname, Integer port) {
-        // Build Redis URI with host and authentication details.
         RedisURI.Builder builder =
-                RedisURI.Builder.redis(hostname)
-                        .withPort(port)
-                        .withSsl(redisStorageConfig.isWithSsl());
+                !redisStorageConfig.isWithSentinel()
+                        ? RedisURI.Builder.redis(hostname).withPort(port)
+                        : RedisURI.Builder.sentinel(hostname, port);
+
+        builder.withSsl(redisStorageConfig.isWithSsl());
+
+        if (redisStorageConfig.getSentinelHostList() != null
+                && !redisStorageConfig.isClusterConnection()) {
+            redisStorageConfig.getSentinelHostList().forEach(builder::withSentinel);
+        }
+
+        if (redisStorageConfig.getMasterIds() != null
+                && !redisStorageConfig.isClusterConnection()) {
+            redisStorageConfig.getMasterIds().forEach(builder::withSentinelMasterId);
+        }
 
         if (redisStorageConfig.isWithAuth()) {
             builder.withAuthentication(
@@ -112,7 +126,6 @@ public class DefaultRedisClientBuilder implements ClientBuilder {
 
         builder.withClientName(redisStorageConfig.getClientName());
 
-        RedisURI redisURI = builder.build();
-        return redisURI;
+        return builder.build();
     }
 }

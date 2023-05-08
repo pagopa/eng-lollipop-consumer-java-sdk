@@ -14,7 +14,7 @@
 In the root folder, update gradlew permission and publish the dependencies
 
 ```bash
-chmod +x ./gradlew 
+chmod +x ./gradlew
 ./gradlew publishToMavenLocal
 ```
 
@@ -24,7 +24,7 @@ update also this gradlew file permission and build the sample
 
 ```bash
 cd samples/spring
-chmod +x ./gradlew 
+chmod +x ./gradlew
 ./gradlew bootJar
 ```
 
@@ -85,8 +85,8 @@ The configurable variables are the following:
 
 - ##### Docker image incompatibility
 
-    The docker image [eclipse-temurin:11-jdk-alpine](https://hub.docker.com/layers/library/eclipse-temurin/11-jdk-alpine/images/sha256-ea0ec99f8cfbaff4d61fec32af9430097e152860ec58b3cf2cb06454d75c61b0?context=explore) 
+    The docker image [eclipse-temurin:11-jdk-alpine](https://hub.docker.com/layers/library/eclipse-temurin/11-jdk-alpine/images/sha256-ea0ec99f8cfbaff4d61fec32af9430097e152860ec58b3cf2cb06454d75c61b0?context=explore)
     used to build the sample is compatible only with amd64 cpus and not with
     apple's silicon cpus (arc64), if you have an arc cpu and having trouble building the docker image
     change it in the Dockerfile to [eclipse-temurin:11-jre-jammy](https://hub.docker.com/layers/library/eclipse-temurin/11-jre-jammy/images/sha256-18c3e334425f4fbf3a53f2f0df713e4d206894fb00ab2edde6df0311f5b63550?context=explore).
-    
+
