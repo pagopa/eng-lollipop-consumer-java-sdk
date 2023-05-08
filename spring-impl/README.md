@@ -6,7 +6,7 @@ application.
 ## Configurations
 
 An extension of the configuration class within the core module is provided, in order to enable property loading
-through the Spring functionalities. Other configurations are expected to be provided from the application using 
+through the Spring functionalities. Other configurations are expected to be provided from the application using
 this specific implementation (See the [spring-sample](../samples/spring) as a reference for a complete setup
 of the other classes, as well as the application.properties file to be used).
 

@@ -4,12 +4,19 @@ package it.pagopa.tech.lollipop.consumer.storage.redis.storage;
 import io.lettuce.core.AbstractRedisClient;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.support.ConnectionPoolSupport;
 import it.pagopa.tech.lollipop.consumer.storage.redis.RedisStorage;
+import lombok.*;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
+@Getter
+@Setter
 /** Implements commands to a simple Redis instance using Lettuce */
 public class SimpleRedisStorage extends RedisStorage {
 
     private Long defaultDelayTimeSeconds = 60L;
+    private Boolean withConnectionPool = false;
 
     public SimpleRedisStorage(AbstractRedisClient redisClient) {
         super(redisClient);
@@ -20,6 +27,13 @@ public class SimpleRedisStorage extends RedisStorage {
         this.defaultDelayTimeSeconds = defaultDelayTimeSeconds;
     }
 
+    public SimpleRedisStorage(
+            RedisClient redisClient, Long defaultDelayTimeSeconds, Boolean withConnectionPool) {
+        super(redisClient);
+        this.defaultDelayTimeSeconds = defaultDelayTimeSeconds;
+        this.withConnectionPool = withConnectionPool;
+    }
+
     /**
      * Retrieves from a synchronous connection the value stored in the Redis instance using the
      * provided key, closes the connection asynchronously
@@ -28,13 +42,21 @@ public class SimpleRedisStorage extends RedisStorage {
      * @return value stored in the Redis instance
      */
     @Override
-    public String get(String key) {
-        StatefulRedisConnection<String, String> statefulConnection =
-                ((RedisClient) getRedisClient()).connect();
-        try {
-            return statefulConnection.sync().get(key);
-        } finally {
-            statefulConnection.closeAsync();
+    public String get(String key) throws Exception {
+        RedisClient redisClient = (RedisClient) getRedisClient();
+        if (!withConnectionPool) {
+            try (StatefulRedisConnection<String, String> statefulConnection =
+                    redisClient.connect()) {
+                return statefulConnection.sync().get(key);
+            }
+        } else {
+            try (GenericObjectPool<StatefulRedisConnection<String, String>> pool =
+                            ConnectionPoolSupport.createGenericObjectPool(
+                                    redisClient::connect, new GenericObjectPoolConfig<>());
+                    StatefulRedisConnection<String, String> statefulConnection =
+                            pool.borrowObject()) {
+                return statefulConnection.sync().get(key);
+            }
         }
     }
 
@@ -45,7 +67,7 @@ public class SimpleRedisStorage extends RedisStorage {
      * @param value value to be stored in the redis instance
      */
     @Override
-    public void save(String key, String value) {
+    public void save(String key, String value) throws Exception {
         save(key, value, defaultDelayTimeSeconds);
     }
 
@@ -57,9 +79,28 @@ public class SimpleRedisStorage extends RedisStorage {
      * @param delayTime seconds defining the stored data TTL
      */
     @Override
-    public void save(String key, String value, Long delayTime) {
-        StatefulRedisConnection<String, String> statefulRedisConnection =
-                ((RedisClient) getRedisClient()).connect();
+    public void save(String key, String value, Long delayTime) throws Exception {
+
+        RedisClient redisClient = (RedisClient) getRedisClient();
+        if (!withConnectionPool) {
+            try (StatefulRedisConnection<String, String> statefulConnection =
+                    redisClient.connect()) {
+                executeSetMethod(key, value, delayTime, statefulConnection);
+            }
+        } else {
+            GenericObjectPool<StatefulRedisConnection<String, String>> pool =
+                    ConnectionPoolSupport.createGenericObjectPool(
+                            redisClient::connect, new GenericObjectPoolConfig<>());
+            StatefulRedisConnection<String, String> statefulConnection = pool.borrowObject();
+            executeSetMethod(key, value, delayTime, statefulConnection);
+        }
+    }
+
+    private void executeSetMethod(
+            String key,
+            String value,
+            Long delayTime,
+            StatefulRedisConnection<String, String> statefulRedisConnection) {
         statefulRedisConnection
                 .async()
                 .set(key, String.valueOf(value))
@@ -78,15 +119,31 @@ public class SimpleRedisStorage extends RedisStorage {
      * @param key key to be used for content deletion from redis
      */
     @Override
-    public void delete(String key) {
-        StatefulRedisConnection<String, String> statefulRedisConnection =
-                ((RedisClient) getRedisClient()).connect();
-        statefulRedisConnection
+    public void delete(String key) throws Exception {
+
+        RedisClient redisClient = (RedisClient) getRedisClient();
+        if (!withConnectionPool) {
+            try (StatefulRedisConnection<String, String> statefulConnection =
+                    redisClient.connect()) {
+                executeAsyncDel(key, statefulConnection);
+            }
+        } else {
+            GenericObjectPool<StatefulRedisConnection<String, String>> pool =
+                    ConnectionPoolSupport.createGenericObjectPool(
+                            redisClient::connect, new GenericObjectPoolConfig<>());
+            StatefulRedisConnection<String, String> statefulConnection = pool.borrowObject();
+            executeAsyncDel(key, statefulConnection);
+        }
+    }
+
+    private void executeAsyncDel(
+            String key, StatefulRedisConnection<String, String> statefulConnection) {
+        statefulConnection
                 .async()
                 .del(key)
                 .thenAccept(
                         result -> {
-                            statefulRedisConnection.closeAsync();
+                            statefulConnection.closeAsync();
                         });
     }
 }
