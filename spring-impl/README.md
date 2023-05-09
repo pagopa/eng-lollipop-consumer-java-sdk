@@ -12,7 +12,7 @@ of the other classes, as well as the application.properties file to be used).
 
 ## Interceptor Registry Example
 
-In order to use the provided Http Interceptor it is required to register in the application context, providing
+In order to use the provided Http Interceptor it is required to register it in the application context, providing
 a configuration for the Spring application to use in order to determine which endpoints should be validated using
 the library functionalities
 

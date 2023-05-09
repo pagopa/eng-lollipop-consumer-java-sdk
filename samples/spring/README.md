@@ -48,8 +48,8 @@ The configurable variables are the following:
 | IDP_CLIENT_CIE_ENDPOINT                   | /idp-keys/cie                                                         | Define endpoint to IDP_CLIENT_BASE_URI for CIE's certification     |
 | IDP_CLIENT_SPID_ENDPOINT                  | /idp-keys/spid                                                        | Define endpoint to IDP_CLIENT_BASE_URI for SPID's certification    |
 | IDP_STORAGE_ENABLED                       | true                                                                  | Enable internal cache storage  for IDP certification data          |
-| IDP_STORAGE_EVICTION_DELAY                | 1                                                                     | Define storage eviction delay for IDP's storage                    |
+| IDP_STORAGE_EVICTION_DELAY                | 1                                                                     | Define storage eviction delay for IDP's storage (in Minutes by default) |
 | ASSERTION_REST_URI                        | http://localhost:3000                                                 | Define base uri to retrieve the Assertion                          |
 | ASSERTION_REST_ENDPOINT                   | /assertions                                                           | Define endpoint to ASSERTION_REST_URI                              |
 | ASSERTION_STORAGE_ENABLED                 | true                                                                  | Enable internal cache storage  for assertions                      |
-| ASSERTION_STORAGE_ENABLED                 | 1                                                                     | Define storage eviction delay for assertion's storage              |
+| ASSERTION_STORAGE_EVICTION_DELAY          | 1                                                                     | Define storage eviction delay for assertion's storage (in Minutes by default) |
