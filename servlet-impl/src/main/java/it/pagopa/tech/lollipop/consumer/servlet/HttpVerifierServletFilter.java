@@ -23,7 +23,7 @@ public class HttpVerifierServletFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        log.error("Servlet filter initialized");
+        log.info("Servlet filter initialized");
     }
 
     /**
@@ -57,6 +57,6 @@ public class HttpVerifierServletFilter implements Filter {
 
     @Override
     public void destroy() {
-        log.error("Servlet filter destroyed");
+        log.info("Servlet filter destroyed");
     }
 }
