@@ -8,15 +8,12 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.pagopa.tech.lollipop.consumer.assertion.storage.AssertionStorage;
 import it.pagopa.tech.lollipop.consumer.assertion.storage.StorageConfig;
-import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorage;
 import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorageConfig;
-import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
 import it.pagopa.tech.lollipop.consumer.storage.redis.RedisStorage;
+import java.util.concurrent.TimeUnit;
 import lombok.SneakyThrows;
 import org.openapitools.jackson.nullable.JsonNullableModule;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation of the {@link AssertionStorage} interface as a redis storage.
@@ -30,8 +27,7 @@ public class RedisAssertionStorage implements AssertionStorage {
 
     private final ObjectMapper objectMapper;
 
-    public RedisAssertionStorage(
-            RedisStorage redisStorage, StorageConfig storageConfig) {
+    public RedisAssertionStorage(RedisStorage redisStorage, StorageConfig storageConfig) {
         this.redisStorage = redisStorage;
         this.storageConfig = storageConfig;
         this.objectMapper = new ObjectMapper();
@@ -47,12 +43,12 @@ public class RedisAssertionStorage implements AssertionStorage {
     }
 
     /**
-     * Retrieve the SAML Assertion associated with the provided assertionRef if the storage is enabled {@link
-     * IdpCertStorageConfig}, otherwise no operation is performed.
+     * Retrieve the SAML Assertion associated with the provided assertionRef if the storage is
+     * enabled {@link IdpCertStorageConfig}, otherwise no operation is performed.
      *
      * @param ref the assertion reference to be used as key
-     * @return the SAML Assertion if found, null if no data is present in the storage or
-     *     the storage is disabled
+     * @return the SAML Assertion if found, null if no data is present in the storage or the storage
+     *     is disabled
      */
     @SneakyThrows
     @Override
@@ -67,11 +63,11 @@ public class RedisAssertionStorage implements AssertionStorage {
     }
 
     /**
-     * Store the SAML Assertion  if the storage is enabled {@link StorageConfig}, otherwise no
+     * Store the SAML Assertion if the storage is enabled {@link StorageConfig}, otherwise no
      * operation is performed.
      *
-     * <p>Once the SAML Assertion is stored an eviction operation is scheduled with a delay configured
-     * via {@link AssertionStorage}
+     * <p>Once the SAML Assertion is stored an eviction operation is scheduled with a delay
+     * configured via {@link AssertionStorage}
      *
      * @param assertionRef the assertion Ref
      * @param samlAssertion SAML Assertion instance
@@ -90,5 +86,4 @@ public class RedisAssertionStorage implements AssertionStorage {
                         storageConfig.getStorageEvictionDelay(),
                         storageConfig.getStorageEvictionDelayTimeUnit()));
     }
-
 }

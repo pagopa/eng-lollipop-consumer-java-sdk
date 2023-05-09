@@ -83,8 +83,7 @@ public class SimpleRedisStorage extends RedisStorage {
 
         RedisClient redisClient = (RedisClient) getRedisClient();
         if (!withConnectionPool) {
-            StatefulRedisConnection<String, String> statefulConnection =
-                    redisClient.connect();
+            StatefulRedisConnection<String, String> statefulConnection = redisClient.connect();
             executeSetMethod(key, value, delayTime, statefulConnection);
         } else {
             GenericObjectPool<StatefulRedisConnection<String, String>> pool =
@@ -122,8 +121,7 @@ public class SimpleRedisStorage extends RedisStorage {
 
         RedisClient redisClient = (RedisClient) getRedisClient();
         if (!withConnectionPool) {
-            StatefulRedisConnection<String, String> statefulConnection =
-                    redisClient.connect();
+            StatefulRedisConnection<String, String> statefulConnection = redisClient.connect();
             executeAsyncDel(key, statefulConnection);
         } else {
             GenericObjectPool<StatefulRedisConnection<String, String>> pool =

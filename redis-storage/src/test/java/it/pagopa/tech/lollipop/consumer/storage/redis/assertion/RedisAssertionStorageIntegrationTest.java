@@ -3,23 +3,17 @@ package it.pagopa.tech.lollipop.consumer.storage.redis.assertion;
 
 import it.pagopa.tech.lollipop.consumer.assertion.storage.AssertionStorage;
 import it.pagopa.tech.lollipop.consumer.assertion.storage.StorageConfig;
-import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorage;
-import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorageConfig;
-import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
 import it.pagopa.tech.lollipop.consumer.storage.redis.RedisStorageProvisioner;
 import it.pagopa.tech.lollipop.consumer.storage.redis.builder.DefaultRedisClientBuilder;
 import it.pagopa.tech.lollipop.consumer.storage.redis.config.RedisStorageConfig;
-import it.pagopa.tech.lollipop.consumer.storage.redis.idp.RedisIdpCertStorageProvider;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
 import redis.embedded.RedisSentinel;
 import redis.embedded.RedisServer;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.concurrent.TimeUnit;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RedisAssertionStorageIntegrationTest {
