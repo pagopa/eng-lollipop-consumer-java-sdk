@@ -24,11 +24,11 @@ configuration class, to be used in order to statup a Redis Client within the mod
 | masterIds             | -                                     | Lost of masterIds to be used if in sentinel mode                                                                                                                                                           |
 
 
-## Example for the Idp interface
+## Examples
 
 ### Simple
 
-The following snippet provides a basic sample in order to use the implementation of the IdP certificates storage interface
+The following snippet provides a basic sample in order to use the implementation of the storage interfaces
 
 ```
 RedisStorageConfig redisConfig = RedisStorageConfig.builder().mainNode(
@@ -38,8 +38,10 @@ RedisStorageConfig redisConfig = RedisStorageConfig.builder().mainNode(
                             .port(6379)
                             .build());
 DefaultClientBuilder builder = new DefaultRedisClientBuilder(redisConfig);
-RedisStorageProvisioner redisStoreProvisioner = new RedisStorageProvisioner(builder.build());              
-redisStorage = new RedisIdpCertStorageProvider(redisStoreProvisioner).provideStorage(idpCertStorageConfig);
+RedisStorageProvisioner redisStoreProvisioner = new RedisStorageProvisioner(builder.build());
+idpRedisStorage = new RedisIdpCertStorageProvider(redisStoreProvisioner).provideStorage(idpCertStorageConfig);
+assertionRedisStorage = new RedisAssertionStorageProvider(redisStoreProvisioner).provideStorage(assertionStorageConfig);
+
 ```
 
 In order to execute with connection pooling active, provide a redisConfig as for the following example:
@@ -96,6 +98,6 @@ RedisStorageConfig redisConfig = RedisStorageConfig.builder()
                                 .builder()
                                 .hostname("redisnode2")
                                 .port(6379)
-                                .build()                        
+                                .build()
                         ));
 ```
