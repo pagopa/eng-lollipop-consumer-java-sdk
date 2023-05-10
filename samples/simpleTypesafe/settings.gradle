@@ -6,4 +6,4 @@ pluginManagement {
 }
 
 
-rootProject.name = 'simple-lollipop-sample'
+rootProject.name = 'typesafe-lollipop-sample'
