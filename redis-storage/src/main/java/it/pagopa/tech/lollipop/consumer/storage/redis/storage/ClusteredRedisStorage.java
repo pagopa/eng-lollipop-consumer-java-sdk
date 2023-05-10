@@ -1,23 +1,40 @@
 /* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.storage.redis.storage;
 
-import io.lettuce.core.RedisClient;
 import io.lettuce.core.cluster.RedisClusterClient;
 import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
+import io.lettuce.core.support.ConnectionPoolSupport;
 import it.pagopa.tech.lollipop.consumer.storage.redis.RedisStorage;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
+@Getter
+@Setter
 /** Implements commands to a Redis Cluster using Lettuce */
 public class ClusteredRedisStorage extends RedisStorage {
 
     private Long defaultDelayTimeSeconds = 60L;
 
+    private Boolean withConnectionPool = false;
+
     public ClusteredRedisStorage(RedisClusterClient redisClient) {
         super(redisClient);
     }
 
-    public ClusteredRedisStorage(RedisClient redisClient, Long defaultDelayTimeSeconds) {
+    public ClusteredRedisStorage(RedisClusterClient redisClient, Long defaultDelayTimeSeconds) {
         super(redisClient);
         this.defaultDelayTimeSeconds = defaultDelayTimeSeconds;
+    }
+
+    public ClusteredRedisStorage(
+            RedisClusterClient redisClient,
+            Long defaultDelayTimeSeconds,
+            Boolean withConnectionPool) {
+        super(redisClient);
+        this.defaultDelayTimeSeconds = defaultDelayTimeSeconds;
+        this.withConnectionPool = withConnectionPool;
     }
 
     /**
@@ -27,13 +44,21 @@ public class ClusteredRedisStorage extends RedisStorage {
      * @return if found the String value obtained from redis, null otherwise
      */
     @Override
-    public String get(String key) {
-        StatefulRedisClusterConnection<String, String> statefulConnection =
-                ((RedisClusterClient) getRedisClient()).connect();
-        try {
-            return statefulConnection.sync().get(key);
-        } finally {
-            statefulConnection.closeAsync();
+    public String get(String key) throws Exception {
+        RedisClusterClient redisClient = (RedisClusterClient) getRedisClient();
+        if (!withConnectionPool) {
+            try (StatefulRedisClusterConnection<String, String> statefulConnection =
+                    redisClient.connect()) {
+                return statefulConnection.sync().get(key);
+            }
+        } else {
+            try (GenericObjectPool<StatefulRedisClusterConnection<String, String>> pool =
+                            ConnectionPoolSupport.createGenericObjectPool(
+                                    redisClient::connect, new GenericObjectPoolConfig<>());
+                    StatefulRedisClusterConnection<String, String> statefulConnection =
+                            pool.borrowObject()) {
+                return statefulConnection.sync().get(key);
+            }
         }
     }
 
@@ -44,7 +69,7 @@ public class ClusteredRedisStorage extends RedisStorage {
      * @param value value to be stored in the redis instance
      */
     @Override
-    public void save(String key, String value) {
+    public void save(String key, String value) throws Exception {
         save(key, value, defaultDelayTimeSeconds);
     }
 
@@ -56,19 +81,20 @@ public class ClusteredRedisStorage extends RedisStorage {
      * @param delayTime seconds defining the stored data TTL
      */
     @Override
-    public void save(String key, String value, Long delayTime) {
-        StatefulRedisClusterConnection<String, String> statefulRedisConnection =
-                ((RedisClusterClient) getRedisClient()).connect();
-        statefulRedisConnection
-                .async()
-                .set(key, String.valueOf(value))
-                .thenAccept(
-                        result -> {
-                            if ("OK".equals(result)) {
-                                statefulRedisConnection.async().expire(key, delayTime);
-                            }
-                            statefulRedisConnection.closeAsync();
-                        });
+    public void save(String key, String value, Long delayTime) throws Exception {
+        RedisClusterClient redisClient = (RedisClusterClient) getRedisClient();
+        if (!withConnectionPool) {
+            try (StatefulRedisClusterConnection<String, String> statefulConnection =
+                    redisClient.connect()) {
+                executeSetMethod(key, value, delayTime, statefulConnection);
+            }
+        } else {
+            GenericObjectPool<StatefulRedisClusterConnection<String, String>> pool =
+                    ConnectionPoolSupport.createGenericObjectPool(
+                            redisClient::connect, new GenericObjectPoolConfig<>());
+            StatefulRedisClusterConnection<String, String> statefulConnection = pool.borrowObject();
+            executeSetMethod(key, value, delayTime, statefulConnection);
+        }
     }
 
     /**
@@ -77,14 +103,46 @@ public class ClusteredRedisStorage extends RedisStorage {
      * @param key key to be used for content deletion from redis
      */
     @Override
-    public void delete(String key) {
-        StatefulRedisClusterConnection<String, String> statefulRedisConnection =
-                ((RedisClusterClient) getRedisClient()).connect();
-        statefulRedisConnection
+    public void delete(String key) throws Exception {
+        RedisClusterClient redisClient = (RedisClusterClient) getRedisClient();
+        if (!withConnectionPool) {
+            try (StatefulRedisClusterConnection<String, String> statefulConnection =
+                    redisClient.connect()) {
+                executeAsyncDel(key, statefulConnection);
+            }
+        } else {
+            GenericObjectPool<StatefulRedisClusterConnection<String, String>> pool =
+                    ConnectionPoolSupport.createGenericObjectPool(
+                            redisClient::connect, new GenericObjectPoolConfig<>());
+            StatefulRedisClusterConnection<String, String> statefulConnection = pool.borrowObject();
+            executeAsyncDel(key, statefulConnection);
+        }
+    }
+
+    private void executeAsyncDel(
+            String key, StatefulRedisClusterConnection<String, String> statefulConnection) {
+        statefulConnection
                 .async()
                 .del(key)
                 .thenAccept(
                         result -> {
+                            statefulConnection.closeAsync();
+                        });
+    }
+
+    private void executeSetMethod(
+            String key,
+            String value,
+            Long delayTime,
+            StatefulRedisClusterConnection<String, String> statefulRedisConnection) {
+        statefulRedisConnection
+                .async()
+                .set(key, String.valueOf(value))
+                .thenAccept(
+                        result -> {
+                            if ("OK".equals(result)) {
+                                statefulRedisConnection.async().expire(key, delayTime);
+                            }
                             statefulRedisConnection.closeAsync();
                         });
     }

@@ -23,7 +23,7 @@ public abstract class RedisStorage {
      * @param key key to be used in order to attempt the retreival of a value from redis
      * @return if found the String value obtained from redis, null otherwise
      */
-    public abstract String get(String key);
+    public abstract String get(String key) throws Exception;
 
     /**
      * Saves a value in the redis using the provided key
@@ -31,7 +31,7 @@ public abstract class RedisStorage {
      * @param key key to be used when saving the value
      * @param value value to be stored in the redis instance
      */
-    public abstract void save(String key, String value);
+    public abstract void save(String key, String value) throws Exception;
 
     /**
      * Saves a value in the redis using the provided key, with a defined TTL
@@ -40,12 +40,12 @@ public abstract class RedisStorage {
      * @param value value to be stored in the redis instance
      * @param delayTime seconds defining the stored data TTL
      */
-    public abstract void save(String key, String value, Long delayTime);
+    public abstract void save(String key, String value, Long delayTime) throws Exception;
 
     /**
      * Deletes a value from redis using the provided key
      *
      * @param key key to be used for content deletion from redis
      */
-    public abstract void delete(String key);
+    public abstract void delete(String key) throws Exception;
 }

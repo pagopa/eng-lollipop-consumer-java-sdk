@@ -10,6 +10,7 @@ import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorage;
 import it.pagopa.tech.lollipop.consumer.idp.storage.IdpCertStorageConfig;
 import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
 import it.pagopa.tech.lollipop.consumer.storage.redis.RedisStorage;
+import java.util.concurrent.TimeUnit;
 import lombok.SneakyThrows;
 import org.openapitools.jackson.nullable.JsonNullableModule;
 
@@ -81,6 +82,8 @@ public class RedisIdpCertStorage implements IdpCertStorage {
         redisStorage.save(
                 tag,
                 objectMapper.writeValueAsString(idpCertData),
-                storageConfig.getStorageEvictionDelay());
+                TimeUnit.SECONDS.convert(
+                        storageConfig.getStorageEvictionDelay(),
+                        storageConfig.getStorageEvictionDelayTimeUnit()));
     }
 }

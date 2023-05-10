@@ -8,11 +8,11 @@ First we fetch the certificates' tag list (a list of certification by their issu
 that could be used for the assertion verification; we compare the tags with the assertion's instant as timestamp in seconds and
 the two eligible tags are the ones right before and after the provided assertion's instant.
 
-Then for each of the found tags the corresponding certification as xml is fetched, 
+Then for each of the found tags the corresponding certification as xml is fetched,
 the xml contains various elements called EntityDescriptor for each entity id,
 so we will filter these elements by the entity id provided in first instance.
 
-Finally, from the EntityDescriptor of the right identity provider we will extract the signature that will be used to 
+Finally, from the EntityDescriptor of the right identity provider we will extract the signature that will be used to
 verify the assertion.
 
 ## Configuration
