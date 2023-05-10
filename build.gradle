@@ -1,0 +1,204 @@
+plugins {
+	id 'java'
+	id 'org.graalvm.buildtools.native' version '0.9.20'
+	id("com.diffplug.spotless") version "6.17.0"
+	id("nebula.lint") version "18.0.3"
+	id("org.kordamp.gradle.reproducible") version "0.50.0"
+	id "org.sonarqube" version "3.5.0.2730"
+	id 'jacoco'
+}
+
+repositories {
+	mavenLocal()
+	mavenCentral()
+	maven {
+		url = uri("https://maven.pkg.github.com/pagopa/eng-http-signatures")
+		credentials {
+			username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+			password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+		}
+	}
+	gradlePluginPortal()
+}
+
+allprojects {
+	version = "1.0.0-RC1"
+	group = 'it.pagopa.tech.lollipop-consumer-java-sdk'
+	sourceCompatibility = '11'
+	targetCompatibility = '11'
+	apply plugin: 'com.diffplug.spotless'
+	apply plugin: 'nebula.lint'
+	gradleLint.rules = []
+
+	configurations {
+		spotless {
+			resolutionStrategy {
+				disableDependencyVerification()
+			}
+		}
+		gradleLint {
+			resolutionStrategy {
+				disableDependencyVerification()
+			}
+		}
+		gradleEnterprise {
+			resolutionStrategy {
+				disableDependencyVerification()
+			}
+		}
+	}
+
+	spotless {
+		// optional: limit format enforcement to just the files changed by this feature branch
+		ratchetFrom 'origin/main'
+
+		format 'misc', {
+			// define the files to apply `misc` to
+			target '*.gradle', '.gitignore'
+
+			// define the steps to apply to those files
+			trimTrailingWhitespace()
+			indentWithTabs() // or spaces. Takes an integer argument if you don't like 4
+			endWithNewline()
+		}
+		java {
+			// don't need to set target, it is inferred from java
+
+			// apply a specific flavor of google-java-format
+			googleJavaFormat('1.15.0').aosp().reflowLongStrings()
+			// fix formatting of type annotations
+			formatAnnotations()
+			// make sure every file has the following copyright header.
+			// optionally, Spotless can set copyright years by digging
+			// through git history (see "license" section below)
+			licenseHeader '/* (C)$YEAR */'
+		}
+	}
+}
+
+
+dependencies {
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.1'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.1'
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformats-text:2.14.1'
+	implementation 'com.fasterxml.jackson.module:jackson-modules-java8:2.14.1'
+	implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names:2.14.1'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.14.1'
+}
+
+// Settings for allowing reproducible build
+tasks.withType(AbstractArchiveTask).configureEach {
+	preserveFileTimestamps = false
+	reproducibleFileOrder = true
+}
+
+
+subprojects {
+
+	apply plugin: 'java'
+	apply plugin: 'org.kordamp.gradle.reproducible'
+	apply plugin: 'maven-publish'
+	apply plugin: 'jacoco'
+	apply plugin: 'org.graalvm.buildtools.native'
+
+
+	java {
+		withSourcesJar()
+		withJavadocJar()
+	}
+
+	tasks.withType(JavaCompile) {
+		options.compilerArgs.add('-Xlint:all')
+	}
+
+	config {
+		reproducible {
+			enabled
+			additionalProperties
+			additionalArtifacts
+		}
+	}
+
+	// Settings for allowing reproducible build
+	tasks.withType(AbstractArchiveTask).configureEach {
+		preserveFileTimestamps = false
+		reproducibleFileOrder = true
+	}
+
+
+	// Generate MD5 checksum on eng-lollipop-consumer-java-sdk jar file
+	jar.doLast { task ->
+		ant.checksum file: task.archivePath
+	}
+
+	publishing {
+		publications {
+			maven(MavenPublication) {
+				groupId project.group
+				artifactId project.name
+				version project.version
+				from components.java
+			}
+		}
+		repositories {
+			maven {
+				name = "GitHubPackages"
+				url = "https://maven.pkg.github.com/pagopa/eng-lollipop-consumer-java-sdk"
+				credentials {
+					username = System.getenv("GITHUB_ACTOR")
+					password = System.getenv("GITHUB_TOKEN")
+				}
+			}
+		}
+
+		sonar {
+			properties {
+				property "sonar.sources", "src/main/java"
+				property "sonar.tests", "src/test/java"
+			}
+		}
+
+
+		test {
+			finalizedBy jacocoTestReport // report is always generated after tests run
+			jacoco {
+				excludes = ["**/config/*","**/*Mock*","**/model/**","**/entity/*","**/*Stub*","**/*Config*","**/*Exception*"]
+
+			}
+		}
+		jacocoTestReport {
+			dependsOn test // tests are required to run before generating the report
+			reports {
+				xml.enabled true
+			}
+		}
+
+	}
+
+}
+
+project(":test-coverage") {
+	sonar {
+		skipProject = true
+	}
+	sonarqube {
+		skipProject = true
+	}
+}
+
+project(":redis-storage") {
+	sonar {
+		skipProject = true
+	}
+	sonarqube {
+		skipProject = true
+	}
+}
+
+graalvmNative {
+	binaries {
+		main {
+			sharedLibrary=true
+		}
+	}
+}

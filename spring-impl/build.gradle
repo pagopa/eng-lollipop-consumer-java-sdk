@@ -1,0 +1,40 @@
+plugins {
+	id 'java-library'
+	id("io.freefair.lombok") version "8.0.0"
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+}
+
+repositories {
+	mavenLocal()
+	mavenCentral()
+	maven {
+		url = uri("https://maven.pkg.github.com/pagopa/eng-http-signatures")
+		credentials {
+			username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+			password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+		}
+	}
+}
+
+dependencies {
+	implementation(project(':core')) {
+		exclude group: 'ch.qos.logback', module: 'logback-classic'
+		exclude group: 'ch.qos.logback', module: 'logback-core'
+	}
+	implementation 'org.springframework.boot:spring-boot-starter-web:2.7.10'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.10'
+	testImplementation 'ch.qos.logback:logback-classic:1.2.11'
+	testImplementation 'ch.qos.logback:logback-core:1.2.11'
+	testImplementation 'org.codehaus.janino:janino:3.1.9'
+	testImplementation 'org.slf4j:slf4j-api:1.7.36'
+	//Mockserver for testing api
+	testImplementation 'org.mock-server:mockserver-netty:5.15.0'
+	testImplementation project(':http-verifier')
+	testImplementation project(':assertion-rest-client-native')
+	testImplementation project(':identity-service-rest-client-native')
+}
+
+tasks.named('test') {
+	// Use JUnit Platform for unit tests.
+	useJUnitPlatform()
+}
