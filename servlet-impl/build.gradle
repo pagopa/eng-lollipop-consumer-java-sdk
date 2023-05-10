@@ -30,7 +30,7 @@ dependencies {
 	testImplementation 'org.slf4j:slf4j-api:1.7.36'
 	testImplementation 'org.mock-server:mockserver-netty:5.15.0'
 	testImplementation 'org.mockito:mockito-core:5.2.0'
-	testImplementation 'org.mockito:mockito-junit-jupiter:5.2.0'
+	testImplementation 'org.mockito:mockito-junit-jupiter:5.3.1'
 	testImplementation project(':http-verifier')
 	testImplementation project(':assertion-rest-client-native')
 	testImplementation project(':identity-service-rest-client-native')
