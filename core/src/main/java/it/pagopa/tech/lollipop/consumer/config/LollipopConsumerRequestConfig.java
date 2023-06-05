@@ -31,7 +31,7 @@ public class LollipopConsumerRequestConfig {
 
     @Builder.Default
     private String expectedFirstLcOriginalUrl =
-            "^https://api-app.io.pagopa.it/first-lollipop/sign$";
+            "^https://api-app.io.pagopa.it/first-lollipop/[a-zA-Z0-9]{8}/sign$";
 
     // assertion validation parameters
     @Builder.Default private int assertionExpireInDays = 30;

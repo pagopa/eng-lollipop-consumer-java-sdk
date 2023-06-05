@@ -38,7 +38,7 @@ class LollipopConsumerRequestValidationServiceImplTest {
     public static final String VALID_SIGNATURE =
             "sig1=:lTuoRytp53GuUMOB4Rz1z97Y96gfSeEOm/xVpO39d3HR6lLAy4KYiGq+1hZ7nmRFBt2bASWEpen7ov5O4wU3kQ==:";
     public static final String VALID_ORIGINAL_URL =
-            "https://api-app.io.pagopa.it/first-lollipop/sign";
+            "https://api-app.io.pagopa.it/first-lollipop/0123ABCD/sign";
 
     @BeforeEach
     void setUp() {
@@ -374,6 +374,31 @@ class LollipopConsumerRequestValidationServiceImplTest {
         headers.put(config.getAuthJWTHeader(), VALID_JWT);
         headers.put(config.getOriginalMethodHeader(), config.getExpectedFirstLcOriginalMethod());
         headers.put(config.getOriginalURLHeader(), VALID_ORIGINAL_URL + "/another-path");
+        LollipopConsumerRequest request =
+                LollipopConsumerRequest.builder().headerParams(headers).build();
+
+        LollipopRequestContentValidationException e =
+                assertThrows(
+                        LollipopRequestContentValidationException.class,
+                        () -> sut.validateLollipopRequest(request));
+
+        assertEquals(
+                LollipopRequestContentValidationException.ErrorCode.UNEXPECTED_ORIGINAL_URL,
+                e.getErrorCode());
+    }
+
+    @Test
+    void validateOriginalURLFailureRegexPatter() {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put(config.getPublicKeyHeader(), VALID_EC_PUBLIC_KEY);
+        headers.put(config.getAssertionRefHeader(), VALID_ASSERTION_REF);
+        headers.put(config.getAssertionTypeHeader(), AssertionType.SAML.name());
+        headers.put(config.getUserIdHeader(), VALID_FISCAL_CODE);
+        headers.put(config.getAuthJWTHeader(), VALID_JWT);
+        headers.put(config.getOriginalMethodHeader(), config.getExpectedFirstLcOriginalMethod());
+        headers.put(
+                config.getOriginalURLHeader(),
+                "https://api-app.io.pagopa.it/first-lollipop/0123_ABCD*/sign");
         LollipopConsumerRequest request =
                 LollipopConsumerRequest.builder().headerParams(headers).build();
 
