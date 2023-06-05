@@ -363,6 +363,29 @@ class LollipopConsumerRequestValidationServiceImplTest {
     }
 
     @Test
+    void validateOriginalURLFailureWithSameSubstring() {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put(config.getPublicKeyHeader(), VALID_EC_PUBLIC_KEY);
+        headers.put(config.getAssertionRefHeader(), VALID_ASSERTION_REF);
+        headers.put(config.getAssertionTypeHeader(), AssertionType.SAML.name());
+        headers.put(config.getUserIdHeader(), VALID_FISCAL_CODE);
+        headers.put(config.getAuthJWTHeader(), VALID_JWT);
+        headers.put(config.getOriginalMethodHeader(), config.getExpectedFirstLcOriginalMethod());
+        headers.put(config.getOriginalURLHeader(), config.getExpectedFirstLcOriginalUrl() +"/another-path");
+        LollipopConsumerRequest request =
+                LollipopConsumerRequest.builder().headerParams(headers).build();
+
+        LollipopRequestContentValidationException e =
+                assertThrows(
+                        LollipopRequestContentValidationException.class,
+                        () -> sut.validateLollipopRequest(request));
+
+        assertEquals(
+                LollipopRequestContentValidationException.ErrorCode.UNEXPECTED_ORIGINAL_URL,
+                e.getErrorCode());
+    }
+
+    @Test
     void validateSignatureInputFailureHeaderNotPresent() {
         HashMap<String, String> headers = new HashMap<>();
         headers.put(config.getPublicKeyHeader(), VALID_EC_PUBLIC_KEY);
