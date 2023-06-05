@@ -49,6 +49,8 @@ public class ServletIntegrationTest {
                 + " \"x-pagopa-lollipop-original-url\");created=1678293988;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\"";
     private static final String SIGNATURE =
             "sig123=:6scl8sMzJdyG/OrnJXHRM9ajmIjrJ/zrLUDqvfOxj2h51DUKztTua3vR1kSUj/c/VT1ioDlt1QIMARABhquewg==:";
+    public static final String VALID_ORIGINAL_URL =
+            "https://api-app.io.pagopa.it/first-lollipop/0123ABCD/sign";
 
     @BeforeAll
     public static void startServer() {
@@ -74,8 +76,7 @@ public class ServletIntegrationTest {
                             request.getHeaders()
                                     .add(
                                             lollipopConsumerRequestConfig.getOriginalURLHeader(),
-                                            lollipopConsumerRequestConfig
-                                                    .getExpectedFirstLcOriginalUrl());
+                                            VALID_ORIGINAL_URL);
                             request.getHeaders()
                                     .add(
                                             lollipopConsumerRequestConfig.getOriginalMethodHeader(),
@@ -131,8 +132,7 @@ public class ServletIntegrationTest {
                             request.getHeaders()
                                     .add(
                                             lollipopConsumerRequestConfig.getOriginalURLHeader(),
-                                            lollipopConsumerRequestConfig
-                                                    .getExpectedFirstLcOriginalUrl());
+                                            VALID_ORIGINAL_URL);
                             request.getHeaders()
                                     .add(
                                             lollipopConsumerRequestConfig.getOriginalMethodHeader(),
