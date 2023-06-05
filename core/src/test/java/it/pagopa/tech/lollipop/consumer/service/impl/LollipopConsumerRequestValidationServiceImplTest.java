@@ -37,6 +37,8 @@ class LollipopConsumerRequestValidationServiceImplTest {
                 + " \"x-pagopa-lollipop-original-url\");created=1678293988;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\"";
     public static final String VALID_SIGNATURE =
             "sig1=:lTuoRytp53GuUMOB4Rz1z97Y96gfSeEOm/xVpO39d3HR6lLAy4KYiGq+1hZ7nmRFBt2bASWEpen7ov5O4wU3kQ==:";
+    public static final String VALID_ORIGINAL_URL =
+            "https://api-app.io.pagopa.it/first-lollipop/sign";
 
     @BeforeEach
     void setUp() {
@@ -371,9 +373,7 @@ class LollipopConsumerRequestValidationServiceImplTest {
         headers.put(config.getUserIdHeader(), VALID_FISCAL_CODE);
         headers.put(config.getAuthJWTHeader(), VALID_JWT);
         headers.put(config.getOriginalMethodHeader(), config.getExpectedFirstLcOriginalMethod());
-        headers.put(
-                config.getOriginalURLHeader(),
-                config.getExpectedFirstLcOriginalUrl() + "/another-path");
+        headers.put(config.getOriginalURLHeader(), VALID_ORIGINAL_URL + "/another-path");
         LollipopConsumerRequest request =
                 LollipopConsumerRequest.builder().headerParams(headers).build();
 
@@ -396,7 +396,7 @@ class LollipopConsumerRequestValidationServiceImplTest {
         headers.put(config.getUserIdHeader(), VALID_FISCAL_CODE);
         headers.put(config.getAuthJWTHeader(), VALID_JWT);
         headers.put(config.getOriginalMethodHeader(), config.getExpectedFirstLcOriginalMethod());
-        headers.put(config.getOriginalURLHeader(), config.getExpectedFirstLcOriginalUrl());
+        headers.put(config.getOriginalURLHeader(), VALID_ORIGINAL_URL);
         LollipopConsumerRequest request =
                 LollipopConsumerRequest.builder().headerParams(headers).build();
 
@@ -419,7 +419,7 @@ class LollipopConsumerRequestValidationServiceImplTest {
         headers.put(config.getUserIdHeader(), VALID_FISCAL_CODE);
         headers.put(config.getAuthJWTHeader(), VALID_JWT);
         headers.put(config.getOriginalMethodHeader(), config.getExpectedFirstLcOriginalMethod());
-        headers.put(config.getOriginalURLHeader(), config.getExpectedFirstLcOriginalUrl());
+        headers.put(config.getOriginalURLHeader(), VALID_ORIGINAL_URL);
         headers.put(config.getSignatureInputHeader(), generateRandomString());
         LollipopConsumerRequest request =
                 LollipopConsumerRequest.builder().headerParams(headers).build();
@@ -443,7 +443,7 @@ class LollipopConsumerRequestValidationServiceImplTest {
         headers.put(config.getUserIdHeader(), VALID_FISCAL_CODE);
         headers.put(config.getAuthJWTHeader(), VALID_JWT);
         headers.put(config.getOriginalMethodHeader(), config.getExpectedFirstLcOriginalMethod());
-        headers.put(config.getOriginalURLHeader(), config.getExpectedFirstLcOriginalUrl());
+        headers.put(config.getOriginalURLHeader(), VALID_ORIGINAL_URL);
         headers.put(config.getSignatureInputHeader(), VALID_SIGNATURE_INPUT);
         LollipopConsumerRequest request =
                 LollipopConsumerRequest.builder().headerParams(headers).build();
@@ -467,7 +467,7 @@ class LollipopConsumerRequestValidationServiceImplTest {
         headers.put(config.getUserIdHeader(), VALID_FISCAL_CODE);
         headers.put(config.getAuthJWTHeader(), VALID_JWT);
         headers.put(config.getOriginalMethodHeader(), config.getExpectedFirstLcOriginalMethod());
-        headers.put(config.getOriginalURLHeader(), config.getExpectedFirstLcOriginalUrl());
+        headers.put(config.getOriginalURLHeader(), VALID_ORIGINAL_URL);
         headers.put(config.getSignatureInputHeader(), VALID_SIGNATURE_INPUT);
         headers.put(config.getSignatureHeader(), generateRandomString());
         LollipopConsumerRequest request =
@@ -492,7 +492,7 @@ class LollipopConsumerRequestValidationServiceImplTest {
         headers.put(config.getUserIdHeader(), VALID_FISCAL_CODE);
         headers.put(config.getAuthJWTHeader(), VALID_JWT);
         headers.put(config.getOriginalMethodHeader(), config.getExpectedFirstLcOriginalMethod());
-        headers.put(config.getOriginalURLHeader(), config.getExpectedFirstLcOriginalUrl());
+        headers.put(config.getOriginalURLHeader(), VALID_ORIGINAL_URL);
         headers.put(config.getSignatureInputHeader(), VALID_SIGNATURE_INPUT);
         headers.put(config.getSignatureHeader(), VALID_SIGNATURE);
         LollipopConsumerRequest request =
@@ -510,7 +510,7 @@ class LollipopConsumerRequestValidationServiceImplTest {
         headers.put(config.getUserIdHeader(), VALID_FISCAL_CODE);
         headers.put(config.getAuthJWTHeader(), VALID_JWT);
         headers.put(config.getOriginalMethodHeader(), config.getExpectedFirstLcOriginalMethod());
-        headers.put(config.getOriginalURLHeader(), config.getExpectedFirstLcOriginalUrl());
+        headers.put(config.getOriginalURLHeader(), VALID_ORIGINAL_URL);
         headers.put(config.getSignatureInputHeader(), VALID_SIGNATURE_INPUT);
         headers.put(config.getSignatureHeader(), VALID_SIGNATURE);
         LollipopConsumerRequest request =
