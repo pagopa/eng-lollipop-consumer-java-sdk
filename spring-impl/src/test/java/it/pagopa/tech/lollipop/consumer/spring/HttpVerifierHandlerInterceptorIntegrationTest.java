@@ -8,10 +8,7 @@ import it.pagopa.tech.lollipop.consumer.idp.client.simple.IdpCertSimpleClientCon
 import it.pagopa.tech.lollipop.consumer.spring.config.HttpVerifierConfiguration;
 import it.pagopa.tech.lollipop.consumer.spring.config.SpringLollipopConsumerRequestConfig;
 import java.io.IOException;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockserver.integration.ClientAndServer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +31,7 @@ import org.springframework.web.client.RestTemplate;
 public class HttpVerifierHandlerInterceptorIntegrationTest {
 
     @LocalServerPort private int port;
-    @Autowired private TestRestTemplate restTemplate;
+    private TestRestTemplate restTemplate;
     @Autowired private SpringLollipopConsumerRequestConfig springLollipopConsumerRequestConfig;
     @Autowired private HttpVerifierHandlerInterceptor interceptor;
     @Autowired private IdpCertSimpleClientConfig idpCertSimpleClientConfig;
@@ -52,9 +49,9 @@ public class HttpVerifierHandlerInterceptorIntegrationTest {
     public static final String VALID_ORIGINAL_URL =
             "https://api-app.io.pagopa.it/first-lollipop/sign";
 
-    @BeforeAll
-    public static void startServer() {
-
+    @BeforeEach
+    public void startServer() {
+        restTemplate = new TestRestTemplate();
         mockServer = startClientAndServer(3000, 3001);
     }
 
@@ -204,7 +201,7 @@ public class HttpVerifierHandlerInterceptorIntegrationTest {
     void testWithInvalidURLRequestReturnsUnauthorized() throws IOException {
         SimpleClientsTestUtils.createExpectationAssertionFound();
         SimpleClientsTestUtils.createExpectationIdpFound();
-        springLollipopConsumerRequestConfig.setAssertionExpireInDays(30);
+        springLollipopConsumerRequestConfig.setAssertionExpireInDays(365);
         springLollipopConsumerRequestConfig.setAssertionNotBeforeDateFormat(
                 "yyyy-MM-dd'T'HH:mm:ss'Z'");
         springLollipopConsumerRequestConfig.setAssertionInstantDateFormat(
@@ -272,11 +269,14 @@ public class HttpVerifierHandlerInterceptorIntegrationTest {
                         "{\"message\":\"a valid message payload\"}",
                         String.class);
         Assertions.assertNotNull(response);
+        Assertions.assertEquals(
+                "^" + VALID_ORIGINAL_URL + "$",
+                springLollipopConsumerRequestConfig.getExpectedFirstLcOriginalUrl());
         Assertions.assertEquals(401, response.getStatusCodeValue());
     }
 
-    @AfterAll
-    public static void stopServer() {
+    @AfterEach
+    public void stopServer() {
         mockServer.stop();
     }
 }
