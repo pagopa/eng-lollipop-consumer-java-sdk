@@ -204,6 +204,7 @@ public class HttpVerifierHandlerInterceptorIntegrationTest {
     void testWithInvalidURLRequestReturnsUnauthorized() throws IOException {
         SimpleClientsTestUtils.createExpectationAssertionFound();
         SimpleClientsTestUtils.createExpectationIdpFound();
+        springLollipopConsumerRequestConfig.setAssertionExpireInDays(30);
         springLollipopConsumerRequestConfig.setAssertionNotBeforeDateFormat(
                 "yyyy-MM-dd'T'HH:mm:ss'Z'");
         springLollipopConsumerRequestConfig.setAssertionInstantDateFormat(
