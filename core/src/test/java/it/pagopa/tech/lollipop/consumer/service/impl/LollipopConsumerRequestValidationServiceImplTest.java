@@ -38,7 +38,7 @@ class LollipopConsumerRequestValidationServiceImplTest {
     public static final String VALID_SIGNATURE =
             "sig1=:lTuoRytp53GuUMOB4Rz1z97Y96gfSeEOm/xVpO39d3HR6lLAy4KYiGq+1hZ7nmRFBt2bASWEpen7ov5O4wU3kQ==:";
     public static final String VALID_ORIGINAL_URL =
-            "https://api-app.io.pagopa.it/first-lollipop/0123ABCD/sign";
+            "https://api-app.io.pagopa.it/first-lollipop/sign";
 
     @BeforeEach
     void setUp() {
@@ -389,6 +389,15 @@ class LollipopConsumerRequestValidationServiceImplTest {
 
     @Test
     void validateOriginalURLFailureRegexPatter() {
+
+        LollipopConsumerRequestConfig new_config =
+                spy(LollipopConsumerRequestConfig.builder().build());
+
+        new_config.setExpectedFirstLcOriginalUrl(
+                "^https://api-app.io.pagopa.it/first-lollipop/[a-zA-Z0-9]{8}/sign$");
+        LollipopConsumerRequestValidationService new_sut =
+                new LollipopConsumerRequestValidationServiceImpl(new_config);
+
         HashMap<String, String> headers = new HashMap<>();
         headers.put(config.getPublicKeyHeader(), VALID_EC_PUBLIC_KEY);
         headers.put(config.getAssertionRefHeader(), VALID_ASSERTION_REF);
@@ -405,7 +414,7 @@ class LollipopConsumerRequestValidationServiceImplTest {
         LollipopRequestContentValidationException e =
                 assertThrows(
                         LollipopRequestContentValidationException.class,
-                        () -> sut.validateLollipopRequest(request));
+                        () -> new_sut.validateLollipopRequest(request));
 
         assertEquals(
                 LollipopRequestContentValidationException.ErrorCode.UNEXPECTED_ORIGINAL_URL,
