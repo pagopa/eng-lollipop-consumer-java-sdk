@@ -30,7 +30,8 @@ public class LollipopConsumerRequestConfig {
     @Builder.Default private String expectedFirstLcOriginalMethod = "POST";
 
     @Builder.Default
-    private String expectedFirstLcOriginalUrl = "https://api-app.io.pagopa.it/first-lollipop/sign";
+    private String expectedFirstLcOriginalUrl =
+            "^https://api-app.io.pagopa.it/first-lollipop/sign$";
 
     // assertion validation parameters
     @Builder.Default private int assertionExpireInDays = 30;

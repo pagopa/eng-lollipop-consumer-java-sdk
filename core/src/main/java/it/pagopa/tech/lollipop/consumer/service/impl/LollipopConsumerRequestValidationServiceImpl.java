@@ -96,9 +96,12 @@ public class LollipopConsumerRequestValidationServiceImpl
     }
 
     private boolean isNotValidAssertionRef(String signature) {
-        boolean matchesSHA256 = AssertionRefAlgorithms.SHA256.getPattern().matcher(signature).matches();
-        boolean matchesSHA384 = AssertionRefAlgorithms.SHA384.getPattern().matcher(signature).matches();
-        boolean matchesSHA512 = AssertionRefAlgorithms.SHA512.getPattern().matcher(signature).matches();
+        boolean matchesSHA256 =
+                AssertionRefAlgorithms.SHA256.getPattern().matcher(signature).matches();
+        boolean matchesSHA384 =
+                AssertionRefAlgorithms.SHA384.getPattern().matcher(signature).matches();
+        boolean matchesSHA512 =
+                AssertionRefAlgorithms.SHA512.getPattern().matcher(signature).matches();
         return !matchesSHA256 && !matchesSHA384 && !matchesSHA512;
     }
 
@@ -143,7 +146,7 @@ public class LollipopConsumerRequestValidationServiceImpl
 
     private boolean isNotValidFiscalCode(String userId) {
         return !Pattern.compile(
-                "^[A-Z]{6}[0-9LMNPQRSTUV]{2}[ABCDEHLMPRST][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]$")
+                        "^[A-Z]{6}[0-9LMNPQRSTUV]{2}[ABCDEHLMPRST][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]$")
                 .matcher(userId)
                 .matches();
     }
@@ -208,7 +211,9 @@ public class LollipopConsumerRequestValidationServiceImpl
                     "Invalid Original URL Header value");
         }
 
-        if (!Pattern.compile(this.config.getExpectedFirstLcOriginalUrl()).matcher(originalURL).matches()) {
+        if (!Pattern.compile(this.config.getExpectedFirstLcOriginalUrl())
+                .matcher(originalURL)
+                .matches()) {
             String errMsg = String.format("Unexpected original url: %s", originalURL);
             throw new LollipopRequestContentValidationException(
                     LollipopRequestContentValidationException.ErrorCode.UNEXPECTED_ORIGINAL_URL,

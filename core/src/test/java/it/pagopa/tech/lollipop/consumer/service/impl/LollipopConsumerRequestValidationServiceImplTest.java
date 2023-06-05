@@ -371,7 +371,9 @@ class LollipopConsumerRequestValidationServiceImplTest {
         headers.put(config.getUserIdHeader(), VALID_FISCAL_CODE);
         headers.put(config.getAuthJWTHeader(), VALID_JWT);
         headers.put(config.getOriginalMethodHeader(), config.getExpectedFirstLcOriginalMethod());
-        headers.put(config.getOriginalURLHeader(), config.getExpectedFirstLcOriginalUrl() +"/another-path");
+        headers.put(
+                config.getOriginalURLHeader(),
+                config.getExpectedFirstLcOriginalUrl() + "/another-path");
         LollipopConsumerRequest request =
                 LollipopConsumerRequest.builder().headerParams(headers).build();
 
