@@ -49,6 +49,8 @@ public class ServletIntegrationTest {
                 + " \"x-pagopa-lollipop-original-url\");created=1678293988;nonce=\"aNonce\";alg=\"ecdsa-p256-sha256\";keyid=\"sha256-a7qE0Y0DyqeOFFREIQSLKfu5WlbckdxVXKFasfcI-Dg\"";
     private static final String SIGNATURE =
             "sig123=:6scl8sMzJdyG/OrnJXHRM9ajmIjrJ/zrLUDqvfOxj2h51DUKztTua3vR1kSUj/c/VT1ioDlt1QIMARABhquewg==:";
+    public static final String VALID_ORIGINAL_URL =
+            "https://api-app.io.pagopa.it/first-lollipop/sign";
 
     @BeforeAll
     public static void startServer() {
@@ -59,6 +61,7 @@ public class ServletIntegrationTest {
     void testWithValidRequestReturnsSuccess() throws IOException {
         SimpleClientsTestUtils.createExpectationAssertionFound();
         SimpleClientsTestUtils.createExpectationIdpFound();
+        lollipopConsumerRequestConfig.setAssertionExpireInDays(365);
         lollipopConsumerRequestConfig.setAssertionNotBeforeDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         lollipopConsumerRequestConfig.setAssertionInstantDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         idpCertSimpleClientConfig.setBaseUri("http://localhost:3001");
@@ -74,8 +77,7 @@ public class ServletIntegrationTest {
                             request.getHeaders()
                                     .add(
                                             lollipopConsumerRequestConfig.getOriginalURLHeader(),
-                                            lollipopConsumerRequestConfig
-                                                    .getExpectedFirstLcOriginalUrl());
+                                            VALID_ORIGINAL_URL);
                             request.getHeaders()
                                     .add(
                                             lollipopConsumerRequestConfig.getOriginalMethodHeader(),
@@ -131,8 +133,7 @@ public class ServletIntegrationTest {
                             request.getHeaders()
                                     .add(
                                             lollipopConsumerRequestConfig.getOriginalURLHeader(),
-                                            lollipopConsumerRequestConfig
-                                                    .getExpectedFirstLcOriginalUrl());
+                                            VALID_ORIGINAL_URL);
                             request.getHeaders()
                                     .add(
                                             lollipopConsumerRequestConfig.getOriginalMethodHeader(),
