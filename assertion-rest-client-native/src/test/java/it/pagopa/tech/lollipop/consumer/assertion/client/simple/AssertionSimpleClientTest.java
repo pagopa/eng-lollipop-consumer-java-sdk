@@ -4,7 +4,6 @@ package it.pagopa.tech.lollipop.consumer.assertion.client.simple;
 import static it.pagopa.tech.lollipop.consumer.assertion.client.simple.AssertionSimpleClientTestUtils.*;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
-import org.mockserver.verify.VerificationTimes;
 
 import it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal.ApiClient;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopAssertionNotFoundException;
@@ -16,6 +15,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockserver.integration.ClientAndServer;
+import org.mockserver.verify.VerificationTimes;
 
 class AssertionSimpleClientTest {
 
