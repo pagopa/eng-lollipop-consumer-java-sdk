@@ -67,7 +67,7 @@ public class ApiClient {
         this.builder = createDefaultHttpClientBuilder();
         this.mapper = createDefaultObjectMapper();
         updateBaseUri(config.getBaseUri());
-        interceptor = null;
+        interceptor = t -> t.header("Ocp-Apim-Subscription-Key", config.getSubscriptionKey());
         readTimeout = null;
         connectTimeout = null;
         responseInterceptor = null;

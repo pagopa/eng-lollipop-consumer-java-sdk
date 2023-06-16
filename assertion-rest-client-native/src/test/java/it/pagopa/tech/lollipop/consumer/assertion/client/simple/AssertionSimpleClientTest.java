@@ -3,6 +3,8 @@ package it.pagopa.tech.lollipop.consumer.assertion.client.simple;
 
 import static it.pagopa.tech.lollipop.consumer.assertion.client.simple.AssertionSimpleClientTestUtils.*;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+import static org.mockserver.model.HttpRequest.request;
+import org.mockserver.verify.VerificationTimes;
 
 import it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal.ApiClient;
 import it.pagopa.tech.lollipop.consumer.exception.LollipopAssertionNotFoundException;
@@ -40,6 +42,10 @@ class AssertionSimpleClientTest {
         Assertions.assertNotNull(response.getAssertionData());
         Assertions.assertEquals(ASSERTION_REF, response.getAssertionRef());
         Assertions.assertEquals(XML_STRING, response.getAssertionData());
+
+        mockServer.verify(
+                request().withHeader("Ocp-Apim-Subscription-Key", "FakeSubscriptionKey"),
+                VerificationTimes.exactly(1));
     }
 
     @Test
