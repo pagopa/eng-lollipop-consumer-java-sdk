@@ -70,7 +70,7 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 /*
-!! WARNING: 
+!! WARNING:
 Generated client do not handle `Ocp-Apim-Subscription-Key` header.
 We added it to `ApiClient` class, by defining the interseptor as
 
