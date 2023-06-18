@@ -264,6 +264,8 @@ public class AssertionSimpleClientTestUtils {
                                 .withPath("/assertions/{assertion}")
                                 .withPathParameter("assertion", ASSERTION_REF)
                                 .withHeaders(
+                                        new Header(
+                                                "Ocp-Apim-Subscription-Key", "FakeSubscriptionKey"),
                                         new Header("Accept", "application/json"),
                                         new Header("x-pagopa-lollipop-auth", JWT)))
                 .respond(response().withStatusCode(200).withBody(RESPONSE_STRING));
@@ -277,6 +279,8 @@ public class AssertionSimpleClientTestUtils {
                                 .withPath("/assertions/{assertion}")
                                 .withPathParameter("assertion", WRONG_ASSERTION_REF)
                                 .withHeaders(
+                                        new Header(
+                                                "Ocp-Apim-Subscription-Key", "FakeSubscriptionKey"),
                                         new Header("Accept", "application/json"),
                                         new Header("x-pagopa-lollipop-auth", JWT)))
                 .respond(response().withStatusCode(404).withBody("{}"));
