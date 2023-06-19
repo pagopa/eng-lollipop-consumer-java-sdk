@@ -72,11 +72,11 @@ tasks.named('test') {
 /*
 !! WARNING:
 Generated client do not handle `Ocp-Apim-Subscription-Key` header.
-We added it to `ApiClient` class, by defining the interseptor as
+We added it to `ApiClient` class, by defining the interceptor as
 
 `interceptor = t -> t.header("Ocp-Apim-Subscription-Key", config.getSubscriptionKey());`
 
-If we need to regenerate the client, please copy/paste this pieace of code again to `ApiClient class construction`.
+If we need to regenerate the client, please copy/paste this piece of code again to `ApiClient class construction`.
 
 ----------------
 

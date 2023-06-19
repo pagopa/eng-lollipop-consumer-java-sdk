@@ -16,5 +16,5 @@ public class AssertionSimpleClientConfig {
 
     @Builder.Default private String assertionRequestEndpoint = "/assertions";
 
-    @Builder.Default private String SubscriptionKey = "FakeSubscriptionKey";
+    @Builder.Default private String subscriptionKey = "FakeSubscriptionKey";
 }

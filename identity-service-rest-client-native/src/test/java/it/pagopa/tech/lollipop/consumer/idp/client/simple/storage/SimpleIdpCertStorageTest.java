@@ -11,7 +11,6 @@ import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -67,7 +66,7 @@ class SimpleIdpCertStorageTest {
     }
 
     @Test
-    void saveAssertionAndScheduleEvictionWithStorageEnabled()
+    void saveIdpCertAndScheduleEvictionWithStorageEnabled()
             throws InterruptedException, ExecutionException {
         doReturn(true).when(storageConfigMock).isIdpCertDataStorageEnabled();
 
@@ -120,15 +119,14 @@ class SimpleIdpCertStorageTest {
         CompletableFuture<Boolean> future = new CompletableFuture<>();
         ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         executorService.submit(
-                new Runnable() {
-                    @SneakyThrows
-                    @Override
-                    public void run() {
-                        ScheduledFuture<?> scheduledFuture =
-                                scheduledEvictionsMap.get(IDPCERTDATA_1);
+                () -> {
+                    ScheduledFuture<?> scheduledFuture = scheduledEvictionsMap.get(IDPCERTDATA_1);
+                    try {
                         scheduledFuture.get();
-                        future.complete(true);
+                    } catch (InterruptedException | ExecutionException e) {
+                        throw new RuntimeException(e);
                     }
+                    future.complete(true);
                 });
         return future;
     }
