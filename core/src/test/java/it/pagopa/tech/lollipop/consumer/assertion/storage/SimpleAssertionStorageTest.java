@@ -28,7 +28,7 @@ class SimpleAssertionStorageTest {
 
     @Test
     void getExistingAssertionAndResetScheduleEvictionWithStorageEnabled()
-            throws InterruptedException, ExecutionException {
+            throws InterruptedException {
         doReturn(true).when(storageConfigMock).isAssertionStorageEnabled();
         doReturn(1000L).when(storageConfigMock).getStorageEvictionDelay();
         doReturn(TimeUnit.MILLISECONDS).when(storageConfigMock).getStorageEvictionDelayTimeUnit();
@@ -72,10 +72,10 @@ class SimpleAssertionStorageTest {
     }
 
     @Test
-    void saveAssertionAndScheduleEvictionWithStorageEnabled()
-            throws InterruptedException, ExecutionException {
+    void saveAssertionAndScheduleEvictionWithStorageEnabled() throws InterruptedException {
         doReturn(true).when(storageConfigMock).isAssertionStorageEnabled();
         doReturn(1000L).when(storageConfigMock).getStorageEvictionDelay();
+
         doReturn(TimeUnit.MILLISECONDS).when(storageConfigMock).getStorageEvictionDelayTimeUnit();
         doReturn(100L).when(storageConfigMock).getMaxNumberOfElements();
 

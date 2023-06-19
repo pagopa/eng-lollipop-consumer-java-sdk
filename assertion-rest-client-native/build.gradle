@@ -70,6 +70,16 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 /*
+!! WARNING:
+Generated client do not handle `Ocp-Apim-Subscription-Key` header.
+We added it to `ApiClient` class, by defining the interceptor as
+
+`interceptor = t -> t.header("Ocp-Apim-Subscription-Key", config.getSubscriptionKey());`
+
+If we need to regenerate the client, please copy/paste this piece of code again to `ApiClient class construction`.
+
+----------------
+
 compileJava.dependsOn tasks.openApiGenerate
 
 openApiGenerate {
