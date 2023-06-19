@@ -28,7 +28,7 @@ class SimpleAssertionStorageTest {
 
     @Test
     void getExistingAssertionAndResetScheduleEvictionWithStorageEnabled()
-            throws InterruptedException, ExecutionException {
+            throws InterruptedException {
         doReturn(true).when(storageConfigMock).isAssertionStorageEnabled();
         doReturn(1000L).when(storageConfigMock).getStorageEvictionDelay();
         doReturn(TimeUnit.MILLISECONDS).when(storageConfigMock).getStorageEvictionDelayTimeUnit();
@@ -71,36 +71,34 @@ class SimpleAssertionStorageTest {
         sut.close();
     }
 
-    // TODO
-    // @Test
-    // void saveAssertionAndScheduleEvictionWithStorageEnabled()
-    //         throws InterruptedException, ExecutionException {
-    //     doReturn(true).when(storageConfigMock).isAssertionStorageEnabled();
-    //     doReturn(1000L).when(storageConfigMock).getStorageEvictionDelay();
-    //
-    // doReturn(TimeUnit.MILLISECONDS).when(storageConfigMock).getStorageEvictionDelayTimeUnit();
-    //     doReturn(100L).when(storageConfigMock).getMaxNumberOfElements();
+    @Test
+    void saveAssertionAndScheduleEvictionWithStorageEnabled() throws InterruptedException {
+        doReturn(true).when(storageConfigMock).isAssertionStorageEnabled();
+        doReturn(1000L).when(storageConfigMock).getStorageEvictionDelay();
 
-    //     ConcurrentHashMap<String, SoftReference<SamlAssertion>> assertionMap =
-    //             new ConcurrentHashMap<>();
-    //     DelayQueue<DelayedCacheObject<SamlAssertion>> delayedCacheObjects = new DelayQueue<>();
+        doReturn(TimeUnit.MILLISECONDS).when(storageConfigMock).getStorageEvictionDelayTimeUnit();
+        doReturn(100L).when(storageConfigMock).getMaxNumberOfElements();
 
-    //     sut = new SimpleAssertionStorage(assertionMap, delayedCacheObjects, storageConfigMock);
-    //     SamlAssertion samlAssertion = new SamlAssertion();
+        ConcurrentHashMap<String, SoftReference<SamlAssertion>> assertionMap =
+                new ConcurrentHashMap<>();
+        DelayQueue<DelayedCacheObject<SamlAssertion>> delayedCacheObjects = new DelayQueue<>();
 
-    //     sut.saveAssertion(ASSERTION_REF_1, samlAssertion);
-    //     delayedCacheObjects.poll(100, TimeUnit.MILLISECONDS);
+        sut = new SimpleAssertionStorage(assertionMap, delayedCacheObjects, storageConfigMock);
+        SamlAssertion samlAssertion = new SamlAssertion();
 
-    //     assertEquals(1, assertionMap.size());
-    //     assertEquals(1, delayedCacheObjects.size());
-    //     assertEquals(samlAssertion, assertionMap.get(ASSERTION_REF_1).get());
+        sut.saveAssertion(ASSERTION_REF_1, samlAssertion);
+        delayedCacheObjects.poll(100, TimeUnit.MILLISECONDS);
 
-    //     delayedCacheObjects.poll(1100, TimeUnit.MILLISECONDS);
-    //     assertEquals(0, assertionMap.size());
-    //     assertEquals(0, delayedCacheObjects.size());
+        assertEquals(1, assertionMap.size());
+        assertEquals(1, delayedCacheObjects.size());
+        assertEquals(samlAssertion, assertionMap.get(ASSERTION_REF_1).get());
 
-    //     sut.close();
-    // }
+        delayedCacheObjects.poll(1100, TimeUnit.MILLISECONDS);
+        assertEquals(0, assertionMap.size());
+        assertEquals(0, delayedCacheObjects.size());
+
+        sut.close();
+    }
 
     @Test
     void saveAssertionToMaximumCapacityWithStorageEnabled() throws InterruptedException {
