@@ -58,7 +58,7 @@ public class ServletIntegrationTest {
     }
 
     @Test
-    void testWithValidRequestReturnsSuccess() throws IOException {
+    void testWithAValidRequestReturnsSuccess() throws IOException {
         SimpleClientsTestUtils.createExpectationAssertionFound();
         SimpleClientsTestUtils.createExpectationIdpFound();
         lollipopConsumerRequestConfig.setAssertionExpireInDays(365);
