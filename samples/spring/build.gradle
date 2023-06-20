@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'it.pagopa.tech.lollipop.consumer.samples'
-version = '1.0.0-RC3'
+version = '1.0.0-RC4'
 sourceCompatibility = '11'
 
 configurations {
