@@ -267,7 +267,7 @@ public class AssertionSimpleClientTestUtils {
                                         new Header(
                                                 "Ocp-Apim-Subscription-Key", "FakeSubscriptionKey"),
                                         new Header("Accept", "application/json"),
-                                        new Header("x-pagopa-lollipop-auth", JWT)))
+                                        new Header("x-pagopa-lollipop-auth", "Bearer " + JWT)))
                 .respond(response().withStatusCode(200).withBody(RESPONSE_STRING));
     }
 
@@ -282,7 +282,7 @@ public class AssertionSimpleClientTestUtils {
                                         new Header(
                                                 "Ocp-Apim-Subscription-Key", "FakeSubscriptionKey"),
                                         new Header("Accept", "application/json"),
-                                        new Header("x-pagopa-lollipop-auth", JWT)))
+                                        new Header("x-pagopa-lollipop-auth", "Bearer " + JWT)))
                 .respond(response().withStatusCode(404).withBody("{}"));
     }
 }
