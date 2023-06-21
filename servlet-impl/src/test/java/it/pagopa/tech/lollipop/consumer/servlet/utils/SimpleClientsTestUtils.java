@@ -240,6 +240,8 @@ public class SimpleClientsTestUtils {
             "eyJrdHkiOiJFQyIsIngiOiJTaHlZa0ZyN1F3eE9rOE5BRXF6aklkTnc4dEVKODlZOVBlWFF1eVVOWDVjIiwieSI6InlULVJxNWc2VlVadENUd0ZnRExDM2RneGNuM2RsSmNGRjhnWGdxYWgyS0UiLCJjcnYiOiJQLTI1NiJ9";
     private static final String IDP_TAG = "latest";
 
+    private static final String SUBSCRIPTION_KEY = "FakeSubscriptionKey";
+
     public static void createExpectationAssertionFound() {
         new MockServerClient("localhost", 3000)
                 .when(
@@ -249,7 +251,8 @@ public class SimpleClientsTestUtils {
                                 .withPathParameter("assertion", ASSERTION_REF)
                                 .withHeaders(
                                         new Header("Accept", "application/json"),
-                                        new Header("x-pagopa-lollipop-auth", JWT)))
+                                        new Header("x-pagopa-lollipop-auth", "Bearer " + JWT),
+                                        new Header("Ocp-Apim-Subscription-Key", SUBSCRIPTION_KEY)))
                 .respond(response().withStatusCode(200).withBody(VALID_ASSERTION_XML));
     }
 

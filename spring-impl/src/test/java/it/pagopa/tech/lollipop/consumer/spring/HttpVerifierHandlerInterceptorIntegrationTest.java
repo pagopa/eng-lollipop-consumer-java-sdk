@@ -53,6 +53,7 @@ public class HttpVerifierHandlerInterceptorIntegrationTest {
     public void startServer() {
         restTemplate = new TestRestTemplate();
         mockServer = startClientAndServer(3000, 3001);
+        idpCertSimpleClientConfig.setBaseUri("http://localhost:3001");
     }
 
     @Test
@@ -63,7 +64,6 @@ public class HttpVerifierHandlerInterceptorIntegrationTest {
                 "yyyy-MM-dd'T'HH:mm:ss'Z'");
         springLollipopConsumerRequestConfig.setAssertionInstantDateFormat(
                 "yyyy-MM-dd'T'HH:mm:ss'Z'");
-        idpCertSimpleClientConfig.setBaseUri("http://localhost:3001");
 
         RestTemplate exec = restTemplate.getRestTemplate();
         exec.getClientHttpRequestInitializers()
