@@ -9,10 +9,7 @@ import it.pagopa.tech.lollipop.consumer.idp.client.simple.IdpCertSimpleClientCon
 import it.pagopa.tech.lollipop.consumer.servlet.config.HttpVerifierConfiguration;
 import it.pagopa.tech.lollipop.consumer.servlet.utils.SimpleClientsTestUtils;
 import java.io.IOException;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockserver.integration.ClientAndServer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +54,11 @@ public class ServletIntegrationTest {
         mockServer = startClientAndServer(3000, 3001);
     }
 
+    @BeforeEach
+    void setup() {
+        idpCertSimpleClientConfig.setBaseUri("http://localhost:3001");
+    }
+
     @Test
     void testWithAValidRequestReturnsSuccess() throws IOException {
         SimpleClientsTestUtils.createExpectationAssertionFound();
@@ -64,7 +66,6 @@ public class ServletIntegrationTest {
         lollipopConsumerRequestConfig.setAssertionExpireInDays(365);
         lollipopConsumerRequestConfig.setAssertionNotBeforeDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         lollipopConsumerRequestConfig.setAssertionInstantDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        idpCertSimpleClientConfig.setBaseUri("http://localhost:3001");
 
         RestTemplate exec = restTemplate.getRestTemplate();
         exec.getClientHttpRequestInitializers()

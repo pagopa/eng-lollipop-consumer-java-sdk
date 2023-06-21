@@ -249,7 +249,7 @@ public class SimpleClientsTestUtils {
                                 .withPathParameter("assertion", ASSERTION_REF)
                                 .withHeaders(
                                         new Header("Accept", "application/json"),
-                                        new Header("x-pagopa-lollipop-auth", JWT)))
+                                        new Header("x-pagopa-lollipop-auth", "Bearer " + JWT)))
                 .respond(response().withStatusCode(200).withBody(VALID_ASSERTION_XML));
     }
 
