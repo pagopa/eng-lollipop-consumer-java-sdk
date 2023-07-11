@@ -37,8 +37,8 @@ public class AssertionSimpleClient implements AssertionClient {
     @Override
     public SamlAssertion getAssertion(String jwt, String assertionRef)
             throws LollipopAssertionNotFoundException, OidcAssertionNotSupported {
-        AssertionRef ref = new AssertionRef(assertionRef);
 
+        AssertionRef ref = new AssertionRef(assertionRef);
         LCUserInfo responseAssertion;
 
         try {
