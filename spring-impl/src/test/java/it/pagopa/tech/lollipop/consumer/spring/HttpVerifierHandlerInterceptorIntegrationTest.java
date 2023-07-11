@@ -60,10 +60,6 @@ public class HttpVerifierHandlerInterceptorIntegrationTest {
     void testWithValidRequestReturnsSuccess() throws IOException {
         SimpleClientsTestUtils.createExpectationAssertionFound();
         SimpleClientsTestUtils.createExpectationIdpFound();
-        springLollipopConsumerRequestConfig.setAssertionNotBeforeDateFormat(
-                "yyyy-MM-dd'T'HH:mm:ss'Z'");
-        springLollipopConsumerRequestConfig.setAssertionInstantDateFormat(
-                "yyyy-MM-dd'T'HH:mm:ss'Z'");
 
         RestTemplate exec = restTemplate.getRestTemplate();
         exec.getClientHttpRequestInitializers()
@@ -202,10 +198,6 @@ public class HttpVerifierHandlerInterceptorIntegrationTest {
         SimpleClientsTestUtils.createExpectationAssertionFound();
         SimpleClientsTestUtils.createExpectationIdpFound();
         springLollipopConsumerRequestConfig.setAssertionExpireInDays(365);
-        springLollipopConsumerRequestConfig.setAssertionNotBeforeDateFormat(
-                "yyyy-MM-dd'T'HH:mm:ss'Z'");
-        springLollipopConsumerRequestConfig.setAssertionInstantDateFormat(
-                "yyyy-MM-dd'T'HH:mm:ss'Z'");
         idpCertSimpleClientConfig.setBaseUri("http://localhost:3001");
 
         RestTemplate exec = restTemplate.getRestTemplate();

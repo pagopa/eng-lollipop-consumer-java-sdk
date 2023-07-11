@@ -24,11 +24,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
@@ -37,6 +33,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.joda.time.format.ISODateTimeFormat;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -150,10 +147,8 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         long notBeforeMilliseconds;
         try {
             notBeforeMilliseconds =
-                    new SimpleDateFormat(lollipopRequestConfig.getAssertionNotBeforeDateFormat())
-                            .parse(notBefore)
-                            .getTime();
-        } catch (ParseException e) {
+                    ISODateTimeFormat.dateTimeParser().parseDateTime(notBefore).getMillis();
+        } catch (UnsupportedOperationException | IllegalArgumentException e) {
             throw new AssertionPeriodException(
                     AssertionPeriodException.ErrorCode.ERROR_PARSING_ASSERTION_NOT_BEFORE_DATE,
                     e.getMessage(),
@@ -442,15 +437,15 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
     }
 
     private String parseInstantToMillis(String instant) {
-        String instantDateFormat = lollipopRequestConfig.getAssertionInstantDateFormat();
         try {
             instant =
-                    Long.toString(new SimpleDateFormat(instantDateFormat).parse(instant).getTime());
-        } catch (ParseException e) {
+                    Long.toString(
+                            ISODateTimeFormat.dateTimeParser().parseDateTime(instant).getMillis());
+        } catch (UnsupportedOperationException | IllegalArgumentException e) {
             String msg =
                     String.format(
-                            "Retrieved instant %s does not match expected format %s",
-                            instant, instantDateFormat);
+                            "Retrieved instant %s does not match expected ISO datetime format",
+                            instant);
             log.debug(msg);
         }
         return instant;

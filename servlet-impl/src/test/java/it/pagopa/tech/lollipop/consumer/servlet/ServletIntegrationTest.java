@@ -64,8 +64,6 @@ public class ServletIntegrationTest {
         SimpleClientsTestUtils.createExpectationAssertionFound();
         SimpleClientsTestUtils.createExpectationIdpFound();
         lollipopConsumerRequestConfig.setAssertionExpireInDays(365);
-        lollipopConsumerRequestConfig.setAssertionNotBeforeDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        lollipopConsumerRequestConfig.setAssertionInstantDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
         RestTemplate exec = restTemplate.getRestTemplate();
         exec.getClientHttpRequestInitializers()
