@@ -53,7 +53,7 @@ dependencies {
 	}
 	implementation 'it.pagopa.tech:http-signatures:1.1.4'
 	// Use JUnit Jupiter for testing.
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
 	testImplementation 'org.assertj:assertj-core:3.24.2'
 	implementation 'com.nimbusds:nimbus-jose-jwt:9.31'
 	implementation 'org.slf4j:slf4j-api:2.0.5'
