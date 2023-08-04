@@ -22,7 +22,7 @@ dependencies {
 		exclude group: 'ch.qos.logback', module: 'logback-core'
 	}
 	implementation 'javax.servlet:javax.servlet-api:3.1.0'
-	implementation 'ch.qos.logback:logback-classic:1.2.11'
+	implementation 'ch.qos.logback:logback-classic:1.4.9'
 	implementation 'ch.qos.logback:logback-core:1.2.11'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-web:2.7.10'
