@@ -23,7 +23,7 @@ dependencies {
 	}
 	implementation 'org.springframework.boot:spring-boot-starter-web:2.7.10'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.10'
-	testImplementation 'ch.qos.logback:logback-classic:1.2.11'
+	testImplementation 'ch.qos.logback:logback-classic:1.4.14'
 	testImplementation 'ch.qos.logback:logback-core:1.2.11'
 	testImplementation 'org.codehaus.janino:janino:3.1.9'
 	testImplementation 'org.slf4j:slf4j-api:1.7.36'
