@@ -1,4 +1,4 @@
-/* (C)2022-2023 */
+/* (C)2024 */
 package it.pagopa.tech.lollipop.consumer.idp.client.simple.internal;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -72,8 +72,8 @@ public class ApiClient {
         this.xmlMapper = createDefaultXmlMapper();
         updateBaseUri(config.getBaseUri());
         interceptor = null;
-        readTimeout = null;
-        connectTimeout = null;
+        readTimeout = config.getReadTimeout();
+        connectTimeout = config.getConnectionTimeout();
         responseInterceptor = null;
         asyncResponseInterceptor = null;
         this.idpKeysCieEndpoint = config.getIdpKeysCieEndpoint();
