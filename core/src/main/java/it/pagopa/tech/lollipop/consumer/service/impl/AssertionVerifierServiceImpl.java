@@ -1,4 +1,4 @@
-/* (C)2023 */
+/* (C)2023-2025 */
 package it.pagopa.tech.lollipop.consumer.service.impl;
 
 import com.nimbusds.jose.JOSEException;
@@ -440,7 +440,8 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         try {
             instant =
                     Long.toString(
-                            ISODateTimeFormat.dateTimeParser().parseDateTime(instant).getMillis() / 1000);
+                            ISODateTimeFormat.dateTimeParser().parseDateTime(instant).getMillis()
+                                    / 1000);
         } catch (UnsupportedOperationException | IllegalArgumentException e) {
             String msg =
                     String.format(
