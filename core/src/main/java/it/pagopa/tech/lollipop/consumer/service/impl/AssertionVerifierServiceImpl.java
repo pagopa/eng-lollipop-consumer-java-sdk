@@ -222,7 +222,7 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
                     ErrorRetrievingIdpCertDataException.ErrorCode.ENTITY_ID_FIELD_NOT_FOUND,
                     "Missing entity id field in the retrieved saml assertion");
         }
-        instant = parseInstantToMillis(instant);
+        instant = parseInstantToUnixTimestamp(instant);
         try {
             entityId = entityId.trim();
             List<IdpCertData> idpCertData = idpCertProvider.getIdpCertData(instant, entityId);
@@ -436,11 +436,11 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         return publicKey;
     }
 
-    private String parseInstantToMillis(String instant) {
+    private String parseInstantToUnixTimestamp(String instant) {
         try {
             instant =
                     Long.toString(
-                            ISODateTimeFormat.dateTimeParser().parseDateTime(instant).getMillis());
+                            ISODateTimeFormat.dateTimeParser().parseDateTime(instant).getMillis() / 1000);
         } catch (UnsupportedOperationException | IllegalArgumentException e) {
             String msg =
                     String.format(
