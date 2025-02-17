@@ -1,4 +1,4 @@
-FROM amazoncorretto:11
+FROM amazoncorretto:11@sha256:ad62c0f683aed0af8a92f1a0b5847b21675d26aeff15f9177857fbcc8cfb27f8
 
 RUN yum update -y --security
 RUN mkdir /app
