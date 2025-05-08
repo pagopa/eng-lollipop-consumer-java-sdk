@@ -224,7 +224,7 @@
             <md:OrganizationURL xml:lang="it">https://www.infocamere.it/</md:OrganizationURL>
         </md:Organization>
     </md:EntityDescriptor>
-    <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:spid="https://spid.gov.it/saml-extensions" ID="_652efda7-3198-49a1-857a-e7123b936f2a" cacheDuration="P0Y0M30DT0H0M0.000S" entityID="https://posteid.poste.it">
+    <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:spid="https://spid.gov.it/saml-extensions" ID="_652efda7-3198-49a1-857a-e7123b936f2a" cacheDuration="P0Y0M30DT0H0M0.000S" entityID="https://posteidwrong.poste.it">
         <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
             <SignedInfo>
                 <CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>

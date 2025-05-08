@@ -45,7 +45,8 @@ class IdpCertSimpleClientTest {
     @BeforeAll
     public static void startServer() {
         mockServer = startClientAndServer(3001);
-        IdpCertSimpleClientConfig entityConfig = spy(IdpCertSimpleClientConfig.builder().build());
+//        IdpCertSimpleClientConfig entityConfig = spy(IdpCertSimpleClientConfig.builder().build());
+        IdpCertSimpleClientConfig entityConfig = IdpCertSimpleClientConfig.builder().baseUri("http://localhost:3001").build();
         ApiClient client = new ApiClient(entityConfig);
         SimpleIdpCertStorageProvider storageProvider = new SimpleIdpCertStorageProvider();
         idpCertSimpleClient =
@@ -53,7 +54,7 @@ class IdpCertSimpleClientTest {
                         client,
                         entityConfig,
                         storageProvider.provideStorage(new IdpCertStorageConfig()));
-        doReturn("http://localhost:3001").when(entityConfig).getBaseUri();
+//        doReturn("http://localhost:3001").when(entityConfig).getBaseUri();
     }
 
     @AfterAll
