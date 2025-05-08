@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.util.List;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
+import org.joda.time.format.ISODateTimeFormat;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -43,10 +44,10 @@ class IdpCertSimpleClientTest {
     private static final String WRONG_INSTANT = "xxxxxx";
 
     @BeforeAll
-    public static void startServer() {
+    static void startServer() {
         mockServer = startClientAndServer(3001);
-//        IdpCertSimpleClientConfig entityConfig = spy(IdpCertSimpleClientConfig.builder().build());
-        IdpCertSimpleClientConfig entityConfig = IdpCertSimpleClientConfig.builder().baseUri("http://localhost:3001").build();
+        IdpCertSimpleClientConfig entityConfig = spy(IdpCertSimpleClientConfig.builder().build());
+//        IdpCertSimpleClientConfig entityConfig = IdpCertSimpleClientConfig.builder().baseUri("http://localhost:3001").build();
         ApiClient client = new ApiClient(entityConfig);
         SimpleIdpCertStorageProvider storageProvider = new SimpleIdpCertStorageProvider();
         idpCertSimpleClient =
@@ -54,7 +55,7 @@ class IdpCertSimpleClientTest {
                         client,
                         entityConfig,
                         storageProvider.provideStorage(new IdpCertStorageConfig()));
-//        doReturn("http://localhost:3001").when(entityConfig).getBaseUri();
+        doReturn("http://localhost:3001").when(entityConfig).getBaseUri();
     }
 
     @AfterAll
@@ -66,6 +67,17 @@ class IdpCertSimpleClientTest {
     void certSPIDDataFound() throws CertDataNotFoundException {
         createExpectationIdpSpidFound();
         List<IdpCertData> response = idpCertSimpleClient.getCertData(SPID_ENTITY_ID, INSTANT);
+
+        Assertions.assertNotNull(response);
+    }
+
+    @Test
+    void certSPIDDataWithCustomEntityIdAndInstant() throws CertDataNotFoundException {
+        var assertionInstant = "2024-07-24T23:18:38.435Z"; //to modify with instant from xml file of assertion
+        var instantForLollipop = parseInstantToUnixTimestamp(assertionInstant);
+        var entityId = "https://posteid.poste.it";
+        createExpectationIdpSpidFound();
+        List<IdpCertData> response = idpCertSimpleClient.getCertData(entityId, instantForLollipop);
 
         Assertions.assertNotNull(response);
     }
@@ -186,5 +198,17 @@ class IdpCertSimpleClientTest {
     private static String retrieveDataFromFile(String fileName) {
         FileInputStream fis = new FileInputStream("src/test/resources/" + fileName);
         return IOUtils.toString(fis, StandardCharsets.UTF_8);
+    }
+
+    private String parseInstantToUnixTimestamp(String instant) {
+        try {
+            instant =
+                    Long.toString(
+                            ISODateTimeFormat.dateTimeParser().parseDateTime(instant).getMillis()
+                                    / 1000);
+        } catch (UnsupportedOperationException | IllegalArgumentException e) {
+            System.err.println(e);
+        }
+        return instant;
     }
 }
