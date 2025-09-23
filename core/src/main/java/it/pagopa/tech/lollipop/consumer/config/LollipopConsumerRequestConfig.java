@@ -1,4 +1,4 @@
-/* (C)2023 */
+/* (C)2023-2025 */
 package it.pagopa.tech.lollipop.consumer.config;
 
 import lombok.AllArgsConstructor;
@@ -26,6 +26,8 @@ public class LollipopConsumerRequestConfig {
     @Builder.Default private String userIdHeader = "x-pagopa-lollipop-user-id";
     @Builder.Default private String publicKeyHeader = "x-pagopa-lollipop-public-key";
     @Builder.Default private String authJWTHeader = "x-pagopa-lollipop-auth-jwt";
+    @Builder.Default private String userGivenNameHeader = "x-pagopa-lollipop-user-name";
+    @Builder.Default private String userFamilyNameHeader = "x-pagopa-lollipop-user-family-name";
 
     @Builder.Default private String expectedFirstLcOriginalMethod = "POST";
 
@@ -43,6 +45,7 @@ public class LollipopConsumerRequestConfig {
     @Builder.Default private String assertionNotBeforeTag = "Conditions";
     @Builder.Default private String assertionFiscalCodeTag = "Attribute";
     @Builder.Default private String assertionInResponseToTag = "SubjectConfirmationData";
+    @Builder.Default private String assertionNameAndSurnameCodeTag = "Attribute";
 
     @Builder.Default private boolean enableConsumerLogging = true;
     @Builder.Default private boolean enableAssertionLogging = true;

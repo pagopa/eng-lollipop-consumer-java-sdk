@@ -7,9 +7,11 @@ import static org.mockito.Mockito.*;
 
 import it.pagopa.tech.lollipop.consumer.assertion.AssertionService;
 import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
+import it.pagopa.tech.lollipop.consumer.enumeration.AssertionVerificationResultCode;
 import it.pagopa.tech.lollipop.consumer.exception.*;
 import it.pagopa.tech.lollipop.consumer.idp.IdpCertProvider;
 import it.pagopa.tech.lollipop.consumer.logger.impl.LollipopLogbackLoggerService;
+import it.pagopa.tech.lollipop.consumer.model.CommandResult;
 import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
@@ -123,10 +125,17 @@ class AssertionVerifierServiceImplTest {
                 .validateInResponseTo(any(LollipopConsumerRequest.class), any(Document.class));
         doReturn(Collections.emptyList()).when(sut).getIdpCertData(any(Document.class));
         doReturn(true).when(sut).validateSignature(any(Document.class), anyList());
+        doReturn(new CommandResult(
+                AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
+                "Name and surname successfully validated",
+                "Mario",
+                "Rossi"
+        )).when(sut).validateFullNameHeader(any(Document.class));
 
-        boolean result = sut.validateLollipop(request);
+        CommandResult result = sut.validateLollipop(request);
 
-        assertTrue(result);
+        assertEquals(AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
+                result.getResultCode());
     }
 
     @SneakyThrows
@@ -203,10 +212,17 @@ class AssertionVerifierServiceImplTest {
                 .validateInResponseTo(any(LollipopConsumerRequest.class), any(Document.class));
         doReturn(Collections.emptyList()).when(sut).getIdpCertData(any(Document.class));
         doReturn(true).when(sut).validateSignature(any(Document.class), anyList());
+        doReturn(new CommandResult(
+                AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
+                "Name and surname successfully validated",
+                "Mario",
+                "Rossi"
+        )).when(sut).validateFullNameHeader(any(Document.class));
 
-        boolean result = sut.validateLollipop(request);
+        CommandResult result = sut.validateLollipop(request);
 
-        assertTrue(result);
+        assertEquals(AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
+                result.getResultCode());
     }
 
     @SneakyThrows
@@ -278,10 +294,17 @@ class AssertionVerifierServiceImplTest {
                 .validateInResponseTo(any(LollipopConsumerRequest.class), any(Document.class));
         doReturn(Collections.emptyList()).when(sut).getIdpCertData(any(Document.class));
         doReturn(true).when(sut).validateSignature(any(Document.class), anyList());
+        doReturn(new CommandResult(
+                AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
+                "Name and surname successfully validated",
+                "Mario",
+                "Rossi"
+        )).when(sut).validateFullNameHeader(any(Document.class));
 
-        boolean result = sut.validateLollipop(request);
+        CommandResult result = sut.validateLollipop(request);
 
-        assertTrue(result);
+        assertEquals(AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
+                result.getResultCode());
     }
 
     @SneakyThrows
@@ -394,10 +417,17 @@ class AssertionVerifierServiceImplTest {
                 .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
         doReturn(Collections.emptyList()).when(sut).getIdpCertData(any(Document.class));
         doReturn(true).when(sut).validateSignature(any(Document.class), anyList());
+        doReturn(new CommandResult(
+                AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
+                "Name and surname successfully validated",
+                "Mario",
+                "Rossi"
+        )).when(sut).validateFullNameHeader(any(Document.class));
 
-        boolean result = sut.validateLollipop(request);
+        CommandResult result = sut.validateLollipop(request);
 
-        assertTrue(result);
+        assertEquals(AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
+                result.getResultCode());
     }
 
     @SneakyThrows
@@ -416,10 +446,17 @@ class AssertionVerifierServiceImplTest {
                 .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
         doReturn(Collections.emptyList()).when(sut).getIdpCertData(any(Document.class));
         doReturn(true).when(sut).validateSignature(any(Document.class), anyList());
+        doReturn(new CommandResult(
+                AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
+                "Name and surname successfully validated",
+                "Mario",
+                "Rossi"
+        )).when(sut).validateFullNameHeader(any(Document.class));
 
-        boolean result = sut.validateLollipop(request);
+        CommandResult result = sut.validateLollipop(request);
 
-        assertTrue(result);
+        assertEquals(AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
+                result.getResultCode());
     }
 
     @SneakyThrows
@@ -438,10 +475,17 @@ class AssertionVerifierServiceImplTest {
                 .validateUserId(any(LollipopConsumerRequest.class), any(Document.class));
         doReturn(Collections.emptyList()).when(sut).getIdpCertData(any(Document.class));
         doReturn(true).when(sut).validateSignature(any(Document.class), anyList());
+        doReturn(new CommandResult(
+                AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
+                "Name and surname successfully validated",
+                "Mario",
+                "Rossi"
+        )).when(sut).validateFullNameHeader(any(Document.class));
 
-        boolean result = sut.validateLollipop(request);
+        CommandResult result = sut.validateLollipop(request);
 
-        assertTrue(result);
+        assertEquals(AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
+                result.getResultCode());
     }
 
     @SneakyThrows
@@ -545,10 +589,17 @@ class AssertionVerifierServiceImplTest {
                 .when(sut)
                 .validateInResponseTo(any(LollipopConsumerRequest.class), any(Document.class));
         doReturn(true).when(sut).validateSignature(any(Document.class), anyList());
+        doReturn(new CommandResult(
+                AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
+                "Name and surname successfully validated",
+                "Mario",
+                "Rossi"
+        )).when(sut).validateFullNameHeader(any(Document.class));
 
-        boolean result = sut.validateLollipop(request);
+        CommandResult result = sut.validateLollipop(request);
 
-        assertTrue(result);
+        assertEquals(AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
+                result.getResultCode());
     }
 
     @SneakyThrows
@@ -568,10 +619,17 @@ class AssertionVerifierServiceImplTest {
                 .when(sut)
                 .validateInResponseTo(any(LollipopConsumerRequest.class), any(Document.class));
         doReturn(true).when(sut).validateSignature(any(Document.class), anyList());
+        doReturn(new CommandResult(
+                AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
+                "Name and surname successfully validated",
+                "Mario",
+                "Rossi"
+        )).when(sut).validateFullNameHeader(any(Document.class));
 
-        boolean result = sut.validateLollipop(request);
+        CommandResult result = sut.validateLollipop(request);
 
-        assertTrue(result);
+        assertEquals(AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
+                result.getResultCode());
     }
 
     @SneakyThrows
@@ -663,9 +721,13 @@ class AssertionVerifierServiceImplTest {
                 .when(sut)
                 .getIdpCertData(any(Document.class));
 
-        boolean result = sut.validateLollipop(request);
+// Verifica che venga lanciata l'eccezione
+        ErrorValidatingAssertionSignature ex = assertThrows(
+                ErrorValidatingAssertionSignature.class,
+                () -> sut.validateLollipop(request)
+        );
 
-        assertFalse(result);
+        assertEquals(ErrorValidatingAssertionSignature.ErrorCode.MISSING_ASSERTION_SIGNATURE, ex.getErrorCode());
     }
 
     @SneakyThrows
@@ -690,10 +752,17 @@ class AssertionVerifierServiceImplTest {
         doReturn(Collections.singletonList(idpCertData))
                 .when(sut)
                 .getIdpCertData(any(Document.class));
+        doReturn(new CommandResult(
+                AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
+                "Name and surname successfully validated",
+                "Mario",
+                "Rossi"
+        )).when(sut).validateFullNameHeader(any(Document.class));
 
-        boolean result = sut.validateLollipop(request);
+        CommandResult result = sut.validateLollipop(request);
 
-        assertTrue(result);
+        assertEquals(AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
+                result.getResultCode());
     }
 
     private LollipopConsumerRequest getLollipopConsumerRequest(
