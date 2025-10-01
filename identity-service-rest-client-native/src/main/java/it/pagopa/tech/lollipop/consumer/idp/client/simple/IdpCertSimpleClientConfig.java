@@ -1,6 +1,7 @@
-/* (C)2023 */
+/* (C)2024 */
 package it.pagopa.tech.lollipop.consumer.idp.client.simple;
 
+import java.time.Duration;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,4 +23,8 @@ public class IdpCertSimpleClientConfig {
     @Builder.Default private String idpKeysCieEndpoint = "/idp-keys/cie";
 
     @Builder.Default private String idpKeysSpidEndpoint = "/idp-keys/spid";
+
+    private Duration readTimeout;
+
+    private Duration connectionTimeout;
 }

@@ -22,7 +22,7 @@ repositories {
 }
 
 allprojects {
-	version = "1.0.0-RC1"
+	version = '1.0.0-RC7-hotfix'
 	group = 'it.pagopa.tech.lollipop-consumer-java-sdk'
 	sourceCompatibility = '11'
 	targetCompatibility = '11'
@@ -54,7 +54,7 @@ allprojects {
 
 		format 'misc', {
 			// define the files to apply `misc` to
-			target '*.gradle', '*.md', '.gitignore'
+			target '*.gradle', '.gitignore'
 
 			// define the steps to apply to those files
 			trimTrailingWhitespace()

@@ -1,5 +1,6 @@
 FROM amazoncorretto:11
 
+RUN yum update -y --security
 RUN mkdir /app
 
 COPY core/build/libs/*.jar /app/

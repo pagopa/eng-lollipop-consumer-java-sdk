@@ -9,7 +9,9 @@ import java.text.ParsePosition;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode
 public class RFC3339DateFormat extends DateFormat {
     private static final long serialVersionUID = 1L;
     private static final TimeZone TIMEZONE_Z = TimeZone.getTimeZone("UTC");

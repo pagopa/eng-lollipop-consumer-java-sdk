@@ -1,12 +1,15 @@
 /* (C)2023 */
 package it.pagopa.tech.lollipop.consumer.assertion.storage;
 
+import it.pagopa.tech.lollipop.consumer.model.DelayedCacheObject;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
+import java.lang.ref.SoftReference;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Implementation of the {@link AssertionStorage} interface as a simple in memory storage.
@@ -17,20 +20,65 @@ import javax.inject.Inject;
  * eviction operations, every time an assertion is accessed the associated eviction operation is
  * rescheduled.
  */
+@Slf4j
 public class SimpleAssertionStorage implements AssertionStorage {
 
-    private final Map<String, SamlAssertion> assertionMap;
-    private final Map<String, ScheduledFuture<?>> scheduledEvictionsMap;
+    private final ConcurrentHashMap<String, SoftReference<SamlAssertion>> cache;
+    private final DelayQueue<DelayedCacheObject<SamlAssertion>> cleaningUpQueue;
+    private Thread cleanerThread;
+
+    private AtomicInteger numberOfElements;
     private final StorageConfig storageConfig;
 
+    private Executor executor;
+
     @Inject
-    public SimpleAssertionStorage(
-            Map<String, SamlAssertion> assertionMap,
-            Map<String, ScheduledFuture<?>> scheduledEvictionsMap,
-            StorageConfig storageConfig) {
-        this.assertionMap = assertionMap;
-        this.scheduledEvictionsMap = scheduledEvictionsMap;
+    public SimpleAssertionStorage(StorageConfig storageConfig) {
+        cache = new ConcurrentHashMap<>();
+        cleaningUpQueue = new DelayQueue<>();
+        initCleanerThread();
         this.storageConfig = storageConfig;
+        executor = new ScheduledThreadPoolExecutor(1);
+        numberOfElements = new AtomicInteger(0);
+    }
+
+    @Inject
+    protected SimpleAssertionStorage(
+            ConcurrentHashMap<String, SoftReference<SamlAssertion>> concurrentHashMap,
+            DelayQueue<DelayedCacheObject<SamlAssertion>> queue,
+            StorageConfig storageConfig) {
+        cache = concurrentHashMap;
+        cleaningUpQueue = queue;
+        initCleanerThread();
+        this.storageConfig = storageConfig;
+        executor = new ScheduledThreadPoolExecutor(1);
+        numberOfElements = new AtomicInteger(0);
+    }
+
+    private void initCleanerThread() {
+        this.cleanerThread =
+                new Thread(
+                        () -> {
+                            DelayedCacheObject<SamlAssertion> delayedCacheObject;
+                            while (!Thread.currentThread().isInterrupted()) {
+                                try {
+                                    delayedCacheObject = this.cleaningUpQueue.take();
+                                    this.cache.remove(
+                                            delayedCacheObject.getKey(),
+                                            delayedCacheObject.getReference());
+                                    CompletableFuture.supplyAsync(
+                                            () -> {
+                                                numberOfElements.decrementAndGet();
+                                                return true;
+                                            },
+                                            executor);
+                                } catch (InterruptedException e) {
+                                    Thread.currentThread().interrupt();
+                                }
+                            }
+                        });
+        this.cleanerThread.setDaemon(true);
+        this.cleanerThread.start();
     }
 
     /**
@@ -50,10 +98,24 @@ public class SimpleAssertionStorage implements AssertionStorage {
             return null;
         }
 
-        SamlAssertion samlAssertion = assertionMap.get(assertionRef);
+        SamlAssertion samlAssertion =
+                Optional.ofNullable(cache.get(assertionRef)).map(SoftReference::get).orElse(null);
+
         if (samlAssertion != null) {
-            delayEviction(assertionRef);
+            CompletableFuture.supplyAsync(
+                    () -> {
+                        cleaningUpQueue.removeIf(
+                                cacheObject ->
+                                        cacheObject
+                                                .getKey()
+                                                .equals(samlAssertion.getAssertionRef()));
+                        numberOfElements.decrementAndGet();
+                        saveAssertion(samlAssertion.getAssertionRef(), samlAssertion);
+                        return true;
+                    },
+                    executor);
         }
+
         return samlAssertion;
     }
 
@@ -73,31 +135,50 @@ public class SimpleAssertionStorage implements AssertionStorage {
             return;
         }
 
-        assertionMap.put(assertionRef, assertion);
-        scheduleEviction(assertionRef);
+        if (assertionRef == null) {
+            return;
+        }
+        if (assertion == null) {
+            cache.remove(assertionRef);
+        } else {
+            CompletableFuture.supplyAsync(
+                    () -> {
+                        if (numberOfElements.get() >= storageConfig.getMaxNumberOfElements()) {
+                            removeDelayedObject();
+                        }
+                        long expiryTime =
+                                System.currentTimeMillis()
+                                        + TimeUnit.MILLISECONDS.convert(
+                                                storageConfig.getStorageEvictionDelay(),
+                                                storageConfig.getStorageEvictionDelayTimeUnit());
+                        SoftReference<SamlAssertion> reference = new SoftReference<>(assertion);
+                        cache.put(assertionRef, reference);
+                        cleaningUpQueue.put(
+                                new DelayedCacheObject<>(assertionRef, reference, expiryTime));
+                        numberOfElements.incrementAndGet();
+                        return true;
+                    },
+                    executor);
+        }
     }
 
-    private void scheduleEviction(String assertionRef) {
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        ScheduledFuture<?> schedule =
-                executorService.schedule(
-                        getEvictionTask(assertionRef),
-                        storageConfig.getStorageEvictionDelay(),
-                        storageConfig.getStorageEvictionDelayTimeUnit());
-        scheduledEvictionsMap.put(assertionRef, schedule);
+    protected void removeDelayedObject() {
+        DelayedCacheObject<SamlAssertion> delayedCacheObject = cleaningUpQueue.peek();
+        boolean isRemoved = cleaningUpQueue.remove(delayedCacheObject);
+        if (isRemoved) {
+            assert delayedCacheObject != null;
+            SoftReference<SamlAssertion> removedElement = cache.remove(delayedCacheObject.getKey());
+            if (removedElement != null && removedElement.get() != null) {
+                log.trace(
+                        "Removed object: "
+                                + Objects.requireNonNull(removedElement.get()).getAssertionRef());
+            }
+        }
     }
 
-    private void delayEviction(String assertionRef) {
-        ScheduledFuture<?> schedule = scheduledEvictionsMap.get(assertionRef);
-        schedule.cancel(false);
-        scheduledEvictionsMap.remove(assertionRef);
-        scheduleEviction(assertionRef);
-    }
-
-    private Runnable getEvictionTask(String assertionRef) {
-        return () -> {
-            assertionMap.remove(assertionRef);
-            scheduledEvictionsMap.remove(assertionRef);
-        };
+    public void close() {
+        this.cleanerThread.interrupt();
+        this.cleaningUpQueue.clear();
+        this.cache.clear();
     }
 }
