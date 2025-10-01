@@ -199,9 +199,6 @@ class AssertionVerifierServiceImplTest {
         assertion.setAssertionData(VALID_ASSERTION_XML);
 
         doReturn(365 * 20).when(lollipopRequestConfigMock).getAssertionExpireInDays();
-        doReturn("yyyy-MM-dd'T'HH:mm:ss'Z'")
-                .when(lollipopRequestConfigMock)
-                .getAssertionNotBeforeDateFormat();
 
         doReturn(assertion).when(assertionServiceMock).getAssertion(anyString(), anyString());
         doReturn(true)

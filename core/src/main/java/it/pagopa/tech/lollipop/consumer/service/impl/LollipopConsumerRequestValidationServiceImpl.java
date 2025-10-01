@@ -211,7 +211,9 @@ public class LollipopConsumerRequestValidationServiceImpl
                     "Invalid Original URL Header value");
         }
 
-        if (!originalURL.equals(this.config.getExpectedFirstLcOriginalUrl())) {
+        if (!Pattern.compile(this.config.getExpectedFirstLcOriginalUrl())
+                .matcher(originalURL)
+                .matches()) {
             String errMsg = String.format("Unexpected original url: %s", originalURL);
             throw new LollipopRequestContentValidationException(
                     LollipopRequestContentValidationException.ErrorCode.UNEXPECTED_ORIGINAL_URL,

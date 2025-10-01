@@ -30,7 +30,10 @@ public class DemoServicesConfig {
 
     @Bean
     public SpringLollipopConsumerRequestConfig verifierConfiguration() {
-        return new SpringLollipopConsumerRequestConfig();
+        SpringLollipopConsumerRequestConfig springLollipopConsumerRequestConfig =
+                new SpringLollipopConsumerRequestConfig();
+        springLollipopConsumerRequestConfig.setAssertionExpireInDays(365);
+        return springLollipopConsumerRequestConfig;
     }
 
     @Bean

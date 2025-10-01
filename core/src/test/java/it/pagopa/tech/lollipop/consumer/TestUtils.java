@@ -26,7 +26,7 @@ public class TestUtils {
                 + " xmlns:saml2=\"urn:oasis:names:tc:SAML:2.0:assertion\""
                 + " ID=\"_6b9580aa-08b1-4f19-8fb6-8b670d070bad\""
                 + " IssueInstant=\"2023-02-28T16:27:25.400Z\" Version=\"2.0\"><saml2:Conditions"
-                + " NotBefore=\"2023-02-28\""
+                + " NotBefore=\"2023-02-28Z\""
                 + " NotOnOrAfter=\"2023-02-28T16:28:25.400Z\"><saml2:AudienceRestriction><saml2:Audience>https://app-backend.io.italia.it</saml2:Audience></saml2:AudienceRestriction></saml2:Conditions></saml2:Assertion></saml2p:Response>";
     public static final String ASSERTION_XML_WITH_EXPIRED_PERIOD =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?><saml2p:Response"

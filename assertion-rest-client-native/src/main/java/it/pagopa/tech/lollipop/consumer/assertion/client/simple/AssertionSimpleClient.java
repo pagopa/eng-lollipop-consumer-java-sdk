@@ -42,7 +42,7 @@ public class AssertionSimpleClient implements AssertionClient {
         LCUserInfo responseAssertion;
 
         try {
-            responseAssertion = this.defaultApi.getAssertion(ref, jwt);
+            responseAssertion = this.defaultApi.getAssertion(ref, "Bearer " + jwt);
         } catch (ApiException e) {
             throw new LollipopAssertionNotFoundException(
                     "Error retrieving assertion: " + e.getMessage(), e);

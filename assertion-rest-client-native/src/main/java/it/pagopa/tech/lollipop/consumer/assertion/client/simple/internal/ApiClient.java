@@ -1,4 +1,4 @@
-/* (C)2023 */
+/* (C)2024 */
 package it.pagopa.tech.lollipop.consumer.assertion.client.simple.internal;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -67,9 +67,9 @@ public class ApiClient {
         this.builder = createDefaultHttpClientBuilder();
         this.mapper = createDefaultObjectMapper();
         updateBaseUri(config.getBaseUri());
-        interceptor = null;
-        readTimeout = null;
-        connectTimeout = null;
+        interceptor = t -> t.header("Ocp-Apim-Subscription-Key", config.getSubscriptionKey());
+        readTimeout = config.getReadTimeout();
+        connectTimeout = config.getConnectionTimeout();
         responseInterceptor = null;
         asyncResponseInterceptor = null;
         this.assertionRequestEndpoint = config.getAssertionRequestEndpoint();
