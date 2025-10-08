@@ -174,8 +174,6 @@ public class LollipopConsumerRequestValidationServiceImpl
                     LollipopRequestContentValidationException.ErrorCode.MISSING_ORIGINAL_METHOD,
                     "Missing Original Method Header");
         }
-        String prop = config.getExpectedFirstLcOriginalMethod();
-        log.info("EXPECTED ORIGINAL METHOD: "+prop);
 
         if (!isRequestMethodSupported(originalMethod)) {
             throw new LollipopRequestContentValidationException(
