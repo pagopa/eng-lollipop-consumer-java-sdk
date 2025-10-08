@@ -2,7 +2,9 @@
 package it.pagopa.tech.lollipop.consumer.service.impl;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
 import it.pagopa.tech.lollipop.consumer.enumeration.AssertionType;
@@ -275,6 +277,34 @@ class LollipopConsumerRequestValidationServiceImplTest {
     }
 
     @Test
+    void validateOriginalMethodOK() {
+        HashMap<String, String> headers = new HashMap<>();
+        when(config.getExpectedFirstLcOriginalMethod()).thenReturn("POST;GET;DELETE");
+
+        headers.put(config.getPublicKeyHeader(), VALID_EC_PUBLIC_KEY);
+        headers.put(config.getAssertionRefHeader(), VALID_ASSERTION_REF);
+        headers.put(config.getAssertionTypeHeader(), AssertionType.SAML.name());
+        headers.put(config.getUserIdHeader(), VALID_FISCAL_CODE);
+        headers.put(config.getAuthJWTHeader(), VALID_JWT);
+        headers.put(config.getOriginalMethodHeader(), "GET");
+
+
+        LollipopConsumerRequest request =
+                LollipopConsumerRequest.builder().headerParams(headers).build();
+
+        //assertDoesNotThrow(() -> sut.validateLollipopRequest(request));
+        LollipopRequestContentValidationException e =
+                assertThrows(
+                        LollipopRequestContentValidationException.class,
+                        () -> sut.validateLollipopRequest(request));
+
+        assertEquals(
+                LollipopRequestContentValidationException.ErrorCode.MISSING_ORIGINAL_URL,
+                e.getErrorCode());
+
+    }
+
+    @Test
     void validateOriginalMethodFailureDifferentFromExpectedMethod() {
         HashMap<String, String> headers = new HashMap<>();
         headers.put(config.getPublicKeyHeader(), VALID_EC_PUBLIC_KEY);
@@ -283,6 +313,7 @@ class LollipopConsumerRequestValidationServiceImplTest {
         headers.put(config.getUserIdHeader(), VALID_FISCAL_CODE);
         headers.put(config.getAuthJWTHeader(), VALID_JWT);
         headers.put(config.getOriginalMethodHeader(), "PUT");
+
         LollipopConsumerRequest request =
                 LollipopConsumerRequest.builder().headerParams(headers).build();
 
