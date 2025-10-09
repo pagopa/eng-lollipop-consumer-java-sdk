@@ -22,7 +22,7 @@ repositories {
 }
 
 allprojects {
-	version = '1.0.0-RC7-hotfix'
+	version = '1.0.1-RC.1'
 	group = 'it.pagopa.tech.lollipop-consumer-java-sdk'
 	sourceCompatibility = '11'
 	targetCompatibility = '11'
