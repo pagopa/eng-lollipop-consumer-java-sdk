@@ -1,7 +1,8 @@
-/* (C)2023 */
+/* (C)2023-2025 */
 package it.pagopa.tech.lollipop.consumer.service;
 
 import it.pagopa.tech.lollipop.consumer.exception.*;
+import it.pagopa.tech.lollipop.consumer.model.CommandResult;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 
 /**
@@ -22,9 +23,11 @@ public interface AssertionVerifierService {
      * @throws AssertionUserIdException thrown for error in user id validation
      * @throws ErrorRetrievingIdpCertDataException thrown for errors when retrieving the IDP data
      * @throws ErrorValidatingAssertionSignature thrown for error in signature validation
+     * @throws AssertionNameException thrown for error in get name and surname validation
      */
-    boolean validateLollipop(LollipopConsumerRequest request)
+    CommandResult validateLollipop(LollipopConsumerRequest request)
             throws ErrorRetrievingAssertionException, AssertionPeriodException,
                     AssertionThumbprintException, AssertionUserIdException,
-                    ErrorRetrievingIdpCertDataException, ErrorValidatingAssertionSignature;
+                    ErrorRetrievingIdpCertDataException, ErrorValidatingAssertionSignature,
+                    AssertionNameException;
 }

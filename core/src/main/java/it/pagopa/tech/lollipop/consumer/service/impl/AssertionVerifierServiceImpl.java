@@ -8,9 +8,11 @@ import com.nimbusds.jose.util.Base64URL;
 import it.pagopa.tech.lollipop.consumer.assertion.AssertionService;
 import it.pagopa.tech.lollipop.consumer.config.LollipopConsumerRequestConfig;
 import it.pagopa.tech.lollipop.consumer.enumeration.AssertionRefAlgorithms;
+import it.pagopa.tech.lollipop.consumer.enumeration.AssertionVerificationResultCode;
 import it.pagopa.tech.lollipop.consumer.exception.*;
 import it.pagopa.tech.lollipop.consumer.idp.IdpCertProvider;
 import it.pagopa.tech.lollipop.consumer.logger.LollipopLoggerService;
+import it.pagopa.tech.lollipop.consumer.model.CommandResult;
 import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.model.SamlAssertion;
@@ -24,6 +26,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
@@ -71,10 +74,11 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
      * @see AssertionVerifierService#validateLollipop(LollipopConsumerRequest)
      */
     @Override
-    public boolean validateLollipop(LollipopConsumerRequest request)
+    public CommandResult validateLollipop(LollipopConsumerRequest request)
             throws ErrorRetrievingAssertionException, AssertionPeriodException,
                     AssertionThumbprintException, AssertionUserIdException,
-                    ErrorRetrievingIdpCertDataException, ErrorValidatingAssertionSignature {
+                    ErrorRetrievingIdpCertDataException, ErrorValidatingAssertionSignature,
+                    AssertionNameException {
         Map<String, String> headerParams = request.getHeaderParams();
 
         Document assertionDoc =
@@ -105,7 +109,15 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         }
 
         List<IdpCertData> idpCertDataList = getIdpCertData(assertionDoc);
-        return validateSignature(assertionDoc, idpCertDataList);
+        boolean isSignatureValid = validateSignature(assertionDoc, idpCertDataList);
+        if (!isSignatureValid) {
+            throw new ErrorValidatingAssertionSignature(
+                    ErrorValidatingAssertionSignature.ErrorCode.MISSING_ASSERTION_SIGNATURE,
+                    "The assetion signature is not valid");
+        }
+
+        // validazione nome e cognome, torna direttamente un CommandResult se tutto è andato ok
+        return validateFullNameHeader(assertionDoc);
     }
 
     private Document getAssertion(String jwt, String assertionRef)
@@ -450,5 +462,86 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
             log.debug(msg);
         }
         return instant;
+    }
+
+    protected CommandResult validateFullNameHeader(Document assertionDoc)
+            throws AssertionNameException {
+        log.info("validateFullNameHeader");
+
+        // name e familyName dall'assertion
+        Map<String, String> nameMap = getFullNameFromAssertion(assertionDoc);
+        String givenName = nameMap.get("name");
+        String familyName = nameMap.get("familyName");
+
+        // lettere, apostrofi, accenti, spazi (es per cognomi composti)
+        String letterPattern = "^[A-Za-zÀ-ÿ'\\- ]+$";
+        if (!givenName.matches(letterPattern) || !familyName.matches(letterPattern)) {
+            throw new AssertionNameException(
+                    AssertionNameException.ErrorCode.INVALID_NAME_OR_SURNAME,
+                    "Name or surname is invalid for request headers");
+        }
+
+        return new CommandResult(
+                AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
+                "Name and surname successfully validated",
+                givenName,
+                familyName);
+    }
+
+    private Map<String, String> getFullNameFromAssertion(Document assertionDoc)
+            throws AssertionNameException {
+        log.info("getFullNameFromAssertion");
+
+        Map<String, String> result = new HashMap<>();
+
+        // recupero del nome (givenName)
+        NodeList givenNameElements =
+                assertionDoc.getElementsByTagNameNS(
+                        lollipopRequestConfig.getSamlNamespaceAssertion(),
+                        lollipopRequestConfig.getAssertionNameAndSurnameCodeTag());
+
+        if (givenNameElements == null || givenNameElements.getLength() <= 0) {
+            throw new AssertionNameException(
+                    AssertionNameException.ErrorCode.NAME_NOT_FOUND,
+                    "Missing givenName in the retrieved SAML assertion.");
+        }
+
+        for (int i = 0; i < givenNameElements.getLength(); i++) {
+            Node item = givenNameElements.item(i);
+            if (item == null || item.getTextContent() == null) {
+                continue;
+            }
+            result.put("name", item.getTextContent().trim());
+            break; // prendo il primo valido
+        }
+
+        // recupero del cognome (familyName)
+        NodeList familyNameElements =
+                assertionDoc.getElementsByTagNameNS(
+                        lollipopRequestConfig.getSamlNamespaceAssertion(),
+                        lollipopRequestConfig.getAssertionNameAndSurnameCodeTag());
+
+        if (familyNameElements == null || familyNameElements.getLength() <= 0) {
+            throw new AssertionNameException(
+                    AssertionNameException.ErrorCode.SURNAME_NOT_FOUND,
+                    "Missing familyName in the retrieved SAML assertion.");
+        }
+
+        for (int i = 0; i < familyNameElements.getLength(); i++) {
+            Node item = familyNameElements.item(i);
+            if (item == null || item.getTextContent() == null) {
+                continue;
+            }
+            result.put("familyName", item.getTextContent().trim());
+            break; // prendo il primo valido
+        }
+
+        if (!result.containsKey("name") || !result.containsKey("familyName")) {
+            throw new AssertionNameException(
+                    AssertionNameException.ErrorCode.NAME_OR_SURNAME_NOT_FOUND,
+                    "Missing or invalid name/surname in the retrieved SAML assertion.");
+        }
+
+        return result;
     }
 }
