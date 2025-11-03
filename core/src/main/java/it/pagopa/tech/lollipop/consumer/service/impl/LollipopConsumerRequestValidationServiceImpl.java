@@ -12,6 +12,7 @@ import it.pagopa.tech.lollipop.consumer.exception.LollipopRequestContentValidati
 import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.service.LollipopConsumerRequestValidationService;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Map;
 import java.util.logging.Level;
@@ -180,7 +181,7 @@ public class LollipopConsumerRequestValidationServiceImpl
                     "Invalid Original Method Header value, method not supported");
         }
 
-        if (!originalMethod.equals(this.config.getExpectedFirstLcOriginalMethod())) {
+        if (!Arrays.asList(this.config.getExpectedFirstLcOriginalMethod().split(";")).contains(originalMethod)) {
             String errMsg = String.format("Unexpected original method: %s", originalMethod);
             throw new LollipopRequestContentValidationException(
                     LollipopRequestContentValidationException.ErrorCode.UNEXPECTED_ORIGINAL_METHOD,

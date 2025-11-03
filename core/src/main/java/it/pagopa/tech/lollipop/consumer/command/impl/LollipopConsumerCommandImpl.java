@@ -1,4 +1,4 @@
-/* (C)2023 */
+/* (C)2023-2025 */
 package it.pagopa.tech.lollipop.consumer.command.impl;
 
 import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommand;
@@ -98,9 +98,12 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
     }
 
     private CommandResult getAssertionVerificationResult(LollipopConsumerRequest request) {
-        boolean result;
         try {
-            result = assertionVerifierService.validateLollipop(request);
+            CommandResult result = assertionVerifierService.validateLollipop(request);
+            // se non è SUCCESS, restiruisce il CommandResult così com’è
+            if (!result.getResultCode().equals(AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name())) {
+                return result;
+            }
         } catch (ErrorRetrievingAssertionException e) {
             String message =
                     String.format(
@@ -152,12 +155,16 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
                             e.getMessage());
             return buildCommandResult(
                     AssertionVerificationResultCode.IDP_CERT_DATA_RETRIEVING_ERROR.name(), message);
-        }
-
-        if (!result) {
+        } catch (AssertionNameException e) {
+            String message =
+                    String.format(
+                            "Assertion validation failed on retrieving user name or surname"
+                                    + CODE_AND_MESSAGE,
+                            e.getErrorCode(),
+                            e.getMessage());
             return buildCommandResult(
-                    AssertionVerificationResultCode.ASSERTION_VERIFICATION_FAILED.name(),
-                    "Validation of SAML assertion failed, authentication failed");
+                    AssertionVerificationResultCode.NAME_OR_SURNAME_RETRIEVING_ERROR.name(),
+                    message);
         }
 
         return buildCommandResult(
