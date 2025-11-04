@@ -8,7 +8,6 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @ToString
 public class CommandResult {
 
@@ -20,5 +19,11 @@ public class CommandResult {
     public CommandResult(String resultCode, String resultMessage) {
         this.resultCode = resultCode;
         this.resultMessage = resultMessage;
+    }
+    public CommandResult(String resultCode, String resultMessage, String name, String familyName) {
+        this.resultCode = resultCode;
+        this.resultMessage = resultMessage;
+        this.name = name;
+        this.familyName = familyName;
     }
 }
