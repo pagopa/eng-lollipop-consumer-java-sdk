@@ -113,8 +113,8 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
                     "The assetion signature is not valid");
         }
         CommandResult result = validateFullNameHeader(assertionDoc);
-        if(result.getName() != null && result.getFamilyName() != null){
-            log.info("Il CommandResult non contiene name e familyName");
+        if(result.getName() == null && result.getFamilyName() == null){
+            log.warn("Il CommandResult non contiene name e familyName");
         }
         // validazione nome e cognome, torna direttamente un CommandResult se tutto è andato ok
         return result;
