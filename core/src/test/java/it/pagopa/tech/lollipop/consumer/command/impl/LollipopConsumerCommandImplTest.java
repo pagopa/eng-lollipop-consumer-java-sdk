@@ -186,7 +186,7 @@ class LollipopConsumerCommandImplTest {
                 .verifyHttpMessage(any(LollipopConsumerRequest.class));
         doReturn(new CommandResult(
                 AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
-                "Assertion successfully validated"))
+                "Assertion successfully validated", "Martina", "Mattei"))
                 .when(assertionVerifierServiceMock)
                 .validateLollipop(any(LollipopConsumerRequest.class));
 

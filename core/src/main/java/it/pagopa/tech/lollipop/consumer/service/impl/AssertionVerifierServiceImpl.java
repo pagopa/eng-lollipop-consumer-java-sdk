@@ -112,9 +112,12 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
                     ErrorValidatingAssertionSignature.ErrorCode.MISSING_ASSERTION_SIGNATURE,
                     "The assetion signature is not valid");
         }
-
+        CommandResult result = validateFullNameHeader(assertionDoc);
+        if(result.getName() != null && result.getFamilyName() != null){
+            log.info("Il CommandResult non contiene name e familyName");
+        }
         // validazione nome e cognome, torna direttamente un CommandResult se tutto è andato ok
-        return validateFullNameHeader(assertionDoc);
+        return result;
     }
 
     private Document getAssertion(String jwt, String assertionRef)
@@ -472,11 +475,12 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         log.info("Name user from assertion= {} ", givenName);
         log.info("FamilyName user from assertion= {}", familyName);
 
-        return new CommandResult(
-                AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
+        CommandResult commandResult = new CommandResult( AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
                 "Name and surname successfully validated",
                 givenName,
                 familyName);
+        log.info("CommandResult = {}", commandResult);
+        return commandResult;
     }
 
     private Map<String, String> getFullNameFromAssertion(Document assertionDoc)
