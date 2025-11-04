@@ -209,12 +209,6 @@ class AssertionVerifierServiceImplTest {
                 .validateInResponseTo(any(LollipopConsumerRequest.class), any(Document.class));
         doReturn(Collections.emptyList()).when(sut).getIdpCertData(any(Document.class));
         doReturn(true).when(sut).validateSignature(any(Document.class), anyList());
-        doReturn(new CommandResult(
-                AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
-                "Name and surname successfully validated",
-                "Mario",
-                "Rossi"
-        )).when(sut).validateFullNameHeader(any(Document.class));
 
         CommandResult result = sut.validateLollipop(request);
 

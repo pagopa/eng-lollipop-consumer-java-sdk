@@ -37,10 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.joda.time.format.ISODateTimeFormat;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -472,14 +469,8 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         Map<String, String> nameMap = getFullNameFromAssertion(assertionDoc);
         String givenName = nameMap.get("name");
         String familyName = nameMap.get("familyName");
-
-        // lettere, apostrofi, accenti, spazi (es per cognomi composti)
-        String letterPattern = "^[A-Za-zÀ-ÿ'\\- ]+$";
-        if (!givenName.matches(letterPattern) || !familyName.matches(letterPattern)) {
-            throw new AssertionNameException(
-                    AssertionNameException.ErrorCode.INVALID_NAME_OR_SURNAME,
-                    "Name or surname is invalid for request headers");
-        }
+        log.info("Name user from assertion= {} ", givenName);
+        log.info("FamilyName user from assertion= {}", familyName);
 
         return new CommandResult(
                 AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
@@ -499,7 +490,7 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
                 assertionDoc.getElementsByTagNameNS(
                         lollipopRequestConfig.getSamlNamespaceAssertion(),
                         lollipopRequestConfig.getAssertionNameAndSurnameCodeTag());
-
+        log.info("GivenNameElements {}", givenNameElements.toString());
         if (givenNameElements == null || givenNameElements.getLength() <= 0) {
             throw new AssertionNameException(
                     AssertionNameException.ErrorCode.NAME_NOT_FOUND,
@@ -511,8 +502,10 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
             if (item == null || item.getTextContent() == null) {
                 continue;
             }
-            result.put("name", item.getTextContent().trim());
-            break; // prendo il primo valido
+            Node name = item.getAttributes().getNamedItem("Name");
+            if( name != null && name.getNodeValue().equals("name")){
+                result.put("name", item.getTextContent().trim());
+            }
         }
 
         // recupero del cognome (familyName)
@@ -532,8 +525,11 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
             if (item == null || item.getTextContent() == null) {
                 continue;
             }
-            result.put("familyName", item.getTextContent().trim());
-            break; // prendo il primo valido
+            Node name = item.getAttributes().getNamedItem("Name");
+            if(name != null && name.getNodeValue().equals("familyName")) {
+
+                result.put("familyName", item.getTextContent().trim());
+            }
         }
 
         if (!result.containsKey("name") || !result.containsKey("familyName")) {
