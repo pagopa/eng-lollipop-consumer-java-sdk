@@ -58,7 +58,11 @@ dependencies {
 	testImplementation 'org.mockito:mockito-junit-jupiter:5.2.0'
 	testImplementation 'org.assertj:assertj-core:3.24.2'
 	testImplementation 'org.springframework:spring-test:5.3.26'
-
+	testImplementation "org.springframework:spring-web:5.3.30"
+	testImplementation "com.fasterxml.jackson.core:jackson-databind:2.14.1"
+	testImplementation project(':http-verifier')
+	testImplementation project (':assertion-rest-client-native')
+	testImplementation project(':identity-service-rest-client-native')
 }
 
 tasks.named('test') {

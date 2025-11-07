@@ -1,4 +1,4 @@
-/* (C)2023 */
+/* (C)2023-2025 */
 package it.pagopa.tech.lollipop.consumer.command.impl;
 
 import it.pagopa.tech.lollipop.consumer.command.LollipopConsumerCommand;
@@ -12,10 +12,13 @@ import it.pagopa.tech.lollipop.consumer.model.LollipopConsumerRequest;
 import it.pagopa.tech.lollipop.consumer.service.AssertionVerifierService;
 import it.pagopa.tech.lollipop.consumer.service.HttpMessageVerifierService;
 import it.pagopa.tech.lollipop.consumer.service.LollipopConsumerRequestValidationService;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.UnsupportedEncodingException;
 import javax.inject.Inject;
 
 /** Implementation of the {@link LollipopConsumerCommand} */
+@Slf4j
 public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
 
     private final LollipopConsumerRequestConfig lollipopConsumerRequestConfig;
@@ -56,11 +59,13 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
     public CommandResult doExecute() {
 
         CommandResult commandResult;
-
+        String name;
+        String familyName;
         try {
             requestValidationService.validateLollipopRequest(request);
 
             CommandResult messageVerificationResult = getHttpMessageVerificationResult(request);
+            log.info("messageVerificationResult= {}", messageVerificationResult);
             if (!messageVerificationResult
                     .getResultCode()
                     .equals(
@@ -70,6 +75,9 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
                 return messageVerificationResult;
             }
             CommandResult assertionVerificationResult = getAssertionVerificationResult(request);
+            log.info("assertionVerificationResult= {}", assertionVerificationResult);
+            name = assertionVerificationResult.getName();
+            familyName = assertionVerificationResult.getFamilyName();
             if (!assertionVerificationResult
                     .getResultCode()
                     .equals(
@@ -92,15 +100,23 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
 
         commandResult =
                 buildCommandResult(
-                        VERIFICATION_SUCCESS_CODE, "Verification completed successfully");
+                        VERIFICATION_SUCCESS_CODE, "Verification completed successfully",name,familyName);
         logRequestAndResponse(request, commandResult);
         return commandResult;
     }
 
     private CommandResult getAssertionVerificationResult(LollipopConsumerRequest request) {
-        boolean result;
+        CommandResult result;
+        String name;
+        String familyName;
         try {
             result = assertionVerifierService.validateLollipop(request);
+            name = result.getName();
+            familyName = result.getFamilyName();
+            // se non è SUCCESS, restiruisce il CommandResult così com’è
+            if (!result.getResultCode().equals(AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name())) {
+                return result;
+            }
         } catch (ErrorRetrievingAssertionException e) {
             String message =
                     String.format(
@@ -152,17 +168,20 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
                             e.getMessage());
             return buildCommandResult(
                     AssertionVerificationResultCode.IDP_CERT_DATA_RETRIEVING_ERROR.name(), message);
-        }
-
-        if (!result) {
+        } catch (AssertionNameException e) {
+            String message =
+                    String.format(
+                            "Assertion validation failed on retrieving user name or surname"
+                                    + CODE_AND_MESSAGE,
+                            e.getErrorCode(),
+                            e.getMessage());
             return buildCommandResult(
-                    AssertionVerificationResultCode.ASSERTION_VERIFICATION_FAILED.name(),
-                    "Validation of SAML assertion failed, authentication failed");
+                    AssertionVerificationResultCode.NAME_OR_SURNAME_RETRIEVING_ERROR.name(),
+                    message);
         }
-
         return buildCommandResult(
                 AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
-                "SAML assertion validated successfully");
+                "SAML assertion validated successfully", name, familyName);
     }
 
     private CommandResult getHttpMessageVerificationResult(LollipopConsumerRequest request) {
@@ -217,6 +236,10 @@ public class LollipopConsumerCommandImpl implements LollipopConsumerCommand {
 
     private CommandResult buildCommandResult(String resultCode, String message) {
         return new CommandResult(resultCode, message);
+    }
+
+    private CommandResult buildCommandResult(String resultCode, String message, String name, String familyName) {
+        return new CommandResult(resultCode, message, name, familyName);
     }
 
     private void logRequestAndResponse(
