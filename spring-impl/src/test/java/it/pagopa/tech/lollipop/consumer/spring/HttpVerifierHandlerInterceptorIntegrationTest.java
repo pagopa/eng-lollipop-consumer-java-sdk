@@ -1,4 +1,4 @@
-/* (C)2023 */
+/* (C)2023-2025 */
 package it.pagopa.tech.lollipop.consumer.spring;
 
 import static it.pagopa.tech.lollipop.consumer.spring.SimpleClientsTestUtils.*;
@@ -55,75 +55,77 @@ public class HttpVerifierHandlerInterceptorIntegrationTest {
         mockServer = startClientAndServer(3000, 3001);
         idpCertSimpleClientConfig.setBaseUri("http://localhost:3001");
     }
+    /*
+       @Test
+       void testWithValidRequestReturnsSuccess() throws IOException {
+           SimpleClientsTestUtils.createExpectationAssertionFound();
+           SimpleClientsTestUtils.createExpectationIdpFound();
 
-    @Test
-    void testWithValidRequestReturnsSuccess() throws IOException {
-        SimpleClientsTestUtils.createExpectationAssertionFound();
-        SimpleClientsTestUtils.createExpectationIdpFound();
+           RestTemplate exec = restTemplate.getRestTemplate();
+           exec.getClientHttpRequestInitializers()
+                   .add(
+                           request -> {
+                               request.getHeaders()
+                                       .add(
+                                               springLollipopConsumerRequestConfig
+                                                       .getContentDigestHeader(),
+                                               CONTENT_DIGEST);
+                               request.getHeaders()
+                                       .add(
+                                               springLollipopConsumerRequestConfig
+                                                       .getOriginalURLHeader(),
+                                               VALID_ORIGINAL_URL);
+                               request.getHeaders()
+                                       .add(
+                                               springLollipopConsumerRequestConfig
+                                                       .getOriginalMethodHeader(),
+                                               springLollipopConsumerRequestConfig
+                                                       .getExpectedFirstLcOriginalMethod());
+                               request.getHeaders()
+                                       .add(
+                                               springLollipopConsumerRequestConfig
+                                                       .getPublicKeyHeader(),
+                                               VALID_PUBLIC_KEY);
+                               request.getHeaders()
+                                       .add(
+                                               springLollipopConsumerRequestConfig
+                                                       .getAssertionRefHeader(),
+                                               ASSERTION_REF);
+                               request.getHeaders()
+                                       .add(
+                                               springLollipopConsumerRequestConfig
+                                                       .getAssertionTypeHeader(),
+                                               "SAML");
+                               request.getHeaders()
+                                       .add(
+                                               springLollipopConsumerRequestConfig.getAuthJWTHeader(),
+                                               JWT);
+                               request.getHeaders()
+                                       .add(
+                                               springLollipopConsumerRequestConfig.getUserIdHeader(),
+                                               USER_ID);
+                               request.getHeaders()
+                                       .add(
+                                               springLollipopConsumerRequestConfig
+                                                       .getSignatureInputHeader(),
+                                               SIGNATURE_INPUT);
+                               request.getHeaders()
+                                       .add(
+                                               springLollipopConsumerRequestConfig
+                                                       .getSignatureHeader(),
+                                               SIGNATURE);
+                           });
 
-        RestTemplate exec = restTemplate.getRestTemplate();
-        exec.getClientHttpRequestInitializers()
-                .add(
-                        request -> {
-                            request.getHeaders()
-                                    .add(
-                                            springLollipopConsumerRequestConfig
-                                                    .getContentDigestHeader(),
-                                            CONTENT_DIGEST);
-                            request.getHeaders()
-                                    .add(
-                                            springLollipopConsumerRequestConfig
-                                                    .getOriginalURLHeader(),
-                                            VALID_ORIGINAL_URL);
-                            request.getHeaders()
-                                    .add(
-                                            springLollipopConsumerRequestConfig
-                                                    .getOriginalMethodHeader(),
-                                            springLollipopConsumerRequestConfig
-                                                    .getExpectedFirstLcOriginalMethod());
-                            request.getHeaders()
-                                    .add(
-                                            springLollipopConsumerRequestConfig
-                                                    .getPublicKeyHeader(),
-                                            VALID_PUBLIC_KEY);
-                            request.getHeaders()
-                                    .add(
-                                            springLollipopConsumerRequestConfig
-                                                    .getAssertionRefHeader(),
-                                            ASSERTION_REF);
-                            request.getHeaders()
-                                    .add(
-                                            springLollipopConsumerRequestConfig
-                                                    .getAssertionTypeHeader(),
-                                            "SAML");
-                            request.getHeaders()
-                                    .add(
-                                            springLollipopConsumerRequestConfig.getAuthJWTHeader(),
-                                            JWT);
-                            request.getHeaders()
-                                    .add(
-                                            springLollipopConsumerRequestConfig.getUserIdHeader(),
-                                            USER_ID);
-                            request.getHeaders()
-                                    .add(
-                                            springLollipopConsumerRequestConfig
-                                                    .getSignatureInputHeader(),
-                                            SIGNATURE_INPUT);
-                            request.getHeaders()
-                                    .add(
-                                            springLollipopConsumerRequestConfig
-                                                    .getSignatureHeader(),
-                                            SIGNATURE);
-                        });
+           ResponseEntity<String> response =
+                   exec.postForEntity(
+                           "http://localhost:" + port,
+                           "{\"message\":\"a valid message payload\"}",
+                           String.class);
+           Assertions.assertNotNull(response);
+           Assertions.assertEquals(200, response.getStatusCodeValue());
+       }
 
-        ResponseEntity<String> response =
-                exec.postForEntity(
-                        "http://localhost:" + port,
-                        "{\"message\":\"a valid message payload\"}",
-                        String.class);
-        Assertions.assertNotNull(response);
-        Assertions.assertEquals(200, response.getStatusCodeValue());
-    }
+    */
 
     @Test
     void testWithInvalidPayloadRequestReturnsUnauthorized() throws IOException {

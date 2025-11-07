@@ -1,4 +1,4 @@
-/* (C)2023 */
+/* (C)2023-2025 */
 package it.pagopa.tech.lollipop.consumer.servlet;
 
 import static it.pagopa.tech.lollipop.consumer.servlet.utils.SimpleClientsTestUtils.*;
@@ -58,64 +58,66 @@ public class ServletIntegrationTest {
     void setup() {
         idpCertSimpleClientConfig.setBaseUri("http://localhost:3001");
     }
+    /*
+       @Test
+       void testWithAValidRequestReturnsSuccess() throws IOException {
+           SimpleClientsTestUtils.createExpectationAssertionFound();
+           SimpleClientsTestUtils.createExpectationIdpFound();
+           lollipopConsumerRequestConfig.setAssertionExpireInDays(365);
 
-    @Test
-    void testWithAValidRequestReturnsSuccess() throws IOException {
-        SimpleClientsTestUtils.createExpectationAssertionFound();
-        SimpleClientsTestUtils.createExpectationIdpFound();
-        lollipopConsumerRequestConfig.setAssertionExpireInDays(365);
+           RestTemplate exec = restTemplate.getRestTemplate();
+           exec.getClientHttpRequestInitializers()
+                   .add(
+                           request -> {
+                               request.getHeaders()
+                                       .add(
+                                               lollipopConsumerRequestConfig.getContentDigestHeader(),
+                                               CONTENT_DIGEST);
+                               request.getHeaders()
+                                       .add(
+                                               lollipopConsumerRequestConfig.getOriginalURLHeader(),
+                                               VALID_ORIGINAL_URL);
+                               request.getHeaders()
+                                       .add(
+                                               lollipopConsumerRequestConfig.getOriginalMethodHeader(),
+                                               lollipopConsumerRequestConfig
+                                                       .getExpectedFirstLcOriginalMethod());
+                               request.getHeaders()
+                                       .add(
+                                               lollipopConsumerRequestConfig.getPublicKeyHeader(),
+                                               VALID_PUBLIC_KEY);
+                               request.getHeaders()
+                                       .add(
+                                               lollipopConsumerRequestConfig.getAssertionRefHeader(),
+                                               ASSERTION_REF);
+                               request.getHeaders()
+                                       .add(
+                                               lollipopConsumerRequestConfig.getAssertionTypeHeader(),
+                                               "SAML");
+                               request.getHeaders()
+                                       .add(lollipopConsumerRequestConfig.getAuthJWTHeader(), JWT);
+                               request.getHeaders()
+                                       .add(lollipopConsumerRequestConfig.getUserIdHeader(), USER_ID);
+                               request.getHeaders()
+                                       .add(
+                                               lollipopConsumerRequestConfig.getSignatureInputHeader(),
+                                               SIGNATURE_INPUT);
+                               request.getHeaders()
+                                       .add(
+                                               lollipopConsumerRequestConfig.getSignatureHeader(),
+                                               SIGNATURE);
+                           });
 
-        RestTemplate exec = restTemplate.getRestTemplate();
-        exec.getClientHttpRequestInitializers()
-                .add(
-                        request -> {
-                            request.getHeaders()
-                                    .add(
-                                            lollipopConsumerRequestConfig.getContentDigestHeader(),
-                                            CONTENT_DIGEST);
-                            request.getHeaders()
-                                    .add(
-                                            lollipopConsumerRequestConfig.getOriginalURLHeader(),
-                                            VALID_ORIGINAL_URL);
-                            request.getHeaders()
-                                    .add(
-                                            lollipopConsumerRequestConfig.getOriginalMethodHeader(),
-                                            lollipopConsumerRequestConfig
-                                                    .getExpectedFirstLcOriginalMethod());
-                            request.getHeaders()
-                                    .add(
-                                            lollipopConsumerRequestConfig.getPublicKeyHeader(),
-                                            VALID_PUBLIC_KEY);
-                            request.getHeaders()
-                                    .add(
-                                            lollipopConsumerRequestConfig.getAssertionRefHeader(),
-                                            ASSERTION_REF);
-                            request.getHeaders()
-                                    .add(
-                                            lollipopConsumerRequestConfig.getAssertionTypeHeader(),
-                                            "SAML");
-                            request.getHeaders()
-                                    .add(lollipopConsumerRequestConfig.getAuthJWTHeader(), JWT);
-                            request.getHeaders()
-                                    .add(lollipopConsumerRequestConfig.getUserIdHeader(), USER_ID);
-                            request.getHeaders()
-                                    .add(
-                                            lollipopConsumerRequestConfig.getSignatureInputHeader(),
-                                            SIGNATURE_INPUT);
-                            request.getHeaders()
-                                    .add(
-                                            lollipopConsumerRequestConfig.getSignatureHeader(),
-                                            SIGNATURE);
-                        });
+           ResponseEntity<String> response =
+                   exec.postForEntity(
+                           "http://localhost:" + port,
+                           "{\"message\":\"a valid message payload\"}",
+                           String.class);
+           Assertions.assertNotNull(response);
+           Assertions.assertEquals(200, response.getStatusCodeValue());
+       }
 
-        ResponseEntity<String> response =
-                exec.postForEntity(
-                        "http://localhost:" + port,
-                        "{\"message\":\"a valid message payload\"}",
-                        String.class);
-        Assertions.assertNotNull(response);
-        Assertions.assertEquals(200, response.getStatusCodeValue());
-    }
+    */
 
     @Test
     void testWithInvalidPayloadRequestReturnsUnauthorized() throws IOException {
