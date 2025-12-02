@@ -12,8 +12,9 @@ public class CommandResult {
 
     private String resultCode;
     private String resultMessage;
-    @ToString.Exclude private String name; // user name
-
+    @ToString.Exclude
+    private String name; // user name
+    @ToString.Exclude
     private String familyName; // user familyName
 
     public CommandResult(String resultCode, String resultMessage) {
