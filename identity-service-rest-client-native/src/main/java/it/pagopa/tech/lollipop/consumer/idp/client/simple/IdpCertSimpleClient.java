@@ -16,11 +16,10 @@ import it.pagopa.tech.lollipop.consumer.model.IdpCertData;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
 import javax.inject.Inject;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
-@Log
+@Slf4j
 public class IdpCertSimpleClient implements IdpCertClient {
 
     private final DefaultApi defaultApi;
@@ -74,7 +73,7 @@ public class IdpCertSimpleClient implements IdpCertClient {
         } catch (ApiException
                 | TagListSearchOutOfBoundException
                 | InvalidInstantFormatException e) {
-            log.log(Level.WARNING, "Error retrieving certificate's tag list: " + e.getMessage(), e);
+            log.warn("Error retrieving certificate's tag list: " + e.getMessage(), e);
             throw new CertDataNotFoundException(
                     "Error retrieving certificate's tag list: " + e.getMessage(), e);
         }
@@ -92,7 +91,9 @@ public class IdpCertSimpleClient implements IdpCertClient {
 
                 listCertData.add(certData);
             } catch (ApiException | EntityIdNotFoundException e) {
-                log.log(Level.WARNING, "Error retrieving certificate data for tag " + tag + ": " + e.getMessage(), e);
+                log.warn(
+                        "Error retrieving certificate data for tag " + tag + ": " + e.getMessage(),
+                        e);
                 throw new CertDataNotFoundException(
                         "Error retrieving certificate data for tag " + tag + ": " + e.getMessage(),
                         e);
@@ -108,7 +109,7 @@ public class IdpCertSimpleClient implements IdpCertClient {
         } catch (ApiException
                 | TagListSearchOutOfBoundException
                 | InvalidInstantFormatException e) {
-            log.log(Level.WARNING, "Error retrieving certificate's tag list: " + e.getMessage(), e);
+            log.warn("Error retrieving certificate's tag list: " + e.getMessage(), e);
             throw new CertDataNotFoundException(
                     "Error retrieving certificate's tag list: " + e.getMessage(), e);
         }
@@ -125,8 +126,7 @@ public class IdpCertSimpleClient implements IdpCertClient {
                 }
                 listCertData.add(certData);
             } catch (ApiException | EntityIdNotFoundException e) {
-                log.log(
-                        Level.WARNING,
+                log.warn(
                         "Error retrieving certificate data for tag " + tag + ": " + e.getMessage(),
                         e);
                 throw new CertDataNotFoundException(
@@ -227,10 +227,12 @@ public class IdpCertSimpleClient implements IdpCertClient {
                     index += 1;
                 }
             } catch (Exception e) {
-                log.log(Level.WARNING, "Error finding the tags relative to assertion instant "
+                log.warn(
+                        "Error finding the tags relative to assertion instant "
                                 + instant
                                 + ": "
-                                + e.getMessage(), e);
+                                + e.getMessage(),
+                        e);
                 throw new TagListSearchOutOfBoundException(
                         "Error finding the tags relative to assertion instant " + instant);
             }
@@ -253,8 +255,7 @@ public class IdpCertSimpleClient implements IdpCertClient {
         try {
             longInstant = Long.parseLong(instant);
         } catch (Exception e) {
-            log.log(
-                    Level.WARNING,
+            log.warn(
                     "The given instant " + instant + " is not a valid timestamp: " + e.getMessage(),
                     e);
             throw new InvalidInstantFormatException(
