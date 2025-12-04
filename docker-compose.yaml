@@ -1,12 +1,12 @@
 version: "3.9"
 services:
   mockserverAssertion:
-    image: mockoon/cli:latest
+    image: mockoon/cli:latest@sha256:ea12a282686e5c0defe9df17256cc04b8de3e306f76ea04e846a1a079586c110
     command: [ "--data", "data", "--port", "3000" ]
     volumes:
       - ./e2e/mockoon/mockoonAssertions.json:/data:readonly
   mockserverIDP:
-    image: mockoon/cli:latest
+    image: mockoon/cli:latest@sha256:ea12a282686e5c0defe9df17256cc04b8de3e306f76ea04e846a1a079586c110
     command: [ "--data", "data", "--port", "3001" ]
     volumes:
       - ./e2e/mockoon/mockoonIDP.json:/data:readonly
