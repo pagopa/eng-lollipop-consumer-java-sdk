@@ -26,7 +26,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
@@ -113,8 +112,8 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
                     "The assetion signature is not valid");
         }
         CommandResult result = validateFullNameHeader(assertionDoc);
-        if(result.getName() != null && result.getFamilyName() != null){
-            log.info("Il CommandResult non contiene name e familyName");
+        if (result.getName() != null && result.getFamilyName() != null) {
+            log.info("Il CommandResult contiene name e familyName");
         }
         // validazione nome e cognome, torna direttamente un CommandResult se tutto è andato ok
         return result;
@@ -472,13 +471,13 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
         Map<String, String> nameMap = getFullNameFromAssertion(assertionDoc);
         String givenName = nameMap.get("name");
         String familyName = nameMap.get("familyName");
-        log.info("Name user from assertion= {} ", givenName);
-        log.info("FamilyName user from assertion= {}", familyName);
 
-        CommandResult commandResult = new CommandResult( AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
-                "Name and surname successfully validated",
-                givenName,
-                familyName);
+        CommandResult commandResult =
+                new CommandResult(
+                        AssertionVerificationResultCode.ASSERTION_VERIFICATION_SUCCESS.name(),
+                        "Name and surname successfully validated",
+                        givenName,
+                        familyName);
         log.info("CommandResult = {}", commandResult);
         return commandResult;
     }
@@ -507,7 +506,7 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
                 continue;
             }
             Node name = item.getAttributes().getNamedItem("Name");
-            if( name != null && name.getNodeValue().equals("name")){
+            if (name != null && name.getNodeValue().equals("name")) {
                 result.put("name", item.getTextContent().trim());
             }
         }
@@ -530,7 +529,7 @@ public class AssertionVerifierServiceImpl implements AssertionVerifierService {
                 continue;
             }
             Node name = item.getAttributes().getNamedItem("Name");
-            if(name != null && name.getNodeValue().equals("familyName")) {
+            if (name != null && name.getNodeValue().equals("familyName")) {
 
                 result.put("familyName", item.getTextContent().trim());
             }
