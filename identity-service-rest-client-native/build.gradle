@@ -9,7 +9,8 @@
 plugins {
 	// Apply the java-library plugin for API and implementation separation.
 	id 'java-library'
-	id("io.freefair.lombok") version "8.0.0-rc4"
+	id("io.freefair.lombok") version "8.0.0"
+	/*id("io.freefair.lombok") version "8.0.0-rc4"*/
 	/*id("org.openapi.generator") version "6.5.0"*/
 }
 
@@ -58,7 +59,9 @@ dependencies {
 	implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2'
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
-
+	implementation 'ch.qos.logback:logback-classic:1.4.6'
+	implementation 'ch.qos.logback:logback-core:1.4.6'
+	implementation 'org.slf4j:slf4j-api:2.0.5'
 	testImplementation 'org.mock-server:mockserver-client-java:5.15.0'
 	implementation 'javax.inject:javax.inject:1'
 	// Use JUnit Jupiter for testing.
