@@ -1,9 +1,9 @@
-FROM eclipse-temurin:11-jdk-alpine as build
+FROM eclipse-temurin:11-jdk-alpine@sha256:1caccc9ade9b6962a76733013084e807279c7d8b4cf396f9a9e19b1639d3779f as build
 
 WORKDIR /build
 COPY ./samples/spring .
 
-FROM eclipse-temurin:11-jdk-alpine as runtime
+FROM eclipse-temurin:11-jdk-alpine@sha256:1caccc9ade9b6962a76733013084e807279c7d8b4cf396f9a9e19b1639d3779f as runtime
 
 WORKDIR /app
 COPY --from=build /build/build/libs/*.jar /app/app.jar
